@@ -12,6 +12,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="/icon-192.png">
 <link rel="apple-touch-icon" sizes="512x512" href="/icon-512.png">
 <title>Do It · Adam</title>
+<meta name="app-version" content="2.7">
 <style>
 /* ── TOKENS ── */
 :root {
@@ -348,6 +349,33 @@ a{text-decoration:none;color:inherit}
 .done-close{background:white;color:#052e16;border-radius:var(--r-sm);padding:16px 44px;font-size:17px;font-weight:600;transition:transform 0.15s}
 .done-close:active{transform:scale(0.96)}
 
+
+/* ── SHOP ROWS ── */
+.shop-row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--sep);cursor:pointer;transition:opacity 0.2s}
+.shop-row:last-child{border-bottom:none}
+.shop-row.got{opacity:0.45}
+.shop-row-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--sep);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.shop-row.got .shop-row-check{background:var(--green);border-color:var(--green)}
+.shop-row.got .shop-row-name{text-decoration:line-through;color:var(--text3)}
+.shop-row-name{font-size:15px;font-weight:400;color:var(--text)}
+
+/* ── TASK DETAIL PAGE ── */
+#page-task .top-bar{border-bottom:1px solid var(--sep)}
+#page-task .top-bar .icon-btn svg{stroke:var(--text)}
+
+/* ── DARK MODE ── */
+body.dark{--bg:#000;--card:#1C1C1E;--text:#fff;--text2:#ebebf599;--text3:#ebebf560;--sep:#38383A}
+body.dark .sidebar{background:#1C1C1E}
+body.dark .tab-bar{background:#1C1C1E}
+
+/* ── ADD TASK MODAL ── */
+#addTaskModal{display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);align-items:flex-end}
+#addTaskModal.open{display:flex}
+#addTaskForm{background:var(--card);border-radius:24px 24px 0 0;padding:20px 20px calc(env(safe-area-inset-bottom)+20px);width:100%;box-sizing:border-box}
+#addTaskForm h3{font-size:18px;font-weight:600;margin-bottom:16px}
+.add-input{width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid var(--sep);font-size:15px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;box-sizing:border-box;margin-bottom:10px;-webkit-appearance:none}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+
 /* ── PARTICLES ── */
 .particle{position:fixed;pointer-events:none;z-index:9997;width:7px;height:7px;border-radius:50%;animation:pburst 0.65s ease-out forwards}
 @keyframes pburst{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0}}
@@ -409,7 +437,7 @@ a{text-decoration:none;color:inherit}
     <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     <span>Me</span>
   </div>
-  <button class="sidebar-fab">+</button>
+  <button class="sidebar-fab" onclick="openAddTask()">+</button>
 </nav>
 
 <div id="main">
@@ -425,10 +453,16 @@ a{text-decoration:none;color:inherit}
       <div class="app-wordmark">Do It<span>.</span></div>
     </div>
     <div class="top-bar-right">
-      <button class="icon-btn"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+      <button class="icon-btn" onclick="toggleSearch()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
       <button class="icon-btn" id="bellBtn" onclick="switchTab('me')"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></button>
-      <div class="avatar-self">A</div>
+      <button class="icon-btn" onclick="switchTab('me')"><div class="avatar-self" style="width:30px;height:30px;font-size:13px;margin:0">A</div></button>
     </div>
+  </div>
+
+  <!-- Search bar (hidden) -->
+  <div id="searchBar" style="display:none;padding:0 20px 12px;animation:fadeIn 0.2s">
+    <input id="searchInput" type="search" placeholder="Search tasks…" oninput="filterSearch(this.value)"
+      style="width:100%;padding:11px 16px;border-radius:12px;border:1.5px solid var(--sep);font-size:15px;font-family:inherit;background:var(--card);color:var(--text);outline:none;box-sizing:border-box;-webkit-appearance:none"/>
   </div>
 
   <!-- Hero -->
@@ -461,7 +495,7 @@ a{text-decoration:none;color:inherit}
           <div class="task-name">Go Gym</div>
           <div class="task-sub">11:30 – 12:45 · Energy first. Everything else follows.</div>
         </div>
-        <button class="task-menu-btn" onclick="openSubtaskDrawer(event,this.closest('.task-card'))">···</button>
+        <button class="task-menu-btn" onclick="openTaskDetail(event,this.closest('.task-card'))">···</button>
       </div>
       <div class="task-card-bottom">
         <span class="task-tag tag-body">Body</span>
@@ -477,7 +511,7 @@ a{text-decoration:none;color:inherit}
           <div class="task-name">Shop — Groceries</div>
           <div class="task-sub">12:45 – 13:15 · List in the Meals tab. In and out.</div>
         </div>
-        <button class="task-menu-btn" onclick="openSubtaskDrawer(event,this.closest('.task-card'))">···</button>
+        <button class="task-menu-btn" onclick="openTaskDetail(event,this.closest('.task-card'))">···</button>
       </div>
       <div class="task-card-bottom">
         <span class="task-tag tag-home">Home</span>
@@ -493,7 +527,7 @@ a{text-decoration:none;color:inherit}
           <div class="task-name">Reply WhatsApp + New Employee</div>
           <div class="task-sub">13:15 – 13:45 · One message at a time. Don't overthink.</div>
         </div>
-        <button class="task-menu-btn" onclick="openSubtaskDrawer(event,this.closest('.task-card'))">···</button>
+        <button class="task-menu-btn" onclick="openTaskDetail(event,this.closest('.task-card'))">···</button>
       </div>
       <div class="task-card-bottom">
         <span class="task-tag tag-work">Work</span>
@@ -509,7 +543,7 @@ a{text-decoration:none;color:inherit}
           <div class="task-name">eBay — List the Jacket</div>
           <div class="task-sub">13:45 – 14:00 · Photos, post, done. 15 min max.</div>
         </div>
-        <button class="task-menu-btn" onclick="openSubtaskDrawer(event,this.closest('.task-card'))">···</button>
+        <button class="task-menu-btn" onclick="openTaskDetail(event,this.closest('.task-card'))">···</button>
       </div>
       <div class="task-card-bottom">
         <span class="task-tag tag-money">Money</span>
@@ -525,7 +559,7 @@ a{text-decoration:none;color:inherit}
           <div class="task-name">Build Personalvermittler Site</div>
           <div class="task-sub">14:00 – 16:00 · Manychat CTA. Unlocks cold emails.</div>
         </div>
-        <button class="task-menu-btn" onclick="openSubtaskDrawer(event,this.closest('.task-card'))">···</button>
+        <button class="task-menu-btn" onclick="openTaskDetail(event,this.closest('.task-card'))">···</button>
       </div>
       <div class="task-card-bottom">
         <span class="task-tag tag-money">Money</span>
@@ -541,7 +575,7 @@ a{text-decoration:none;color:inherit}
           <div class="task-name">Build Arbeitgeber Site</div>
           <div class="task-sub">16:00 – 18:00 · Video slot + Manychat CTA.</div>
         </div>
-        <button class="task-menu-btn" onclick="openSubtaskDrawer(event,this.closest('.task-card'))">···</button>
+        <button class="task-menu-btn" onclick="openTaskDetail(event,this.closest('.task-card'))">···</button>
       </div>
       <div class="task-card-bottom">
         <span class="task-tag tag-money">Money</span>
@@ -557,7 +591,7 @@ a{text-decoration:none;color:inherit}
           <div class="task-name">Video für Arbeitgeber</div>
           <div class="task-sub">18:00 – 18:30 · Record it. First take counts.</div>
         </div>
-        <button class="task-menu-btn" onclick="openSubtaskDrawer(event,this.closest('.task-card'))">···</button>
+        <button class="task-menu-btn" onclick="openTaskDetail(event,this.closest('.task-card'))">···</button>
       </div>
       <div class="task-card-bottom">
         <span class="task-tag tag-work">Work</span>
@@ -573,7 +607,7 @@ a{text-decoration:none;color:inherit}
           <div class="task-name">Learn Islam / Quran</div>
           <div class="task-sub">Evening · 20 minutes. Soul before sleep.</div>
         </div>
-        <button class="task-menu-btn" onclick="openSubtaskDrawer(event,this.closest('.task-card'))">···</button>
+        <button class="task-menu-btn" onclick="openTaskDetail(event,this.closest('.task-card'))">···</button>
       </div>
       <div class="task-card-bottom">
         <span class="task-tag tag-soul">Soul</span>
@@ -643,22 +677,43 @@ a{text-decoration:none;color:inherit}
       <div class="meal-kcal">580</div>
     </div>
   </div>
-  <div class="shop-section">
-    <div class="shop-title">Shopping List 🛒</div>
-    <div class="shop-grid">
-      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-check"><svg width="10" height="7" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="shop-name">Eggs (6)</div></div>
-      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-check"><svg width="10" height="7" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="shop-name">Avocado (2)</div></div>
-      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-check"><svg width="10" height="7" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="shop-name">Salmon (200g)</div></div>
-      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-check"><svg width="10" height="7" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="shop-name">Sweet potato (2)</div></div>
-      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-check"><svg width="10" height="7" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="shop-name">Chicken thighs (2)</div></div>
-      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-check"><svg width="10" height="7" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="shop-name">Rice (200g)</div></div>
-      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-check"><svg width="10" height="7" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="shop-name">Broccoli</div></div>
-      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-check"><svg width="10" height="7" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="shop-name">Greek yogurt</div></div>
-      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-check"><svg width="10" height="7" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="shop-name">Mixed berries</div></div>
-      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-check"><svg width="10" height="7" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="shop-name">Bananas</div></div>
-      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-check"><svg width="10" height="7" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="shop-name">Garlic</div></div>
-      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-check"><svg width="10" height="7" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="shop-name">Peanut butter</div></div>
+  <!-- Shopping List -->
+  <div style="padding:0 20px 20px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="font-size:20px;font-weight:600">Shopping List 🛒</div>
+      <button onclick="clearCheckedShop()" style="font-size:13px;font-weight:500;color:var(--orange);background:none;border:none;cursor:pointer">Clear done</button>
     </div>
+    <!-- Add item -->
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <input id="shopAddInput" placeholder="Add item…" style="flex:1;padding:10px 14px;border-radius:12px;border:1.5px solid var(--sep);font-size:15px;font-family:inherit;background:var(--card);color:var(--text);outline:none;-webkit-appearance:none" onkeydown="if(event.key==='Enter')addShopItem()" />
+      <button onclick="addShopItem()" style="background:var(--orange);color:white;border:none;border-radius:12px;padding:10px 16px;font-size:15px;font-weight:600;cursor:pointer">+</button>
+    </div>
+    <!-- Protein -->
+    <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">🥩 Protein</div>
+    <div id="shopList-protein" style="background:var(--card);border-radius:14px;overflow:hidden;margin-bottom:14px">
+      <div class="shop-row" onclick="toggleShopRow(this)"><div class="shop-row-check"></div><div class="shop-row-name">Eggs (6)</div></div>
+      <div class="shop-row" onclick="toggleShopRow(this)"><div class="shop-row-check"></div><div class="shop-row-name">Salmon (200g)</div></div>
+      <div class="shop-row" onclick="toggleShopRow(this)"><div class="shop-row-check"></div><div class="shop-row-name">Chicken thighs (2)</div></div>
+      <div class="shop-row" onclick="toggleShopRow(this)"><div class="shop-row-check"></div><div class="shop-row-name">Greek yogurt</div></div>
+    </div>
+    <!-- Produce -->
+    <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">🥦 Produce</div>
+    <div id="shopList-produce" style="background:var(--card);border-radius:14px;overflow:hidden;margin-bottom:14px">
+      <div class="shop-row" onclick="toggleShopRow(this)"><div class="shop-row-check"></div><div class="shop-row-name">Avocado (2)</div></div>
+      <div class="shop-row" onclick="toggleShopRow(this)"><div class="shop-row-check"></div><div class="shop-row-name">Sweet potato (2)</div></div>
+      <div class="shop-row" onclick="toggleShopRow(this)"><div class="shop-row-check"></div><div class="shop-row-name">Broccoli</div></div>
+      <div class="shop-row" onclick="toggleShopRow(this)"><div class="shop-row-check"></div><div class="shop-row-name">Bananas</div></div>
+      <div class="shop-row" onclick="toggleShopRow(this)"><div class="shop-row-check"></div><div class="shop-row-name">Mixed berries</div></div>
+      <div class="shop-row" onclick="toggleShopRow(this)"><div class="shop-row-check"></div><div class="shop-row-name">Garlic</div></div>
+    </div>
+    <!-- Pantry -->
+    <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">🍚 Pantry</div>
+    <div id="shopList-pantry" style="background:var(--card);border-radius:14px;overflow:hidden;margin-bottom:14px">
+      <div class="shop-row" onclick="toggleShopRow(this)"><div class="shop-row-check"></div><div class="shop-row-name">Rice (200g)</div></div>
+      <div class="shop-row" onclick="toggleShopRow(this)"><div class="shop-row-check"></div><div class="shop-row-name">Peanut butter</div></div>
+    </div>
+    <!-- Added items -->
+    <div id="shopList-custom" style="background:var(--card);border-radius:14px;overflow:hidden;margin-bottom:14px"></div>
   </div>
   <div style="height:20px"></div>
 </div>
@@ -706,47 +761,169 @@ a{text-decoration:none;color:inherit}
 <div class="page" id="page-me">
   <div class="top-bar">
     <div class="app-wordmark">Do It<span>.</span></div>
-    <div class="avatar-self">A</div>
   </div>
-  <div class="me-section">
-    <h1>Adam 👤</h1>
-    <p>Streak, notifications &amp; soul.</p>
-  </div>
-  <div class="me-cards">
-    <div class="me-card">
-      <div class="streak-card">
-        <div class="streak-num" id="streakNum">1</div>
-        <div><div class="streak-label">🔥 Day streak</div><div class="streak-sub">Keep finishing your days</div></div>
-      </div>
+
+  <!-- Profile -->
+  <div style="padding:20px 20px 0;display:flex;align-items:center;gap:16px">
+    <div style="width:64px;height:64px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:white;flex-shrink:0">A</div>
+    <div>
+      <div style="font-size:22px;font-weight:700;color:var(--text)">Adam</div>
+      <div style="font-size:14px;color:var(--text3);margin-top:2px">🔥 <span id="streakNum">1</span> day streak</div>
     </div>
-    <div class="me-card" onclick="toggleNotify(this)" style="cursor:pointer">
-      <div class="notify-row">
-        <div class="notify-icon-wrap">🔔</div>
-        <div class="notify-body">
-          <div class="notify-title">Daily 8:00 AM Push</div>
-          <div class="notify-sub">Get notified when today's list is ready</div>
+  </div>
+
+  <!-- Stats row -->
+  <div style="display:flex;gap:10px;padding:16px 20px 0">
+    <div style="flex:1;background:var(--card);border-radius:14px;padding:14px;text-align:center">
+      <div id="tasksCompletedStat" style="font-size:28px;font-weight:700;color:var(--orange)">0</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:2px;font-weight:500">Done today</div>
+    </div>
+    <div style="flex:1;background:var(--card);border-radius:14px;padding:14px;text-align:center">
+      <div id="streakStatNum" style="font-size:28px;font-weight:700;color:var(--orange)">1</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:2px;font-weight:500">Day streak</div>
+    </div>
+    <div style="flex:1;background:var(--card);border-radius:14px;padding:14px;text-align:center">
+      <div id="tasksRemainingMeStat" style="font-size:28px;font-weight:700;color:var(--text)">8</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:2px;font-weight:500">Remaining</div>
+    </div>
+  </div>
+
+  <!-- Section: Notifications -->
+  <div style="padding:20px 20px 8px">
+    <div style="font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Notifications</div>
+    <div style="background:var(--card);border-radius:16px;overflow:hidden">
+      <div onclick="toggleNotify(this)" style="display:flex;align-items:center;gap:14px;padding:14px 16px;cursor:pointer;border-bottom:1px solid var(--sep)">
+        <div style="width:36px;height:36px;border-radius:10px;background:var(--orange-light);display:flex;align-items:center;justify-content:center;font-size:18px">🔔</div>
+        <div style="flex:1">
+          <div style="font-size:15px;font-weight:500;color:var(--text)">Daily 8:00 AM Push</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:1px">Get notified when your list is ready</div>
         </div>
         <div class="notify-status notify-off" id="notifyStatus">OFF</div>
       </div>
-    </div>
-    <div class="me-card" style="cursor:pointer" onclick="testPushNow()">
-      <div class="notify-row">
-        <div class="notify-icon-wrap">⚡</div>
-        <div class="notify-body">
-          <div class="notify-title">Send Test Notification</div>
-          <div class="notify-sub">Tap to fire a real push to your phone right now</div>
+      <div onclick="testPushNow()" style="display:flex;align-items:center;gap:14px;padding:14px 16px;cursor:pointer">
+        <div style="width:36px;height:36px;border-radius:10px;background:#fff3e0;display:flex;align-items:center;justify-content:center;font-size:18px">⚡</div>
+        <div style="flex:1">
+          <div style="font-size:15px;font-weight:500;color:var(--text)">Send Test Notification</div>
+          <div id="testPushStatusSub" style="font-size:12px;color:var(--text3);margin-top:1px">Tap to fire a push to your phone now</div>
         </div>
-        <div id="testPushStatus" style="font-size:12px;font-weight:500;color:var(--text3)">Tap</div>
+        <div id="testPushStatus" style="font-size:12px;font-weight:500;color:var(--text3)">→</div>
       </div>
     </div>
+  </div>
+
+  <!-- Section: Daily Remembrance -->
+  <div style="padding:0 20px 8px">
+    <div style="font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Daily Remembrance</div>
     <div class="quran-card-inner">
-      <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px">Daily Remembrance · <span id="quranStreak">0 days</span></div>
+      <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px">Surah Al-Inshirah · <span id="quranStreak">0 days</span></div>
       <div class="quran-ayah">إِنَّ مَعَ الْعُسْرِ يُسْرًا</div>
-      <div class="quran-ref">Surah Al-Inshirah 94:6 · "Indeed, with hardship comes ease."</div>
+      <div class="quran-ref">"Indeed, with hardship comes ease." — 94:6</div>
       <button class="quran-btn" id="quranBtn" onclick="markQuran(this)">✓ Done for Today</button>
     </div>
   </div>
+
+  <!-- Section: Settings -->
+  <div style="padding:0 20px 8px">
+    <div style="font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Settings</div>
+    <div style="background:var(--card);border-radius:16px;overflow:hidden">
+      <div onclick="toggleDarkMode()" style="display:flex;align-items:center;gap:14px;padding:14px 16px;cursor:pointer;border-bottom:1px solid var(--sep)">
+        <div style="width:36px;height:36px;border-radius:10px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:18px">🌙</div>
+        <div style="flex:1"><div style="font-size:15px;font-weight:500;color:var(--text)">Dark Mode</div></div>
+        <div id="darkModeStatus" style="font-size:12px;font-weight:500;color:var(--text3)">OFF</div>
+      </div>
+      <div onclick="confirmResetDay()" style="display:flex;align-items:center;gap:14px;padding:14px 16px;cursor:pointer;border-bottom:1px solid var(--sep)">
+        <div style="width:36px;height:36px;border-radius:10px;background:#fff0f0;display:flex;align-items:center;justify-content:center;font-size:18px">🔄</div>
+        <div style="flex:1"><div style="font-size:15px;font-weight:500;color:var(--text)">Reset Today's Tasks</div><div style="font-size:12px;color:var(--text3);margin-top:1px">Uncheck all for a fresh start</div></div>
+        <div style="font-size:12px;color:var(--text3)">→</div>
+      </div>
+      <div onclick="switchTab('vision')" style="display:flex;align-items:center;gap:14px;padding:14px 16px;cursor:pointer">
+        <div style="width:36px;height:36px;border-radius:10px;background:#f0f4ff;display:flex;align-items:center;justify-content:center;font-size:18px">✦</div>
+        <div style="flex:1"><div style="font-size:15px;font-weight:500;color:var(--text)">The Vision Board</div></div>
+        <div style="font-size:12px;color:var(--text3)">→</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Version footer -->
+  <div style="padding:12px 20px 20px;text-align:center;font-size:12px;color:var(--text3)">
+    Do It · v2.7 · <span id="buildDateDisplay"></span>
+  </div>
+
   <div style="height:20px"></div>
+</div>
+
+
+<!-- ╔══════════════════════╗ -->
+<!-- ║   TASK DETAIL        ║ -->
+<!-- ╚══════════════════════╝ -->
+<div class="page" id="page-task">
+  <div class="top-bar">
+    <button class="icon-btn" onclick="switchTab('home')" style="margin-left:-4px">
+      <svg viewBox="0 0 24 24" width="20" height="20"><polyline points="15 18 9 12 15 6" stroke-width="2.5"/></svg>
+    </button>
+    <div id="taskDetailName" style="flex:1;text-align:center;font-size:17px;font-weight:600;color:var(--text)"></div>
+    <div style="width:32px"></div>
+  </div>
+
+  <!-- Task hero -->
+  <div style="padding:20px 20px 0;display:flex;align-items:center;gap:14px">
+    <div id="taskDetailIcon" style="font-size:40px;line-height:1"></div>
+    <div style="flex:1">
+      <div id="taskDetailTitle" style="font-size:22px;font-weight:700;color:var(--text);line-height:1.2"></div>
+      <div id="taskDetailSub" style="font-size:13px;color:var(--text3);margin-top:4px"></div>
+    </div>
+  </div>
+
+  <!-- Progress bar -->
+  <div style="padding:16px 20px 0">
+    <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+      <span style="font-size:13px;font-weight:500;color:var(--text3)">Progress</span>
+      <span id="taskDetailPct" style="font-size:13px;font-weight:600;color:var(--orange)">0%</span>
+    </div>
+    <div style="height:6px;background:var(--sep);border-radius:3px;overflow:hidden">
+      <div id="taskDetailBar" style="height:100%;background:var(--orange);border-radius:3px;width:0%;transition:width 0.3s"></div>
+    </div>
+  </div>
+
+  <!-- Section tabs -->
+  <div style="display:flex;padding:16px 20px 0;gap:8px">
+    <button id="tdTab-subtasks" onclick="switchTaskDetailTab('subtasks')" style="flex:1;padding:9px 4px;border-radius:10px;border:none;background:var(--orange);color:white;font-size:14px;font-weight:500;cursor:pointer">Subtasks</button>
+    <button id="tdTab-notes" onclick="switchTaskDetailTab('notes')" style="flex:1;padding:9px 4px;border-radius:10px;border:none;background:var(--sep);color:var(--text3);font-size:14px;font-weight:500;cursor:pointer">Notes</button>
+    <button id="tdTab-reminder" onclick="switchTaskDetailTab('reminder')" style="flex:1;padding:9px 4px;border-radius:10px;border:none;background:var(--sep);color:var(--text3);font-size:14px;font-weight:500;cursor:pointer">Reminder</button>
+  </div>
+
+  <!-- Subtasks panel -->
+  <div id="tdPanel-subtasks" style="padding:12px 20px 0">
+    <div id="taskDetailSubtaskList" style="margin-bottom:12px"></div>
+    <div style="display:flex;gap:10px">
+      <input id="taskDetailSubInput" placeholder="Add subtask…"
+        style="flex:1;padding:11px 14px;border-radius:12px;border:1.5px solid var(--sep);font-size:15px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;-webkit-appearance:none"
+        onkeydown="if(event.key==='Enter')addTaskDetailSubtask()" />
+      <button onclick="addTaskDetailSubtask()" style="background:var(--orange);color:white;border:none;border-radius:12px;padding:11px 16px;font-size:15px;font-weight:600;cursor:pointer">Add</button>
+    </div>
+  </div>
+
+  <!-- Notes panel -->
+  <div id="tdPanel-notes" style="padding:12px 20px 0;display:none">
+    <textarea id="taskDetailNotes" placeholder="Notes, links, context…"
+      style="width:100%;height:180px;padding:14px;border-radius:12px;border:1.5px solid var(--sep);font-size:15px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;resize:none;box-sizing:border-box;-webkit-appearance:none"
+      oninput="saveTaskDetailNotes()"></textarea>
+    <div style="font-size:12px;color:var(--text3);margin-top:6px">Auto-saved.</div>
+  </div>
+
+  <!-- Reminder panel -->
+  <div id="tdPanel-reminder" style="padding:16px 20px 0;display:none">
+    <div style="font-size:14px;color:var(--text3);margin-bottom:14px">Send a push notification at a set time.</div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <input type="time" id="tdReminderTime"
+        style="flex:1;padding:12px;border-radius:12px;border:1.5px solid var(--sep);font-size:16px;font-family:inherit;background:var(--bg);color:var(--text);outline:none" />
+      <button onclick="setTaskReminder()" style="background:var(--orange);color:white;border:none;border-radius:12px;padding:12px 18px;font-size:15px;font-weight:600;cursor:pointer">Set</button>
+    </div>
+    <div id="tdReminderStatus" style="font-size:13px;color:var(--text3);margin-top:10px"></div>
+    <button onclick="sendPushForTask()" style="margin-top:16px;width:100%;background:var(--bg);border:1.5px solid var(--sep);border-radius:12px;padding:13px;font-size:15px;font-weight:500;color:var(--text);cursor:pointer">⚡ Push this task to phone now</button>
+  </div>
+
+  <div style="height:40px"></div>
 </div>
 
 </div><!-- end .pages -->
@@ -764,7 +941,7 @@ a{text-decoration:none;color:inherit}
     <span>Meals</span>
   </button>
   <div class="tab-fab-wrap">
-    <button class="tab-fab">+</button>
+    <button class="tab-fab" onclick="openAddTask()">+</button>
   </div>
   <button class="tab-btn" id="tab-vision" onclick="switchTab('vision')">
     <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -796,6 +973,33 @@ function showToast(icon,msg){
   clearTimeout(toastTimer);
   toastTimer=setTimeout(()=>t.classList.remove('show'),2600);
 }
+
+
+/* ── SHOP ROWS ── */
+.shop-row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--sep);cursor:pointer;transition:opacity 0.2s}
+.shop-row:last-child{border-bottom:none}
+.shop-row.got{opacity:0.45}
+.shop-row-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--sep);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.shop-row.got .shop-row-check{background:var(--green);border-color:var(--green)}
+.shop-row.got .shop-row-name{text-decoration:line-through;color:var(--text3)}
+.shop-row-name{font-size:15px;font-weight:400;color:var(--text)}
+
+/* ── TASK DETAIL PAGE ── */
+#page-task .top-bar{border-bottom:1px solid var(--sep)}
+#page-task .top-bar .icon-btn svg{stroke:var(--text)}
+
+/* ── DARK MODE ── */
+body.dark{--bg:#000;--card:#1C1C1E;--text:#fff;--text2:#ebebf599;--text3:#ebebf560;--sep:#38383A}
+body.dark .sidebar{background:#1C1C1E}
+body.dark .tab-bar{background:#1C1C1E}
+
+/* ── ADD TASK MODAL ── */
+#addTaskModal{display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);align-items:flex-end}
+#addTaskModal.open{display:flex}
+#addTaskForm{background:var(--card);border-radius:24px 24px 0 0;padding:20px 20px calc(env(safe-area-inset-bottom)+20px);width:100%;box-sizing:border-box}
+#addTaskForm h3{font-size:18px;font-weight:600;margin-bottom:16px}
+.add-input{width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid var(--sep);font-size:15px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;box-sizing:border-box;margin-bottom:10px;-webkit-appearance:none}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── PARTICLES ── */
 function burst(el){
@@ -897,6 +1101,7 @@ function switchTab(tab){
   if(page){page.classList.add('active');}
   const mTab=document.getElementById('tab-'+tab);if(mTab)mTab.classList.add('active');
   const sTab=document.getElementById('stab-'+tab);if(sTab)sTab.classList.add('active');
+  if(tab==='me') updateMeStats();
 }
 
 /* ── QURAN ── */
@@ -913,22 +1118,46 @@ function urlBase64ToUint8Array(b64){const pad='='.repeat((4-b64.length%4)%4);con
 
 async function toggleNotify(card){
   const isStandalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
-  if(!isStandalone){alert('To enable notifications:\n\n1. Tap Share in Safari\n2. "Add to Home Screen"\n3. Open Do It from your home screen\n4. Tap this again');return;}
-  if(!('Notification' in window)||!('serviceWorker' in navigator)||!('PushManager' in window)){alert('Push requires iOS 16.4+ with Do It installed to Home Screen.');return;}
+  if(!isStandalone){alert('To enable push notifications:\n\n1. Open Safari → ryker06.github.io\n2. Tap the Share button (box with arrow)\n3. Tap "Add to Home Screen"\n4. Open the installed app\n5. Come back here and tap again');return;}
+  if(!('serviceWorker' in navigator)||!('PushManager' in window)){alert('Push not supported on this device/OS. Requires iOS 16.4+.');return;}
   const status=document.getElementById('notifyStatus');
+  // TURN OFF
   if(status.classList.contains('notify-on')){
-    try{const reg=await navigator.serviceWorker.ready;const sub=await reg.pushManager.getSubscription();if(sub){await fetch(WORKER_URL+'/subscribe',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub)});await sub.unsubscribe();}}catch(e){}
-    status.textContent='OFF';status.className='notify-status notify-off';return;
+    try{
+      const reg=await navigator.serviceWorker.ready;
+      const sub=await reg.pushManager.getSubscription();
+      if(sub){
+        await fetch(WORKER_URL+'/subscribe',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub)});
+        await sub.unsubscribe();
+      }
+    }catch(e){}
+    status.textContent='OFF';status.className='notify-status notify-off';
+    showToast('🔕','Notifications off');
+    return;
   }
+  // TURN ON — always force fresh subscription
   try{
+    if(!('Notification' in window)){alert('Notification API not available. Open this app from your Home Screen (not Safari).'); return;}
     const perm=await Notification.requestPermission();
-    if(perm!=='granted'){alert('Notifications blocked. Go to Settings → Do It → Notifications.');return;}
+    if(perm!=='granted'){alert('Notifications blocked.\n\nGo to: Settings → Do It → Notifications → Allow'); return;}
     const reg=await navigator.serviceWorker.ready;
+    // Unsubscribe any stale subscription first
+    try{const old=await reg.pushManager.getSubscription();if(old)await old.unsubscribe();}catch(e){}
+    // Fresh subscribe
     const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(VAPID_PUBLIC)});
-    await fetch(WORKER_URL+'/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub)});
+    const saveRes=await fetch(WORKER_URL+'/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub)});
+    const saveData=await saveRes.json();
+    if(!saveRes.ok) throw new Error('Server error: '+(saveData.error||saveRes.status));
     status.textContent='ON ✓';status.className='notify-status notify-on';
-    showToast('🔔','Morning reminders on!');
-  }catch(e){alert('Could not enable: '+e.message);}
+    showToast('🔔','Notifications enabled!');
+    // Immediately fire a test push so user knows it works
+    setTimeout(()=>{
+      fetch(WORKER_URL+'/notify',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer adam_notify_2026'},body:JSON.stringify({title:'Do It 🔔',body:'Notifications are working!'})});
+    },1500);
+  }catch(e){
+    alert('Could not enable notifications:\n'+e.message+
+      '\n\nMake sure:\n• App is installed to Home Screen\n• iOS 16.4 or later\n• Notifications allowed in Settings');
+  }
 }
 
 /* ── DATE ── */
@@ -1168,6 +1397,26 @@ function updateTaskProgress(taskId) {
   <div id="drawerPanel-notes" style="flex:1;overflow-y:auto;min-height:0;display:none;padding:20px">
     <textarea id="taskNotes" placeholder="Add notes, links, context…" style="width:100%;height:160px;padding:14px;border-radius:12px;border:1.5px solid var(--sep);font-size:15px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;resize:none;box-sizing:border-box;-webkit-appearance:none" oninput="saveTaskNotes()"></textarea>
     <div style="font-size:12px;color:var(--text3);margin-top:8px">Notes are saved automatically.</div>
+  </div>
+</div>
+
+<!-- ADD TASK MODAL -->
+<div id="addTaskModal" onclick="if(event.target===this)closeAddTask()">
+  <div id="addTaskForm">
+    <h3>New Task</h3>
+    <input id="newTaskName" class="add-input" placeholder="Task name…" onkeydown="if(event.key==='Enter')document.getElementById('newTaskTime').focus()" />
+    <input id="newTaskTime" class="add-input" placeholder="Time (e.g. 14:00 – 15:00)" onkeydown="if(event.key==='Enter')submitNewTask()" />
+    <select id="newTaskCat" class="add-input" style="cursor:pointer">
+      <option value="body">💪 Body</option>
+      <option value="work">⚡ Work</option>
+      <option value="money">💰 Money</option>
+      <option value="home">🏠 Home</option>
+      <option value="soul">🌙 Soul</option>
+    </select>
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button onclick="closeAddTask()" style="flex:1;padding:13px;border-radius:12px;background:var(--sep);border:none;font-size:15px;font-weight:500;color:var(--text);cursor:pointer">Cancel</button>
+      <button onclick="submitNewTask()" style="flex:2;padding:13px;border-radius:12px;background:var(--orange);border:none;font-size:15px;font-weight:600;color:white;cursor:pointer">Add Task</button>
+    </div>
   </div>
 </div>
 </body>
