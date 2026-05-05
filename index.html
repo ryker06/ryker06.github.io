@@ -652,7 +652,7 @@ const CORRECT_PIN = '0605';
 const PIN_KEY = 'adam_pin_v1';
 const STATE_KEY = 'adam_ios_v2';
 const VAPID_PUBLIC = 'BAkRnXwUgj1gzn04jv2GCArscugp7Q_kb0vAP7ghTPHuOcDobGAQ61FXmiGoTMLEfjr_lvs3qwXKjIHFLK9tFwM';
-const WORKER_URL = 'WORKER_URL_PLACEHOLDER';
+const WORKER_URL = 'https://adam-today-push.adamlashin2.workers.dev';
 
 // ── PIN LOGIC ──
 let pinEntry = '';
@@ -847,7 +847,7 @@ function urlBase64ToUint8Array(b64) {
 }
 
 async function toggleNotify(btn) {
-  if (WORKER_URL === 'WORKER_URL_PLACEHOLDER') {
+  if (WORKER_URL === 'https://adam-today-push.adamlashin2.workers.dev') {
     alert('Push notifications coming soon — Cloudflare setup pending.');
     return;
   }
