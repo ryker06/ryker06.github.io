@@ -2,945 +2,980 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Today">
-<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-title" content="Do It">
+<meta name="theme-color" content="#F5F5F5">
 <link rel="manifest" href="manifest.json">
-<title>Today · Adam</title>
+<title>Do It · Adam</title>
 <style>
+/* ── TOKENS ── */
 :root {
-  --bg: #F2F2F7;
+  --bg: #F5F5F5;
   --card: #FFFFFF;
-  --card2: #F9F9F9;
-  --acc: #007AFF;
-  --grn: #34C759;
+  --orange: #FF6B2B;
+  --orange-light: rgba(255,107,43,0.1);
+  --green: #34C759;
   --red: #FF3B30;
-  --ora: #FF9500;
-  --purp: #AF52DE;
-  --text: #000000;
-  --text2: #3C3C43;
-  --text3: #8E8E93;
-  --sep: rgba(60,60,67,0.12);
-  --hero: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --radius: 16px;
-  --safe-top: env(safe-area-inset-top, 0px);
+  --blue: #007AFF;
+  --text: #1C1C1E;
+  --text2: #636366;
+  --text3: #AEAEB2;
+  --sep: rgba(0,0,0,0.08);
+  --shadow: 0 2px 16px rgba(0,0,0,0.07);
+  --shadow-sm: 0 1px 6px rgba(0,0,0,0.05);
+  --r: 20px;
+  --r-sm: 14px;
+  --r-pill: 100px;
+  --tab-h: 82px;
   --safe-bot: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --sidebar-w: 72px;
+  --spring: cubic-bezier(0.34,1.56,0.64,1);
+  --ease: cubic-bezier(0.4,0,0.2,1);
 }
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; background: var(--bg); font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif; }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',sans-serif;color:var(--text);overscroll-behavior:none}
+button{border:none;background:none;cursor:pointer;font-family:inherit}
+a{text-decoration:none;color:inherit}
 
-/* ── PIN SCREEN ── */
-#pinScreen {
-  position: fixed; inset: 0; z-index: 9999;
-  background: linear-gradient(160deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: 40px 24px calc(40px + var(--safe-bot));
-}
-.pin-icon { font-size: 52px; margin-bottom: 16px; filter: drop-shadow(0 4px 24px rgba(102,126,234,0.5)); }
-.pin-title { font-size: 28px; font-weight: 700; color: white; margin-bottom: 6px; letter-spacing: -0.5px; }
-.pin-sub { font-size: 15px; color: rgba(255,255,255,0.55); margin-bottom: 48px; }
-.pin-dots { display: flex; gap: 16px; margin-bottom: 48px; }
-.pin-dot {
-  width: 16px; height: 16px; border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.35);
-  transition: all 0.15s ease;
-  background: transparent;
-}
-.pin-dot.filled { background: white; border-color: white; transform: scale(1.1); }
-.pin-error { color: #FF6B6B; font-size: 14px; margin-top: -32px; margin-bottom: 16px; opacity: 0; transition: opacity 0.2s; }
-.pin-error.show { opacity: 1; }
-.pin-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; width: 100%; max-width: 300px; }
-.pin-key {
-  height: 72px; border-radius: 50%; background: rgba(255,255,255,0.12);
-  border: none; color: white; font-size: 22px; font-weight: 500;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  flex-direction: column; gap: 2px;
-  transition: transform 0.08s ease, background 0.1s;
-  -webkit-user-select: none;
-}
-.pin-key:active { transform: scale(0.92); background: rgba(255,255,255,0.22); }
-.pin-key .sub { font-size: 9px; letter-spacing: 1.5px; opacity: 0.65; font-weight: 600; }
-.pin-key.del { background: rgba(255,255,255,0.08); font-size: 18px; }
-.pin-key.empty { background: transparent; pointer-events: none; }
+/* ── LAYOUT ── */
+#shell{display:flex;height:100vh;overflow:hidden}
 
-/* ── MAIN APP ── */
-#app { display: none; min-height: 100vh; padding: 0 0 calc(24px + var(--safe-bot)); }
+/* ── SIDEBAR (desktop) ── */
+.sidebar{
+  display:none;width:var(--sidebar-w);background:var(--card);
+  flex-direction:column;align-items:center;padding:20px 0 30px;
+  border-right:1px solid var(--sep);position:relative;z-index:10;
+  flex-shrink:0;gap:8px;
+}
+.sidebar-logo{
+  width:42px;height:42px;background:var(--orange);border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;font-weight:900;color:white;letter-spacing:-1px;
+  margin-bottom:16px;
+}
+.sidebar-tab{
+  width:52px;height:52px;border-radius:var(--r-sm);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;color:var(--text3);transition:all 0.2s var(--ease);cursor:pointer;
+}
+.sidebar-tab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.sidebar-tab span{font-size:9px;font-weight:600;letter-spacing:0.3px}
+.sidebar-tab.active{background:var(--orange-light);color:var(--orange)}
+.sidebar-tab:active{transform:scale(0.93)}
+.sidebar-fab{
+  margin-top:auto;width:44px;height:44px;border-radius:50%;
+  background:var(--orange);display:flex;align-items:center;justify-content:center;
+  color:white;font-size:22px;font-weight:300;box-shadow:0 4px 14px rgba(255,107,43,0.4);
+  transition:transform 0.2s var(--spring);
+}
+.sidebar-fab:active{transform:scale(0.92)}
 
-/* ── HEADER ── */
-.header {
-  background: var(--hero);
-  padding: calc(var(--safe-top) + 54px) 20px 28px;
-  position: relative; overflow: hidden;
+/* ── MAIN SCROLL AREA ── */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.pages{flex:1;overflow:hidden;position:relative}
+.page{
+  position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;
+  padding-bottom:calc(var(--tab-h) + var(--safe-bot) + 20px);
+  display:none;opacity:0;transform:translateY(12px);
+  transition:opacity 0.25s var(--ease),transform 0.25s var(--ease);
 }
-.header::before {
-  content: ''; position: absolute; inset: 0;
-  background: radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.12) 0%, transparent 60%);
-}
-.header-row { display: flex; align-items: flex-start; justify-content: space-between; position: relative; }
-.header-left {}
-.header-greeting { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 4px; }
-.header-date { font-size: 30px; font-weight: 700; color: white; letter-spacing: -0.8px; line-height: 1.1; }
-.header-sub { font-size: 14px; color: rgba(255,255,255,0.65); margin-top: 6px; line-height: 1.4; max-width: 220px; }
-.ring-wrap { flex-shrink: 0; }
-.ring-svg { transform: rotate(-90deg); }
-.ring-bg { fill: none; stroke: rgba(255,255,255,0.2); }
-.ring-fg { fill: none; stroke: white; stroke-linecap: round; transition: stroke-dashoffset 0.6s cubic-bezier(0.4,0,0.2,1); }
-.ring-pct { font-size: 15px; font-weight: 700; fill: white; text-anchor: middle; dominant-baseline: central; }
-.ring-label { font-size: 8px; fill: rgba(255,255,255,0.65); text-anchor: middle; }
-.ring-center { transform: rotate(90deg); transform-origin: center; }
+.page.active{display:block;opacity:1;transform:translateY(0)}
 
-/* ── STREAK BANNER ── */
-.streak-bar {
-  background: rgba(0,0,0,0.18); backdrop-filter: blur(10px);
-  margin: 0 16px 0; border-radius: 0 0 14px 14px;
-  padding: 10px 16px; display: flex; align-items: center; gap: 10px;
-  position: relative; margin-top: -1px;
+/* ── TOP BAR ── */
+.top-bar{
+  display:flex;align-items:center;padding:calc(var(--safe-top) + 14px) 20px 10px;
+  gap:12px;
 }
-.streak-bar.hidden { display: none; }
-.streak-flame { font-size: 20px; }
-.streak-text { font-size: 13px; color: rgba(255,255,255,0.9); font-weight: 500; }
-.streak-num { font-weight: 700; color: #FFD60A; }
-.next-task-bar {
-  background: linear-gradient(90deg, rgba(0,122,255,0.12) 0%, rgba(0,122,255,0.06) 100%);
-  border-left: 3px solid var(--acc); border-radius: 0 12px 12px 0;
-  margin: 12px 16px 0; padding: 10px 14px;
-  display: flex; align-items: center; gap: 10px;
+.top-bar-left{flex:1;display:flex;align-items:center;gap:10px}
+.app-wordmark{font-size:22px;font-weight:900;color:var(--text);letter-spacing:-0.8px}
+.app-wordmark span{color:var(--orange)}
+.top-bar-right{display:flex;align-items:center;gap:8px}
+.icon-btn{width:36px;height:36px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm)}
+.icon-btn svg{width:18px;height:18px;stroke:var(--text);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.avatar-self{
+  width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);
+  display:flex;align-items:center;justify-content:center;color:white;font-size:13px;font-weight:700;
 }
-.next-arrow { font-size: 16px; }
-.next-label { font-size: 11px; color: var(--text3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-.next-name { font-size: 14px; color: var(--acc); font-weight: 600; }
 
-/* ── SECTIONS ── */
-.section { margin: 20px 16px 0; }
-.section-label {
-  font-size: 11px; font-weight: 700; color: var(--text3);
-  text-transform: uppercase; letter-spacing: 0.8px;
-  padding: 0 4px; margin-bottom: 10px;
+/* ── HERO ── */
+.hero{padding:10px 20px 20px}
+.hero-greeting{font-size:13px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px}
+.hero-title{font-size:34px;font-weight:900;line-height:1.1;letter-spacing:-1.2px;color:var(--text)}
+.hero-title em{font-style:normal;color:var(--orange)}
+
+/* ── CATEGORY FILTER ── */
+.cat-scroll{display:flex;gap:8px;padding:0 20px 16px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.cat-scroll::-webkit-scrollbar{display:none}
+.cat-pill{
+  flex-shrink:0;padding:7px 16px;border-radius:var(--r-pill);
+  font-size:13px;font-weight:600;background:var(--card);color:var(--text2);
+  box-shadow:var(--shadow-sm);transition:all 0.18s var(--ease);white-space:nowrap;
 }
+.cat-pill.active{background:var(--orange);color:white}
+.cat-pill:active{transform:scale(0.95)}
+
+/* ── BANNER ── */
+.task-banner{
+  margin:0 20px 20px;background:#1C1C1E;border-radius:var(--r-pill);
+  padding:12px 16px;display:flex;align-items:center;gap:10px;
+}
+.task-banner.hidden{display:none}
+.banner-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.6;transform:scale(1.3)}}
+.banner-text{flex:1;font-size:14px;font-weight:500;color:white}
+.banner-text strong{color:var(--orange)}
+.banner-x{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.15);color:white;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.banner-x:active{background:rgba(255,255,255,0.25)}
+
+/* ── SECTION HEADER ── */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;padding:0 20px 12px}
+.sec-title{font-size:20px;font-weight:800;letter-spacing:-0.4px}
+.sec-link{font-size:14px;font-weight:600;color:var(--orange)}
 
 /* ── TASK CARDS ── */
-.task-group { background: var(--card); border-radius: var(--radius); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-.task-row {
-  display: flex; align-items: center; gap: 12px;
-  padding: 14px 16px; cursor: pointer;
-  transition: background 0.15s;
-  position: relative;
+.task-list{display:flex;flex-direction:column;gap:12px;padding:0 20px}
+.task-card{
+  background:var(--card);border-radius:var(--r);padding:18px 18px 0;
+  box-shadow:var(--shadow);cursor:pointer;
+  transition:transform 0.15s var(--ease),box-shadow 0.15s var(--ease);
+  overflow:hidden;position:relative;
 }
-.task-row + .task-row { border-top: 0.5px solid var(--sep); }
-.task-row:active { background: rgba(0,0,0,0.04); }
-.task-check {
-  width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--sep);
-  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-  transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
-  background: transparent;
+.task-card:active{transform:scale(0.985);box-shadow:var(--shadow-sm)}
+.task-card.done{opacity:0.6}
+.task-card-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
+.check-circle{
+  width:28px;height:28px;border-radius:50%;border:2px solid var(--sep);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:2px;
+  transition:all 0.25s var(--spring);background:transparent;
 }
-.task-check svg { opacity: 0; transform: scale(0.3); transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1); }
-.task-row.done .task-check { background: var(--grn); border-color: var(--grn); }
-.task-row.done .task-check svg { opacity: 1; transform: scale(1); }
-.task-body { flex: 1; min-width: 0; }
-.task-name { font-size: 16px; font-weight: 500; color: var(--text); line-height: 1.3; transition: color 0.2s; }
-.task-time { font-size: 12px; color: var(--text3); margin-top: 2px; font-weight: 400; }
-.task-row.done .task-name { text-decoration: line-through; color: var(--text3); }
-.task-tag {
-  font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 20px;
-  flex-shrink: 0; letter-spacing: 0.3px;
+.check-circle svg{opacity:0;transform:scale(0.2);transition:all 0.25s var(--spring);stroke:white;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.task-card.done .check-circle{background:var(--green);border-color:var(--green)}
+.task-card.done .check-circle svg{opacity:1;transform:scale(1)}
+.task-card.done .task-name{text-decoration:line-through;color:var(--text3)}
+.task-body{flex:1;min-width:0}
+.task-name{font-size:16px;font-weight:700;color:var(--text);line-height:1.3;transition:color 0.2s}
+.task-sub{font-size:13px;color:var(--text3);margin-top:3px;line-height:1.4}
+.task-menu-btn{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:18px;flex-shrink:0}
+.task-menu-btn:active{background:var(--bg)}
+.task-card-bottom{display:flex;align-items:center;justify-content:space-between;padding-bottom:16px}
+.task-tag{
+  font-size:11px;font-weight:700;padding:4px 10px;border-radius:var(--r-pill);
+  letter-spacing:0.3px;
 }
-.tag-body { background: rgba(52,199,89,0.12); color: #1a8a37; }
-.tag-home { background: rgba(255,149,0,0.12); color: #b56800; }
-.tag-work { background: rgba(0,122,255,0.1); color: var(--acc); }
-.tag-money { background: rgba(175,82,222,0.12); color: #7b3da8; }
-.tag-soul { background: rgba(255,214,10,0.15); color: #8a6800; }
+.tag-body{background:rgba(52,199,89,0.12);color:#1a8a37}
+.tag-home{background:rgba(255,149,0,0.12);color:#b56800}
+.tag-work{background:rgba(0,122,255,0.1);color:#0055cc}
+.tag-money{background:rgba(255,107,43,0.12);color:#cc4400}
+.tag-soul{background:rgba(175,82,222,0.12);color:#6b2fa0}
+.tag-blocked{background:rgba(255,59,48,0.1);color:var(--red)}
+.task-progress-wrap{display:flex;align-items:center;gap:8px}
+.task-pct{font-size:12px;font-weight:700;color:var(--text3)}
+.task-card.done .task-pct{color:var(--green)}
+/* Progress bar sits at bottom of card */
+.progress-track{
+  height:4px;background:var(--bg);margin:0 -18px;
+}
+.progress-fill{
+  height:100%;background:var(--green);border-radius:0;width:0%;
+  transition:width 0.5s var(--ease);
+}
+.task-card.done .progress-fill{width:100%}
 
-/* ── BLOCKED EMAILS ── */
-.blocked-section { background: var(--card); border-radius: var(--radius); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-.blocked-header {
-  padding: 14px 16px; background: rgba(255,59,48,0.06);
-  border-bottom: 0.5px solid rgba(255,59,48,0.15);
-  display: flex; align-items: center; gap: 10px;
+/* ── BLOCKED SECTION ── */
+.blocked-header{
+  margin:24px 20px 0;background:var(--card);border-radius:var(--r) var(--r) 0 0;
+  padding:16px 18px;display:flex;align-items:center;gap:12px;
+  border-bottom:1px solid var(--sep);
 }
-.blocked-icon { font-size: 18px; }
-.blocked-title { font-size: 14px; font-weight: 700; color: var(--red); }
-.blocked-sub { font-size: 12px; color: var(--text3); margin-top: 1px; }
-.blocked-unlock {
-  margin-left: auto; background: var(--grn); color: white;
-  border: none; border-radius: 20px; padding: 6px 14px;
-  font-size: 12px; font-weight: 700; cursor: pointer; display: none;
-  transition: transform 0.15s;
+.blocked-pill{
+  background:rgba(255,59,48,0.1);border-radius:var(--r-pill);padding:5px 12px;
+  font-size:12px;font-weight:700;color:var(--red);
 }
-.blocked-unlock:active { transform: scale(0.95); }
-.blocked-row {
-  display: flex; align-items: center; gap: 12px; padding: 13px 16px;
-  opacity: 0.5; pointer-events: none;
+.blocked-label{flex:1;font-size:14px;font-weight:700;color:var(--text)}
+.blocked-sublabel{font-size:12px;color:var(--text3);margin-top:2px}
+.unlock-btn{
+  background:var(--green);color:white;border-radius:var(--r-pill);
+  padding:7px 14px;font-size:12px;font-weight:700;display:none;
+  transition:transform 0.15s;
 }
-.blocked-row + .blocked-row { border-top: 0.5px solid var(--sep); }
-.blocked-row.unlocked { opacity: 1; pointer-events: auto; cursor: pointer; }
-.blocked-row.unlocked:active { background: rgba(0,0,0,0.04); }
-.blocked-row.done .task-name { text-decoration: line-through; color: var(--text3); }
-.blocked-row.done .task-check { background: var(--grn); border-color: var(--grn); }
-.blocked-row.done .task-check svg { opacity: 1; transform: scale(1); }
+.unlock-btn:active{transform:scale(0.95)}
+.blocked-list{margin:0 20px 24px;background:var(--card);border-radius:0 0 var(--r) var(--r)}
+.blocked-row{
+  display:flex;align-items:center;gap:12px;padding:14px 18px;
+  opacity:0.45;pointer-events:none;cursor:default;
+}
+.blocked-row+.blocked-row{border-top:1px solid var(--sep)}
+.blocked-row.unlocked{opacity:1;pointer-events:auto;cursor:pointer}
+.blocked-row.unlocked:active{background:var(--bg)}
+.blocked-row.done .task-name{text-decoration:line-through;color:var(--text3)}
+.blocked-row.done .check-circle{background:var(--green);border-color:var(--green)}
+.blocked-row.done .check-circle svg{opacity:1;transform:scale(1)}
 
-/* ── MEALS ── */
-.meal-group { background: var(--card); border-radius: var(--radius); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-.meal-row { display: flex; align-items: center; gap: 14px; padding: 13px 16px; }
-.meal-row + .meal-row { border-top: 0.5px solid var(--sep); }
-.meal-emoji { font-size: 28px; flex-shrink: 0; }
-.meal-body { flex: 1; }
-.meal-name { font-size: 15px; font-weight: 600; color: var(--text); }
-.meal-desc { font-size: 12px; color: var(--text3); margin-top: 2px; }
-.meal-kcal { font-size: 13px; font-weight: 600; color: var(--text3); }
+/* ── TOAST NOTIFICATION ── */
+.toast{
+  position:fixed;bottom:calc(var(--tab-h) + var(--safe-bot) + 12px);left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:#1C1C1E;color:white;
+  padding:12px 20px;border-radius:var(--r-pill);
+  font-size:14px;font-weight:600;
+  display:flex;align-items:center;gap:8px;
+  opacity:0;transition:opacity 0.25s var(--ease),transform 0.3s var(--spring);
+  pointer-events:none;z-index:9999;white-space:nowrap;
+  box-shadow:0 8px 32px rgba(0,0,0,0.25);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast-icon{font-size:16px}
 
-/* ── SHOPPING ── */
-.shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; background: var(--card); border-radius: var(--radius); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-.shop-item {
-  display: flex; align-items: center; gap: 10px; padding: 13px 14px;
-  cursor: pointer; transition: background 0.15s;
-  border-right: 0.5px solid var(--sep); border-bottom: 0.5px solid var(--sep);
+/* ── MEALS PAGE ── */
+.meal-hero{padding:10px 20px 24px}
+.meal-hero h1{font-size:30px;font-weight:900;letter-spacing:-0.8px}
+.meal-hero p{font-size:14px;color:var(--text3);margin-top:4px}
+.meal-cards{display:flex;flex-direction:column;gap:12px;padding:0 20px}
+.meal-card{
+  background:var(--card);border-radius:var(--r);padding:18px;
+  box-shadow:var(--shadow);display:flex;align-items:center;gap:16px;
 }
-.shop-item:nth-child(2n) { border-right: none; }
-.shop-item:nth-last-child(-n+2) { border-bottom: none; }
-.shop-item:active { background: rgba(0,0,0,0.04); }
-.shop-item.got { opacity: 0.4; }
-.shop-check {
-  width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--sep);
-  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-  transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+.meal-emoji{font-size:36px;flex-shrink:0}
+.meal-body{flex:1}
+.meal-name{font-size:16px;font-weight:700}
+.meal-desc{font-size:13px;color:var(--text3);margin-top:3px}
+.meal-kcal{font-size:20px;font-weight:800;color:var(--text3)}
+.shop-section{padding:24px 20px 0}
+.shop-title{font-size:20px;font-weight:800;letter-spacing:-0.4px;margin-bottom:12px}
+.shop-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.shop-item{
+  background:var(--card);border-radius:var(--r-sm);padding:14px;
+  display:flex;align-items:center;gap:10px;cursor:pointer;
+  box-shadow:var(--shadow-sm);transition:opacity 0.2s;
 }
-.shop-check svg { opacity: 0; transform: scale(0.3); transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1); }
-.shop-item.got .shop-check { background: var(--grn); border-color: var(--grn); }
-.shop-item.got .shop-check svg { opacity: 1; transform: scale(1); }
-.shop-name { font-size: 14px; color: var(--text); font-weight: 400; }
+.shop-item.got{opacity:0.4}
+.shop-item:active{transform:scale(0.97)}
+.shop-check{
+  width:22px;height:22px;border-radius:50%;border:2px solid var(--sep);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s var(--spring);
+}
+.shop-check svg{opacity:0;transform:scale(0.2);transition:all 0.2s var(--spring);stroke:white;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.shop-item.got .shop-check{background:var(--green);border-color:var(--green)}
+.shop-item.got .shop-check svg{opacity:1;transform:scale(1)}
+.shop-name{font-size:13px;font-weight:500;color:var(--text)}
 
-/* ── QURAN ── */
-.quran-card {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
-  border-radius: var(--radius); padding: 20px;
-  box-shadow: 0 2px 12px rgba(15,52,96,0.25);
+/* ── VISION PAGE ── */
+.vision-hero{padding:10px 20px 24px}
+.vision-hero h1{font-size:30px;font-weight:900;letter-spacing:-0.8px}
+.vision-hero p{font-size:14px;color:var(--text3);margin-top:4px}
+.vision-list{display:flex;flex-direction:column;gap:10px;padding:0 20px}
+.vision-item{
+  background:var(--card);border-radius:var(--r-sm);padding:16px;
+  display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);
 }
-.quran-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-.quran-label { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; }
-.quran-streak { font-size: 13px; color: #FFD60A; font-weight: 700; }
-.quran-ayah { font-size: 22px; color: white; text-align: right; line-height: 1.8; font-weight: 400; margin-bottom: 10px; font-family: 'Traditional Arabic', 'Scheherazade', serif; }
-.quran-ref { font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 16px; }
-.quran-btn {
-  background: rgba(255,255,255,0.12); border: none; border-radius: 10px;
-  color: white; font-size: 14px; font-weight: 600; padding: 11px 20px;
-  cursor: pointer; width: 100%; transition: background 0.15s;
+.vision-num{
+  width:32px;height:32px;border-radius:50%;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:var(--text3);flex-shrink:0;
 }
-.quran-btn:active { background: rgba(255,255,255,0.2); }
+.vision-text{font-size:14px;font-weight:500;color:var(--text);line-height:1.4;flex:1}
 
-/* ── PARKED ── */
-.parked-card { background: var(--card); border-radius: var(--radius); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-.parked-toggle {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 16px; cursor: pointer;
-}
-.parked-toggle:active { background: rgba(0,0,0,0.04); }
-.parked-left { display: flex; align-items: center; gap: 12px; }
-.parked-emoji { font-size: 22px; }
-.parked-title { font-size: 16px; font-weight: 600; color: var(--text); }
-.parked-count { font-size: 12px; color: var(--text3); margin-top: 2px; }
-.parked-chev { font-size: 14px; color: var(--text3); transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1); }
-.parked-chev.open { transform: rotate(90deg); }
-.parked-body { display: none; border-top: 0.5px solid var(--sep); }
-.parked-body.open { display: block; }
-.parked-item { display: flex; align-items: center; gap: 10px; padding: 11px 16px; }
-.parked-item + .parked-item { border-top: 0.5px solid var(--sep); }
-.parked-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text3); flex-shrink: 0; }
-.parked-text { font-size: 14px; color: var(--text2); line-height: 1.4; }
+/* ── ME PAGE ── */
+.me-section{padding:10px 20px 24px}
+.me-section h1{font-size:30px;font-weight:900;letter-spacing:-0.8px;margin-bottom:4px}
+.me-section p{font-size:14px;color:var(--text3)}
+.me-cards{display:flex;flex-direction:column;gap:12px;padding:0 20px}
+.me-card{background:var(--card);border-radius:var(--r);padding:18px;box-shadow:var(--shadow)}
+.me-card-title{font-size:16px;font-weight:700;margin-bottom:4px}
+.me-card-sub{font-size:13px;color:var(--text3)}
+.notify-row{display:flex;align-items:center;gap:14px}
+.notify-icon-wrap{width:44px;height:44px;border-radius:12px;background:var(--orange-light);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.notify-body{flex:1}
+.notify-title{font-size:15px;font-weight:700}
+.notify-sub{font-size:12px;color:var(--text3);margin-top:2px}
+.notify-status{font-size:12px;font-weight:700;padding:4px 10px;border-radius:var(--r-pill)}
+.notify-on{background:rgba(52,199,89,0.12);color:var(--green)}
+.notify-off{background:var(--bg);color:var(--text3)}
+.streak-card{display:flex;align-items:center;gap:14px}
+.streak-num{font-size:44px;font-weight:900;color:var(--orange);line-height:1}
+.streak-label{font-size:14px;font-weight:600;color:var(--text)}
+.streak-sub{font-size:12px;color:var(--text3);margin-top:2px}
+.quran-card-inner{background:linear-gradient(135deg,#1a1a2e,#16213e 60%,#0f3460);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)}
+.quran-ayah{font-size:22px;color:white;text-align:right;line-height:1.8;margin:12px 0;font-family:'Traditional Arabic','Scheherazade',serif}
+.quran-ref{font-size:12px;color:rgba(255,255,255,0.5)}
+.quran-btn{margin-top:14px;background:rgba(255,255,255,0.12);color:white;border-radius:var(--r-sm);padding:11px;font-size:14px;font-weight:600;width:100%;transition:background 0.15s}
+.quran-btn:active{background:rgba(255,255,255,0.2)}
 
-/* ── NOTIFY BUTTON ── */
-.notify-btn {
-  background: var(--card); border-radius: var(--radius);
-  padding: 16px; display: flex; align-items: center; gap: 14px;
-  cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-  border: none; width: 100%; text-align: left;
-  transition: transform 0.15s;
+/* ── TAB BAR (mobile) ── */
+.tab-bar{
+  position:fixed;bottom:0;left:0;right:0;height:calc(var(--tab-h) + var(--safe-bot));
+  background:white;border-top:1px solid var(--sep);
+  display:flex;align-items:flex-start;padding-top:10px;
+  z-index:100;
 }
-.notify-btn:active { transform: scale(0.98); }
-.notify-icon { font-size: 28px; }
-.notify-body { flex: 1; }
-.notify-title { font-size: 16px; font-weight: 600; color: var(--text); }
-.notify-sub { font-size: 13px; color: var(--text3); margin-top: 2px; }
-.notify-status { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
-.notify-on { background: rgba(52,199,89,0.12); color: var(--grn); }
-.notify-off { background: rgba(142,142,147,0.12); color: var(--text3); }
+.tab-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+  color:var(--text3);transition:color 0.18s var(--ease);padding:0 4px;
+}
+.tab-btn.active{color:var(--orange)}
+.tab-btn svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke 0.18s}
+.tab-btn span{font-size:10px;font-weight:600;letter-spacing:0.2px}
+.tab-btn:active svg{transform:scale(0.88);transition:transform 0.1s var(--spring)}
+.tab-fab-wrap{flex:1;display:flex;justify-content:center;align-items:flex-start;padding-top:0}
+.tab-fab{
+  width:54px;height:54px;border-radius:50%;background:var(--orange);
+  display:flex;align-items:center;justify-content:center;
+  color:white;font-size:26px;font-weight:300;line-height:1;
+  box-shadow:0 4px 18px rgba(255,107,43,0.45);
+  transform:translateY(-14px);
+  transition:transform 0.2s var(--spring);
+}
+.tab-fab:active{transform:translateY(-14px) scale(0.92)}
+
+/* ── DONE OVERLAY ── */
+#doneOverlay{
+  position:fixed;inset:0;z-index:9998;
+  background:linear-gradient(160deg,#052e16,#14532d,#166534);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:40px;
+}
+.done-trophy{font-size:80px;margin-bottom:20px;animation:pop 0.6s var(--spring)}
+@keyframes pop{0%{transform:scale(0)}100%{transform:scale(1)}}
+.done-title{font-size:38px;font-weight:900;color:white;letter-spacing:-1px;margin-bottom:8px}
+.done-sub{font-size:18px;color:rgba(255,255,255,0.7);margin-bottom:40px;line-height:1.5}
+.done-close{background:white;color:#052e16;border-radius:var(--r-sm);padding:16px 44px;font-size:17px;font-weight:800;transition:transform 0.15s}
+.done-close:active{transform:scale(0.96)}
 
 /* ── PARTICLES ── */
-.particle {
-  position: fixed; pointer-events: none; z-index: 9998;
-  width: 8px; height: 8px; border-radius: 50%;
-  animation: burst 0.7s ease-out forwards;
-}
-@keyframes burst {
-  0% { transform: translate(0,0) scale(1); opacity: 1; }
-  100% { transform: translate(var(--dx),var(--dy)) scale(0); opacity: 0; }
+.particle{position:fixed;pointer-events:none;z-index:9997;width:7px;height:7px;border-radius:50%;animation:pburst 0.65s ease-out forwards}
+@keyframes pburst{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0}}
+
+/* ── DESKTOP ── */
+@media(min-width:768px){
+  .sidebar{display:flex}
+  .tab-bar{display:none}
+  .page{padding-bottom:40px}
+  .toast{bottom:30px;left:calc(var(--sidebar-w) + 50%);transform:translateX(-50%) translateY(20px)}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  .hero-title{font-size:42px}
+  .task-list{max-width:640px}
+  .meal-cards,.vision-list,.me-cards{max-width:640px}
+  .shop-grid{grid-template-columns:1fr 1fr 1fr}
+  .task-banner,.blocked-header,.blocked-list,.sec-hdr{max-width:680px;margin-left:auto;margin-right:auto}
+  .sec-hdr{padding-left:0;padding-right:0}
+  .task-list,.meal-cards,.vision-list,.me-cards,.shop-grid{margin:0 auto}
+  .shop-section,.vision-list,.meal-cards{padding-left:20px;padding-right:20px}
+  .pages{overflow-y:auto}
+  .page{position:relative;overflow:visible;transform:none;opacity:1;display:none}
+  .page.active{display:block}
 }
 
-/* ── DONE SCREEN ── */
-#doneScreen {
-  display: none; position: fixed; inset: 0; z-index: 999;
-  background: linear-gradient(160deg, #0a2e1a 0%, #0d3d22 50%, #1a5c35 100%);
-  align-items: center; justify-content: center;
-  flex-direction: column; text-align: center; padding: 40px;
+@media(min-width:1200px){
+  #main{flex-direction:row}
+  .pages{flex:1}
+  .right-panel{
+    width:320px;flex-shrink:0;background:var(--card);
+    border-left:1px solid var(--sep);overflow-y:auto;padding:30px 20px;
+  }
+  .task-list,.sec-hdr{max-width:100%}
 }
-.done-emoji { font-size: 80px; margin-bottom: 20px; animation: bounce 0.6s cubic-bezier(0.34,1.56,0.64,1); }
-@keyframes bounce { 0% { transform: scale(0); } 100% { transform: scale(1); } }
-.done-title { font-size: 36px; font-weight: 800; color: white; letter-spacing: -1px; margin-bottom: 10px; }
-.done-sub { font-size: 18px; color: rgba(255,255,255,0.7); margin-bottom: 40px; line-height: 1.5; }
-.done-btn { background: white; color: #0d3d22; border: none; border-radius: 14px; padding: 16px 40px; font-size: 17px; font-weight: 700; cursor: pointer; }
 </style>
 </head>
 <body>
 
-<!-- PIN SCREEN -->
-<div id="pinScreen">
-  <div class="pin-icon">✦</div>
-  <div class="pin-title">Good morning, Adam</div>
-  <div class="pin-sub">Enter your PIN to continue</div>
-  <div class="pin-dots">
-    <div class="pin-dot" id="d0"></div>
-    <div class="pin-dot" id="d1"></div>
-    <div class="pin-dot" id="d2"></div>
-    <div class="pin-dot" id="d3"></div>
-  </div>
-  <div class="pin-error" id="pinError">Wrong PIN — try again</div>
-  <div class="pin-keypad">
-    <button class="pin-key" onclick="pinPress('1')"><span>1</span></button>
-    <button class="pin-key" onclick="pinPress('2')"><span>2</span><span class="sub">ABC</span></button>
-    <button class="pin-key" onclick="pinPress('3')"><span>3</span><span class="sub">DEF</span></button>
-    <button class="pin-key" onclick="pinPress('4')"><span>4</span><span class="sub">GHI</span></button>
-    <button class="pin-key" onclick="pinPress('5')"><span>5</span><span class="sub">JKL</span></button>
-    <button class="pin-key" onclick="pinPress('6')"><span>6</span><span class="sub">MNO</span></button>
-    <button class="pin-key" onclick="pinPress('7')"><span>7</span><span class="sub">PQRS</span></button>
-    <button class="pin-key" onclick="pinPress('8')"><span>8</span><span class="sub">TUV</span></button>
-    <button class="pin-key" onclick="pinPress('9')"><span>9</span><span class="sub">WXYZ</span></button>
-    <button class="pin-key empty"></button>
-    <button class="pin-key" onclick="pinPress('0')"><span>0</span></button>
-    <button class="pin-key del" onclick="pinDel()">⌫</button>
-  </div>
-</div>
-
-<!-- DONE SCREEN -->
-<div id="doneScreen">
-  <div class="done-emoji">🏆</div>
+<!-- DONE OVERLAY -->
+<div id="doneOverlay">
+  <div class="done-trophy">🏆</div>
   <div class="done-title">Day Complete.</div>
-  <div class="done-sub">Every single task. Done.<br>That's rare. That's you.</div>
-  <button class="done-btn" onclick="document.getElementById('doneScreen').style.display='none'">Back to Today</button>
+  <div class="done-sub">Every task done.<br>That's rare. That's you.</div>
+  <button class="done-close" onclick="document.getElementById('doneOverlay').style.display='none'">Back to Today</button>
 </div>
 
-<!-- MAIN APP -->
-<div id="app">
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toastIcon">✓</span>
+  <span id="toastMsg">Done!</span>
+</div>
 
-<!-- HEADER -->
-<div class="header">
-  <div class="header-row">
-    <div class="header-left">
-      <div class="header-greeting" id="greetLabel">Tuesday · May 5</div>
-      <div class="header-date" id="dateLabel">Today</div>
-      <div class="header-sub">Not 30. Not everything. Just these. The rest is parked — not gone.</div>
+<!-- SHELL -->
+<div id="shell">
+
+<!-- SIDEBAR (desktop only) -->
+<nav class="sidebar">
+  <div class="sidebar-logo">D.</div>
+  <div class="sidebar-tab active" id="stab-home" onclick="switchTab('home')">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>Today</span>
+  </div>
+  <div class="sidebar-tab" id="stab-meals" onclick="switchTab('meals')">
+    <svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+    <span>Meals</span>
+  </div>
+  <div class="sidebar-tab" id="stab-vision" onclick="switchTab('vision')">
+    <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    <span>Vision</span>
+  </div>
+  <div class="sidebar-tab" id="stab-me" onclick="switchTab('me')">
+    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>Me</span>
+  </div>
+  <button class="sidebar-fab">+</button>
+</nav>
+
+<div id="main">
+<div class="pages">
+
+<!-- ╔══════════════════════╗ -->
+<!-- ║   HOME / TODAY       ║ -->
+<!-- ╚══════════════════════╝ -->
+<div class="page active" id="page-home">
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <div class="app-wordmark">Do It<span>.</span></div>
     </div>
-    <div class="ring-wrap">
-      <svg class="ring-svg" width="76" height="76" viewBox="0 0 76 76">
-        <circle class="ring-bg" cx="38" cy="38" r="30" stroke-width="6"/>
-        <circle class="ring-fg" id="ringFg" cx="38" cy="38" r="30" stroke-width="6"
-          stroke-dasharray="188.5" stroke-dashoffset="188.5"/>
-        <g class="ring-center">
-          <text class="ring-pct" id="ringPct" x="38" y="35">0%</text>
-          <text class="ring-label" x="38" y="47">done</text>
-        </g>
-      </svg>
+    <div class="top-bar-right">
+      <button class="icon-btn"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+      <button class="icon-btn" id="bellBtn" onclick="switchTab('me')"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></button>
+      <div class="avatar-self">A</div>
     </div>
   </div>
-</div>
 
-<!-- STREAK -->
-<div class="streak-bar" id="streakBar">
-  <div class="streak-flame">🔥</div>
-  <div class="streak-text">Day <span class="streak-num" id="streakNum">1</span> streak — keep going</div>
-</div>
-
-<!-- NEXT TASK -->
-<div class="next-task-bar" id="nextBar">
-  <div class="next-arrow">→</div>
-  <div>
-    <div class="next-label">Do This Now</div>
-    <div class="next-name" id="nextName">Go Gym</div>
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-greeting" id="heroDate">Tuesday · May 5</div>
+    <h1 class="hero-title" id="heroTitle">Get It Done,<br>Adam <em>✌️</em></h1>
   </div>
-</div>
 
-<!-- TODAY TASKS -->
-<div class="section">
-  <div class="section-label">Today · 8 Tasks</div>
-  <div class="task-group" id="taskList">
+  <!-- Category pills -->
+  <div class="cat-scroll" id="catScroll">
+    <div class="cat-pill active" onclick="filterTasks('all',this)">All</div>
+    <div class="cat-pill" onclick="filterTasks('body',this)">💪 Body</div>
+    <div class="cat-pill" onclick="filterTasks('home',this)">🏠 Home</div>
+    <div class="cat-pill" onclick="filterTasks('work',this)">⚡ Work</div>
+    <div class="cat-pill" onclick="filterTasks('money',this)">💰 Money</div>
+    <div class="cat-pill" onclick="filterTasks('soul',this)">🌙 Soul</div>
+  </div>
 
-    <div class="task-row" onclick="toggleTask(this)" data-id="gym">
-      <div class="task-check"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4.5L4.5 8L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="task-body">
-        <div class="task-name">Go Gym</div>
-        <div class="task-time">11:30 – 12:45 · Energy first. Everything else follows.</div>
+  <!-- Banner -->
+  <div class="task-banner" id="taskBanner">
+    <div class="banner-dot"></div>
+    <div class="banner-text">You have <strong id="remainCount">8</strong> tasks today.</div>
+    <button class="banner-x" onclick="document.getElementById('taskBanner').classList.add('hidden')">×</button>
+  </div>
+
+  <!-- Today Tasks -->
+  <div class="sec-hdr">
+    <div class="sec-title">Today Tasks</div>
+    <div class="sec-link">See All ›</div>
+  </div>
+
+  <div class="task-list" id="taskList">
+
+    <div class="task-card" data-id="gym" data-cat="body" onclick="toggleTask(this)">
+      <div class="task-card-top">
+        <div class="check-circle"><svg width="12" height="9" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="task-body">
+          <div class="task-name">Go Gym</div>
+          <div class="task-sub">11:30 – 12:45 · Energy first. Everything else follows.</div>
+        </div>
+        <button class="task-menu-btn" onclick="event.stopPropagation()">···</button>
       </div>
-      <div class="task-tag tag-body">Body</div>
+      <div class="task-card-bottom">
+        <span class="task-tag tag-body">Body</span>
+        <div class="task-progress-wrap"><span class="task-pct">0%</span></div>
+      </div>
+      <div class="progress-track"><div class="progress-fill"></div></div>
     </div>
 
-    <div class="task-row" onclick="toggleTask(this)" data-id="shop">
-      <div class="task-check"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4.5L4.5 8L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="task-body">
-        <div class="task-name">Shop — Groceries</div>
-        <div class="task-time">12:45 – 13:15 · List below. In and out in 30 min.</div>
+    <div class="task-card" data-id="shop" data-cat="home" onclick="toggleTask(this)">
+      <div class="task-card-top">
+        <div class="check-circle"><svg width="12" height="9" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="task-body">
+          <div class="task-name">Shop — Groceries</div>
+          <div class="task-sub">12:45 – 13:15 · List in the Meals tab. In and out.</div>
+        </div>
+        <button class="task-menu-btn" onclick="event.stopPropagation()">···</button>
       </div>
-      <div class="task-tag tag-home">Home</div>
+      <div class="task-card-bottom">
+        <span class="task-tag tag-home">Home</span>
+        <div class="task-progress-wrap"><span class="task-pct">0%</span></div>
+      </div>
+      <div class="progress-track"><div class="progress-fill"></div></div>
     </div>
 
-    <div class="task-row" onclick="toggleTask(this)" data-id="whatsapp">
-      <div class="task-check"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4.5L4.5 8L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="task-body">
-        <div class="task-name">Reply WhatsApp + Gather new employee</div>
-        <div class="task-time">13:15 – 13:45 · One message at a time. Don't overthink.</div>
+    <div class="task-card" data-id="whatsapp" data-cat="work" onclick="toggleTask(this)">
+      <div class="task-card-top">
+        <div class="check-circle"><svg width="12" height="9" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="task-body">
+          <div class="task-name">Reply WhatsApp + New Employee</div>
+          <div class="task-sub">13:15 – 13:45 · One message at a time. Don't overthink.</div>
+        </div>
+        <button class="task-menu-btn" onclick="event.stopPropagation()">···</button>
       </div>
-      <div class="task-tag tag-work">Work</div>
+      <div class="task-card-bottom">
+        <span class="task-tag tag-work">Work</span>
+        <div class="task-progress-wrap"><span class="task-pct">0%</span></div>
+      </div>
+      <div class="progress-track"><div class="progress-fill"></div></div>
     </div>
 
-    <div class="task-row" onclick="toggleTask(this)" data-id="ebay">
-      <div class="task-check"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4.5L4.5 8L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="task-body">
-        <div class="task-name">eBay — List the Jacket</div>
-        <div class="task-time">13:45 – 14:00 · Photos, description, post. 15 minutes max.</div>
+    <div class="task-card" data-id="ebay" data-cat="money" onclick="toggleTask(this)">
+      <div class="task-card-top">
+        <div class="check-circle"><svg width="12" height="9" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="task-body">
+          <div class="task-name">eBay — List the Jacket</div>
+          <div class="task-sub">13:45 – 14:00 · Photos, post, done. 15 min max.</div>
+        </div>
+        <button class="task-menu-btn" onclick="event.stopPropagation()">···</button>
       </div>
-      <div class="task-tag tag-money">Money</div>
+      <div class="task-card-bottom">
+        <span class="task-tag tag-money">Money</span>
+        <div class="task-progress-wrap"><span class="task-pct">0%</span></div>
+      </div>
+      <div class="progress-track"><div class="progress-fill"></div></div>
     </div>
 
-    <div class="task-row" onclick="toggleTask(this)" data-id="build-pv">
-      <div class="task-check"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4.5L4.5 8L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="task-body">
-        <div class="task-name">Build Personalvermittler Website</div>
-        <div class="task-time">14:00 – 16:00 · Manychat CTA. Unlocks 3 cold emails when done.</div>
+    <div class="task-card" data-id="build-pv" data-cat="money" onclick="toggleTask(this)">
+      <div class="task-card-top">
+        <div class="check-circle"><svg width="12" height="9" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="task-body">
+          <div class="task-name">Build Personalvermittler Site</div>
+          <div class="task-sub">14:00 – 16:00 · Manychat CTA. Unlocks cold emails.</div>
+        </div>
+        <button class="task-menu-btn" onclick="event.stopPropagation()">···</button>
       </div>
-      <div class="task-tag tag-money">Money</div>
+      <div class="task-card-bottom">
+        <span class="task-tag tag-money">Money</span>
+        <div class="task-progress-wrap"><span class="task-pct">0%</span></div>
+      </div>
+      <div class="progress-track"><div class="progress-fill"></div></div>
     </div>
 
-    <div class="task-row" onclick="toggleTask(this)" data-id="build-ag">
-      <div class="task-check"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4.5L4.5 8L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="task-body">
-        <div class="task-name">Build Arbeitgeber Website</div>
-        <div class="task-time">16:00 – 18:00 · Video slot + Manychat CTA. Then email flows.</div>
+    <div class="task-card" data-id="build-ag" data-cat="money" onclick="toggleTask(this)">
+      <div class="task-card-top">
+        <div class="check-circle"><svg width="12" height="9" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="task-body">
+          <div class="task-name">Build Arbeitgeber Site</div>
+          <div class="task-sub">16:00 – 18:00 · Video slot + Manychat CTA.</div>
+        </div>
+        <button class="task-menu-btn" onclick="event.stopPropagation()">···</button>
       </div>
-      <div class="task-tag tag-money">Money</div>
+      <div class="task-card-bottom">
+        <span class="task-tag tag-money">Money</span>
+        <div class="task-progress-wrap"><span class="task-pct">0%</span></div>
+      </div>
+      <div class="progress-track"><div class="progress-fill"></div></div>
     </div>
 
-    <div class="task-row" onclick="toggleTask(this)" data-id="video">
-      <div class="task-check"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4.5L4.5 8L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="task-body">
-        <div class="task-name">Video für Arbeitgeber</div>
-        <div class="task-time">18:00 – 18:30 · Record. Don't overthink. First take counts.</div>
+    <div class="task-card" data-id="video" data-cat="work" onclick="toggleTask(this)">
+      <div class="task-card-top">
+        <div class="check-circle"><svg width="12" height="9" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="task-body">
+          <div class="task-name">Video für Arbeitgeber</div>
+          <div class="task-sub">18:00 – 18:30 · Record it. First take counts.</div>
+        </div>
+        <button class="task-menu-btn" onclick="event.stopPropagation()">···</button>
       </div>
-      <div class="task-tag tag-work">Work</div>
+      <div class="task-card-bottom">
+        <span class="task-tag tag-work">Work</span>
+        <div class="task-progress-wrap"><span class="task-pct">0%</span></div>
+      </div>
+      <div class="progress-track"><div class="progress-fill"></div></div>
     </div>
 
-    <div class="task-row" onclick="toggleTask(this)" data-id="quran">
-      <div class="task-check"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4.5L4.5 8L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="task-body">
-        <div class="task-name">Learn Islam / Quran</div>
-        <div class="task-time">Evening · 20 minutes. Soul work is the foundation.</div>
+    <div class="task-card" data-id="quran-task" data-cat="soul" onclick="toggleTask(this)">
+      <div class="task-card-top">
+        <div class="check-circle"><svg width="12" height="9" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="task-body">
+          <div class="task-name">Learn Islam / Quran</div>
+          <div class="task-sub">Evening · 20 minutes. Soul before sleep.</div>
+        </div>
+        <button class="task-menu-btn" onclick="event.stopPropagation()">···</button>
       </div>
-      <div class="task-tag tag-soul">Soul</div>
+      <div class="task-card-bottom">
+        <span class="task-tag tag-soul">Soul</span>
+        <div class="task-progress-wrap"><span class="task-pct">0%</span></div>
+      </div>
+      <div class="progress-track"><div class="progress-fill"></div></div>
     </div>
 
   </div>
-</div>
 
-<!-- BLOCKED EMAILS -->
-<div class="section">
-  <div class="section-label">Cold Emails · Blocked</div>
-  <div class="blocked-section" id="blockedSection">
-    <div class="blocked-header">
-      <div class="blocked-icon">🔒</div>
-      <div>
-        <div class="blocked-title">Blocked until sites are live</div>
-        <div class="blocked-sub" id="blockedSub">Complete both Build tasks to unlock</div>
-      </div>
-      <button class="blocked-unlock" id="unlockBtn" onclick="unlockEmails()">Unlock</button>
+  <!-- Blocked Emails -->
+  <div class="blocked-header" id="blockedHeader">
+    <div class="blocked-pill">🔒 Blocked</div>
+    <div>
+      <div class="blocked-label">Cold Emails</div>
+      <div class="blocked-sublabel" id="blockedSub">Complete both Build tasks to unlock</div>
     </div>
+    <button class="unlock-btn" id="unlockBtn" onclick="unlockEmails()">Unlock ✓</button>
+  </div>
+  <div class="blocked-list" id="blockedList">
     <div class="blocked-row" id="email-reiner" onclick="toggleBlocked(this)">
-      <div class="task-check"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4.5L4.5 8L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="task-body">
-        <div class="task-name">Cold Email — Reiner</div>
-        <div class="task-time">Draft → send. Don't polish forever.</div>
-      </div>
-      <div class="task-tag tag-money">Money</div>
+      <div class="check-circle"><svg width="12" height="9" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-body"><div class="task-name">Cold Email — Reiner</div><div class="task-sub">Draft → send. One email.</div></div>
+      <span class="task-tag tag-money">Money</span>
     </div>
     <div class="blocked-row" id="email-ag" onclick="toggleBlocked(this)">
-      <div class="task-check"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4.5L4.5 8L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="task-body">
-        <div class="task-name">Cold Email — Arbeitgeber</div>
-        <div class="task-time">Copy Reiner structure. Adapt. Send.</div>
-      </div>
-      <div class="task-tag tag-money">Money</div>
+      <div class="check-circle"><svg width="12" height="9" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-body"><div class="task-name">Cold Email — Arbeitgeber</div><div class="task-sub">Copy structure. Adapt. Send.</div></div>
+      <span class="task-tag tag-money">Money</span>
     </div>
     <div class="blocked-row" id="email-pv" onclick="toggleBlocked(this)">
-      <div class="task-check"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4.5L4.5 8L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="task-body">
-        <div class="task-name">Cold Email — Personalvermittler</div>
-        <div class="task-time">Same rhythm. Send today.</div>
-      </div>
-      <div class="task-tag tag-money">Money</div>
+      <div class="check-circle"><svg width="12" height="9" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-body"><div class="task-name">Cold Email — Personalvermittler</div><div class="task-sub">Same rhythm. Send today.</div></div>
+      <span class="task-tag tag-money">Money</span>
     </div>
   </div>
-</div>
 
-<!-- MEAL PLAN -->
-<div class="section">
-  <div class="section-label">Meal Plan</div>
-  <div class="meal-group">
-    <div class="meal-row">
+  <div style="height:20px"></div>
+</div><!-- end page-home -->
+
+<!-- ╔══════════════════════╗ -->
+<!-- ║   MEALS              ║ -->
+<!-- ╚══════════════════════╝ -->
+<div class="page" id="page-meals">
+  <div class="top-bar">
+    <div class="app-wordmark">Do It<span>.</span></div>
+    <div class="avatar-self">A</div>
+  </div>
+  <div class="meal-hero">
+    <h1>Fuel Up 🥗</h1>
+    <p>Eat for performance, not comfort.</p>
+  </div>
+  <div class="meal-cards">
+    <div class="meal-card">
       <div class="meal-emoji">🥚</div>
-      <div class="meal-body">
-        <div class="meal-name">Eggs + Avocado Toast</div>
-        <div class="meal-desc">Breakfast · Protein + healthy fats. No crash.</div>
-      </div>
-      <div class="meal-kcal">~450</div>
+      <div class="meal-body"><div class="meal-name">Eggs + Avocado Toast</div><div class="meal-desc">Breakfast · Protein + healthy fats</div></div>
+      <div class="meal-kcal">450</div>
     </div>
-    <div class="meal-row">
+    <div class="meal-card">
       <div class="meal-emoji">🍗</div>
-      <div class="meal-body">
-        <div class="meal-name">Chicken Rice Bowl</div>
-        <div class="meal-desc">Lunch · Lean protein + complex carbs. Fuel for the build.</div>
-      </div>
-      <div class="meal-kcal">~620</div>
+      <div class="meal-body"><div class="meal-name">Chicken Rice Bowl</div><div class="meal-desc">Lunch · Lean protein + complex carbs</div></div>
+      <div class="meal-kcal">620</div>
     </div>
-    <div class="meal-row">
+    <div class="meal-card">
       <div class="meal-emoji">🐟</div>
-      <div class="meal-body">
-        <div class="meal-name">Salmon + Sweet Potato</div>
-        <div class="meal-desc">Dinner · Omega-3 + slow carbs. Recovery mode.</div>
+      <div class="meal-body"><div class="meal-name">Salmon + Sweet Potato</div><div class="meal-desc">Dinner · Omega-3 + slow carbs</div></div>
+      <div class="meal-kcal">580</div>
+    </div>
+  </div>
+  <div class="shop-section">
+    <div class="shop-title">Shopping List 🛒</div>
+    <div class="shop-grid">
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-check"><svg width="10" height="7" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="shop-name">Eggs (6)</div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-check"><svg width="10" height="7" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="shop-name">Avocado (2)</div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-check"><svg width="10" height="7" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="shop-name">Salmon (200g)</div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-check"><svg width="10" height="7" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="shop-name">Sweet potato (2)</div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-check"><svg width="10" height="7" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="shop-name">Chicken thighs (2)</div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-check"><svg width="10" height="7" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="shop-name">Rice (200g)</div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-check"><svg width="10" height="7" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="shop-name">Broccoli</div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-check"><svg width="10" height="7" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="shop-name">Greek yogurt</div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-check"><svg width="10" height="7" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="shop-name">Mixed berries</div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-check"><svg width="10" height="7" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="shop-name">Bananas</div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-check"><svg width="10" height="7" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="shop-name">Garlic</div></div>
+      <div class="shop-item" onclick="toggleShop(this)"><div class="shop-check"><svg width="10" height="7" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="shop-name">Peanut butter</div></div>
+    </div>
+  </div>
+  <div style="height:20px"></div>
+</div>
+
+<!-- ╔══════════════════════╗ -->
+<!-- ║   VISION             ║ -->
+<!-- ╚══════════════════════╝ -->
+<div class="page" id="page-vision">
+  <div class="top-bar">
+    <div class="app-wordmark">Do It<span>.</span></div>
+    <div class="avatar-self">A</div>
+  </div>
+  <div class="vision-hero">
+    <h1>The Vision ✦</h1>
+    <p>Parked — not forgotten. The big picture lives here.</p>
+  </div>
+  <div class="vision-list">
+    <div class="vision-item"><div class="vision-num">1</div><div class="vision-text">Brain — Standalone knowledge system</div></div>
+    <div class="vision-item"><div class="vision-num">2</div><div class="vision-text">Jarvis + Brain — Co-evolution engine</div></div>
+    <div class="vision-item"><div class="vision-num">3</div><div class="vision-text">Launch Webuild / Digitalo Company</div></div>
+    <div class="vision-item"><div class="vision-num">4</div><div class="vision-text">Make the 3-Sided Website</div></div>
+    <div class="vision-item"><div class="vision-num">5</div><div class="vision-text">Set up Manychat — Customers + Business Owners</div></div>
+    <div class="vision-item"><div class="vision-num">6</div><div class="vision-text">Launch Meta-Ads for employers</div></div>
+    <div class="vision-item"><div class="vision-num">7</div><div class="vision-text">Company that builds websites &amp; systems</div></div>
+    <div class="vision-item"><div class="vision-num">8</div><div class="vision-text">Framer Templates → Design Extractor → AI</div></div>
+    <div class="vision-item"><div class="vision-num">9</div><div class="vision-text">Pre-made sites → Template Library → Scale</div></div>
+    <div class="vision-item"><div class="vision-num">10</div><div class="vision-text">Kentnissprüfung App, Site and Videos</div></div>
+    <div class="vision-item"><div class="vision-num">11</div><div class="vision-text">Plan For Dr. Lashin</div></div>
+    <div class="vision-item"><div class="vision-num">12</div><div class="vision-text">Plan for Webuild</div></div>
+    <div class="vision-item"><div class="vision-num">13</div><div class="vision-text">Jarvis → Claude Hybrid Model (Notion bridge)</div></div>
+    <div class="vision-item"><div class="vision-num">14</div><div class="vision-text">Startup video for Jarvis + fix speed + design</div></div>
+    <div class="vision-item"><div class="vision-num">15</div><div class="vision-text">Download WhatsApp messages → Claude replies</div></div>
+    <div class="vision-item"><div class="vision-num">16</div><div class="vision-text">Redesign Home (table, glass, balcony)</div></div>
+    <div class="vision-item"><div class="vision-num">17</div><div class="vision-text">Sell Baba's furniture, add stuff to home</div></div>
+    <div class="vision-item"><div class="vision-num">18</div><div class="vision-text">Claude + Higgsfield setup</div></div>
+    <div class="vision-item"><div class="vision-num">19</div><div class="vision-text">Claude code as Jarvis coder via Notion</div></div>
+    <div class="vision-item"><div class="vision-num">20</div><div class="vision-text">Openclaw on old laptop</div></div>
+  </div>
+  <div style="height:20px"></div>
+</div>
+
+<!-- ╔══════════════════════╗ -->
+<!-- ║   ME                 ║ -->
+<!-- ╚══════════════════════╝ -->
+<div class="page" id="page-me">
+  <div class="top-bar">
+    <div class="app-wordmark">Do It<span>.</span></div>
+    <div class="avatar-self">A</div>
+  </div>
+  <div class="me-section">
+    <h1>Adam 👤</h1>
+    <p>Streak, notifications &amp; soul.</p>
+  </div>
+  <div class="me-cards">
+    <div class="me-card">
+      <div class="streak-card">
+        <div class="streak-num" id="streakNum">1</div>
+        <div><div class="streak-label">🔥 Day streak</div><div class="streak-sub">Keep finishing your days</div></div>
       </div>
-      <div class="meal-kcal">~580</div>
     </div>
-  </div>
-</div>
-
-<!-- SHOPPING LIST -->
-<div class="section">
-  <div class="section-label">Shopping List</div>
-  <div class="shop-grid">
-    <div class="shop-item" onclick="toggleShop(this)">
-      <div class="shop-check"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="shop-name">Eggs (6)</div>
-    </div>
-    <div class="shop-item" onclick="toggleShop(this)">
-      <div class="shop-check"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="shop-name">Avocado (2)</div>
-    </div>
-    <div class="shop-item" onclick="toggleShop(this)">
-      <div class="shop-check"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="shop-name">Salmon fillet (200g)</div>
-    </div>
-    <div class="shop-item" onclick="toggleShop(this)">
-      <div class="shop-check"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="shop-name">Sweet potato (2)</div>
-    </div>
-    <div class="shop-item" onclick="toggleShop(this)">
-      <div class="shop-check"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="shop-name">Chicken thighs (2)</div>
-    </div>
-    <div class="shop-item" onclick="toggleShop(this)">
-      <div class="shop-check"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="shop-name">Rice (200g)</div>
-    </div>
-    <div class="shop-item" onclick="toggleShop(this)">
-      <div class="shop-check"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="shop-name">Broccoli</div>
-    </div>
-    <div class="shop-item" onclick="toggleShop(this)">
-      <div class="shop-check"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="shop-name">Greek yogurt</div>
-    </div>
-    <div class="shop-item" onclick="toggleShop(this)">
-      <div class="shop-check"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="shop-name">Mixed berries</div>
-    </div>
-    <div class="shop-item" onclick="toggleShop(this)">
-      <div class="shop-check"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="shop-name">Bananas</div>
-    </div>
-    <div class="shop-item" onclick="toggleShop(this)">
-      <div class="shop-check"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="shop-name">Garlic</div>
-    </div>
-    <div class="shop-item" onclick="toggleShop(this)">
-      <div class="shop-check"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="shop-name">Peanut butter</div>
-    </div>
-  </div>
-</div>
-
-<!-- QURAN / ISLAM -->
-<div class="section">
-  <div class="section-label">Soul · Quran</div>
-  <div class="quran-card">
-    <div class="quran-top">
-      <div class="quran-label">Daily Remembrance</div>
-      <div class="quran-streak" id="quranStreak">📿 0 days</div>
-    </div>
-    <div class="quran-ayah">إِنَّ مَعَ الْعُسْرِ يُسْرًا</div>
-    <div class="quran-ref">Surah Al-Inshirah 94:6 · "Indeed, with hardship comes ease."</div>
-    <button class="quran-btn" onclick="markQuran(this)">✓ Done for Today</button>
-  </div>
-</div>
-
-<!-- PUSH NOTIFICATIONS -->
-<div class="section">
-  <div class="section-label">Morning Reminder</div>
-  <button class="notify-btn" onclick="toggleNotify(this)">
-    <div class="notify-icon">🔔</div>
-    <div class="notify-body">
-      <div class="notify-title">Daily 8:00 AM Push</div>
-      <div class="notify-sub">Get notified when today's list is ready</div>
-    </div>
-    <div class="notify-status notify-off" id="notifyStatus">OFF</div>
-  </button>
-</div>
-
-<!-- PARKED -->
-<div class="section">
-  <div class="section-label">Parked · Not Today</div>
-  <div class="parked-card">
-    <div class="parked-toggle" onclick="toggleParked()">
-      <div class="parked-left">
-        <div class="parked-emoji">🗂</div>
-        <div>
-          <div class="parked-title">Vision & Projects</div>
-          <div class="parked-count">23 items — safe here, not forgotten</div>
+    <div class="me-card" onclick="toggleNotify(this)" style="cursor:pointer">
+      <div class="notify-row">
+        <div class="notify-icon-wrap">🔔</div>
+        <div class="notify-body">
+          <div class="notify-title">Daily 8:00 AM Push</div>
+          <div class="notify-sub">Get notified when today's list is ready</div>
         </div>
+        <div class="notify-status notify-off" id="notifyStatus">OFF</div>
       </div>
-      <div class="parked-chev" id="parkedChev">›</div>
     </div>
-    <div class="parked-body" id="parkedBody">
-      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Brain — Standalone knowledge system</div></div>
-      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Jarvis + Brain — Co-evolution engine, refine vision</div></div>
-      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Launch Webuild / Digitalo Company</div></div>
-      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Make the 3-Sided Website</div></div>
-      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Website for Employer</div></div>
-      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Set up Manychat — Customers + Business Owners</div></div>
-      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Launch Meta-Ads for employers</div></div>
-      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Start the Company that builds websites & systems</div></div>
-      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Framer Templates → Design Extractor Plugin → AI</div></div>
-      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Pre-Made sites → Extract → Template Library → Scale</div></div>
-      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Kentnissprüfung App, Site and Vids</div></div>
-      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Plan For Dr. Lashin</div></div>
-      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Plan for Webuild</div></div>
-      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Plan For Life</div></div>
-      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Claude + Higgsfield setup</div></div>
-      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Jarvis → Claude Hybrid Model (Notion bridge)</div></div>
-      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Startup video for Jarvis + fix app speed + design</div></div>
-      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Claude code as Jarvis coder via Notion</div></div>
-      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Download WhatsApp messages → Claude replies</div></div>
-      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Openclaw on old laptop</div></div>
-      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Redesign Home (Printer table, glass, balcony)</div></div>
-      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Sell Baba's furniture, add stuff to home</div></div>
-      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Figure out Claude design + system so you stop re-prompting</div></div>
+    <div class="quran-card-inner">
+      <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px">Daily Remembrance · <span id="quranStreak">0 days</span></div>
+      <div class="quran-ayah">إِنَّ مَعَ الْعُسْرِ يُسْرًا</div>
+      <div class="quran-ref">Surah Al-Inshirah 94:6 · "Indeed, with hardship comes ease."</div>
+      <button class="quran-btn" id="quranBtn" onclick="markQuran(this)">✓ Done for Today</button>
     </div>
   </div>
+  <div style="height:20px"></div>
 </div>
 
-<div style="height:40px"></div>
-</div><!-- end #app -->
+</div><!-- end .pages -->
+</div><!-- end #main -->
+</div><!-- end #shell -->
+
+<!-- TAB BAR (mobile) -->
+<nav class="tab-bar">
+  <button class="tab-btn active" id="tab-home" onclick="switchTab('home')">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>Today</span>
+  </button>
+  <button class="tab-btn" id="tab-meals" onclick="switchTab('meals')">
+    <svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+    <span>Meals</span>
+  </button>
+  <div class="tab-fab-wrap">
+    <button class="tab-fab">+</button>
+  </div>
+  <button class="tab-btn" id="tab-vision" onclick="switchTab('vision')">
+    <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    <span>Vision</span>
+  </button>
+  <button class="tab-btn" id="tab-me" onclick="switchTab('me')">
+    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>Me</span>
+  </button>
+</nav>
 
 <script>
-const CORRECT_PIN = '0605';
-const PIN_KEY = 'adam_pin_v1';
-const STATE_KEY = 'adam_ios_v2';
-const VAPID_PUBLIC = 'BAkRnXwUgj1gzn04jv2GCArscugp7Q_kb0vAP7ghTPHuOcDobGAQ61FXmiGoTMLEfjr_lvs3qwXKjIHFLK9tFwM';
 const WORKER_URL = 'https://adam-today-push.adamlashin2.workers.dev';
+const VAPID_PUBLIC = 'BAkRnXwUgj1gzn04jv2GCArscugp7Q_kb0vAP7ghTPHuOcDobGAQ61FXmiGoTMLEfjr_lvs3qwXKjIHFLK9tFwM';
+const STATE_KEY = 'doit_v2';
+const TODAY = new Date().toDateString();
 
-// ── PIN LOGIC ──
-let pinEntry = '';
+/* ── STATE ── */
+function getState(){try{const s=JSON.parse(localStorage.getItem(STATE_KEY)||'{}');if(s.date!==TODAY){return{date:TODAY,tasks:{},emails:{},emailsUnlocked:false,streak:s.completedYesterday?(s.streak||0)+1:(s.streak||0)};}return s;}catch(e){return{date:TODAY,tasks:{},emails:{},emailsUnlocked:false,streak:0};}}
+function saveState(s){localStorage.setItem(STATE_KEY,JSON.stringify(s));}
 
-function checkPinSession() {
-  try {
-    const s = JSON.parse(localStorage.getItem(PIN_KEY) || '{}');
-    if (s.unlocked && Date.now() - s.unlocked < 12 * 60 * 60 * 1000) {
-      showApp(); return;
-    }
-  } catch(e) {}
-  document.getElementById('pinScreen').style.display = 'flex';
+/* ── TOAST ── */
+let toastTimer;
+function showToast(icon,msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toastIcon').textContent=icon;
+  document.getElementById('toastMsg').textContent=msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2600);
 }
 
-function pinPress(d) {
-  if (pinEntry.length >= 4) return;
-  pinEntry += d;
-  for (let i = 0; i < 4; i++) {
-    document.getElementById('d'+i).classList.toggle('filled', i < pinEntry.length);
-  }
-  if (pinEntry.length === 4) {
-    if (pinEntry === CORRECT_PIN) {
-      localStorage.setItem(PIN_KEY, JSON.stringify({unlocked: Date.now()}));
-      document.getElementById('pinScreen').style.transition = 'opacity 0.4s';
-      document.getElementById('pinScreen').style.opacity = '0';
-      setTimeout(showApp, 400);
-    } else {
-      document.getElementById('pinError').classList.add('show');
-      document.getElementById('pinScreen').style.animation = 'shake 0.4s ease';
-      setTimeout(() => {
-        pinEntry = '';
-        for (let i = 0; i < 4; i++) document.getElementById('d'+i).classList.remove('filled');
-        document.getElementById('pinError').classList.remove('show');
-        document.getElementById('pinScreen').style.animation = '';
-      }, 700);
-    }
+/* ── PARTICLES ── */
+function burst(el){
+  const r=el.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+  const colors=['#FF6B2B','#34C759','#007AFF','#AF52DE','#FFD60A'];
+  for(let i=0;i<10;i++){
+    const p=document.createElement('div');p.className='particle';
+    const a=(i/10)*360,d=35+Math.random()*35;
+    p.style.cssText=`left:${cx-3.5}px;top:${cy-3.5}px;background:${colors[i%5]};--dx:${Math.cos(a*Math.PI/180)*d}px;--dy:${Math.sin(a*Math.PI/180)*d}px`;
+    document.body.appendChild(p);setTimeout(()=>p.remove(),650);
   }
 }
 
-function pinDel() {
-  if (!pinEntry.length) return;
-  pinEntry = pinEntry.slice(0, -1);
-  for (let i = 0; i < 4; i++) {
-    document.getElementById('d'+i).classList.toggle('filled', i < pinEntry.length);
+/* ── TOGGLE TASK ── */
+const TASK_NAMES={gym:'Go Gym',shop:'Groceries',whatsapp:'WhatsApp replied','build-pv':'Personalvermittler site','build-ag':'Arbeitgeber site',video:'Video recorded','quran-task':'Quran done',ebay:'Jacket listed'};
+const TASK_ICONS={gym:'💪',shop:'🛒',whatsapp:'✓',ebay:'💰','build-pv':'🚀','build-ag':'🚀',video:'🎬','quran-task':'🌙'};
+
+function toggleTask(card){
+  const id=card.dataset.id;
+  const wasDone=card.classList.contains('done');
+  card.classList.toggle('done');
+  const pct=card.querySelector('.task-pct');
+  if(pct) pct.textContent=wasDone?'0%':'100%';
+  if(!wasDone){
+    burst(card);
+    showToast(TASK_ICONS[id]||'✓', (TASK_NAMES[id]||id)+' — done!');
+  }
+  const s=getState();if(!s.tasks)s.tasks={};
+  s.tasks[id]=!wasDone;saveState(s);
+  updateBanner();checkBuildsForUnlock();checkAllDone();
+}
+
+/* ── BLOCKED EMAILS ── */
+function toggleBlocked(row){
+  if(!row.classList.contains('unlocked'))return;
+  const wasDone=row.classList.contains('done');
+  row.classList.toggle('done');
+  if(!wasDone){burst(row);showToast('📧',row.querySelector('.task-name').textContent+' — sent!');}
+  const s=getState();if(!s.emails)s.emails={};
+  s.emails[row.id]=!wasDone;saveState(s);
+}
+function checkBuildsForUnlock(){
+  const s=getState();
+  const buildsDone=s.tasks&&s.tasks['build-pv']&&s.tasks['build-ag'];
+  if(buildsDone&&!s.emailsUnlocked){
+    document.getElementById('unlockBtn').style.display='block';
+    document.getElementById('blockedSub').textContent='✓ Both sites live — ready to send';
   }
 }
-
-function showApp() {
-  document.getElementById('pinScreen').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-  loadState();
-  updateUI();
-}
-
-// ── STATE ──
-function getState() {
-  try { return JSON.parse(localStorage.getItem(STATE_KEY) || '{}'); } catch(e) { return {}; }
-}
-function saveState(s) { localStorage.setItem(STATE_KEY, JSON.stringify(s)); }
-
-function loadState() {
-  const s = getState();
-  // Tasks
-  document.querySelectorAll('.task-row[data-id]').forEach(row => {
-    if (s.tasks && s.tasks[row.dataset.id]) row.classList.add('done');
+function unlockEmails(){
+  ['email-reiner','email-ag','email-pv'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.classList.add('unlocked');
   });
-  // Emails
-  ['email-reiner','email-ag','email-pv'].forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    if (s.emailsUnlocked) el.classList.add('unlocked');
-    if (s.emails && s.emails[id]) el.classList.add('done');
+  document.getElementById('unlockBtn').style.display='none';
+  document.getElementById('blockedSub').textContent='Sites live — go send those emails';
+  const s=getState();s.emailsUnlocked=true;saveState(s);
+  showToast('🔓','Cold emails unlocked!');
+}
+
+/* ── BANNER ── */
+function updateBanner(){
+  const cards=document.querySelectorAll('.task-card');
+  const rem=Array.from(cards).filter(c=>!c.classList.contains('done')).length;
+  const el=document.getElementById('remainCount');if(el)el.textContent=rem;
+  if(rem===0)document.getElementById('taskBanner').classList.add('hidden');
+}
+
+/* ── ALL DONE ── */
+function checkAllDone(){
+  const cards=document.querySelectorAll('.task-card');
+  const allDone=Array.from(cards).every(c=>c.classList.contains('done'));
+  if(allDone){
+    setTimeout(()=>{
+      const o=document.getElementById('doneOverlay');o.style.display='flex';
+      const s=getState();s.completedYesterday=true;s.streak=(s.streak||0)+1;saveState(s);
+      document.getElementById('streakNum').textContent=s.streak;
+    },700);
+  }
+}
+
+/* ── SHOP ── */
+function toggleShop(item){item.classList.toggle('got');}
+
+/* ── FILTER ── */
+function filterTasks(cat,pill){
+  document.querySelectorAll('.cat-pill').forEach(p=>p.classList.remove('active'));
+  pill.classList.add('active');
+  document.querySelectorAll('.task-card').forEach(card=>{
+    card.style.display=(cat==='all'||card.dataset.cat===cat)?'':'none';
   });
-  if (s.emailsUnlocked) {
-    document.getElementById('unlockBtn').style.display = 'none';
+}
+
+/* ── TAB SWITCH ── */
+function switchTab(tab){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.sidebar-tab').forEach(b=>b.classList.remove('active'));
+  const page=document.getElementById('page-'+tab);
+  if(page){page.classList.add('active');}
+  const mTab=document.getElementById('tab-'+tab);if(mTab)mTab.classList.add('active');
+  const sTab=document.getElementById('stab-'+tab);if(sTab)sTab.classList.add('active');
+}
+
+/* ── QURAN ── */
+function markQuran(btn){
+  btn.textContent='✓ Done — بارك الله فيك';btn.disabled=true;
+  btn.style.background='rgba(52,199,89,0.25)';btn.style.color='#34C759';
+  const s=getState();s.quranStreak=(s.quranStreak||0)+1;saveState(s);
+  document.getElementById('quranStreak').textContent=s.quranStreak+' days';
+  showToast('🌙','Quran done — بارك الله فيك');
+}
+
+/* ── NOTIFICATIONS ── */
+function urlBase64ToUint8Array(b64){const pad='='.repeat((4-b64.length%4)%4);const raw=atob((b64+pad).replace(/-/g,'+').replace(/_/g,'/'));const out=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)out[i]=raw.charCodeAt(i);return out;}
+
+async function toggleNotify(card){
+  const isStandalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
+  if(!isStandalone){alert('To enable notifications:\n\n1. Tap Share in Safari\n2. "Add to Home Screen"\n3. Open Do It from your home screen\n4. Tap this again');return;}
+  if(!('Notification' in window)||!('serviceWorker' in navigator)||!('PushManager' in window)){alert('Push requires iOS 16.4+ with Do It installed to Home Screen.');return;}
+  const status=document.getElementById('notifyStatus');
+  if(status.classList.contains('notify-on')){
+    try{const reg=await navigator.serviceWorker.ready;const sub=await reg.pushManager.getSubscription();if(sub){await fetch(WORKER_URL+'/subscribe',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub)});await sub.unsubscribe();}}catch(e){}
+    status.textContent='OFF';status.className='notify-status notify-off';return;
+  }
+  try{
+    const perm=await Notification.requestPermission();
+    if(perm!=='granted'){alert('Notifications blocked. Go to Settings → Do It → Notifications.');return;}
+    const reg=await navigator.serviceWorker.ready;
+    const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(VAPID_PUBLIC)});
+    await fetch(WORKER_URL+'/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub)});
+    status.textContent='ON ✓';status.className='notify-status notify-on';
+    showToast('🔔','Morning reminders on!');
+  }catch(e){alert('Could not enable: '+e.message);}
+}
+
+/* ── DATE ── */
+function setDate(){
+  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const n=new Date();
+  document.getElementById('heroDate').textContent=days[n.getDay()]+' · '+months[n.getMonth()]+' '+n.getDate();
+}
+
+/* ── INIT ── */
+function init(){
+  setDate();
+  const s=getState();
+  // Restore tasks
+  document.querySelectorAll('.task-card[data-id]').forEach(card=>{
+    if(s.tasks&&s.tasks[card.dataset.id]){
+      card.classList.add('done');
+      const pct=card.querySelector('.task-pct');if(pct)pct.textContent='100%';
+    }
+  });
+  // Restore emails
+  ['email-reiner','email-ag','email-pv'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    if(s.emailsUnlocked)el.classList.add('unlocked');
+    if(s.emails&&s.emails[id])el.classList.add('done');
+  });
+  if(s.emailsUnlocked){
+    document.getElementById('unlockBtn').style.display='none';
+    document.getElementById('blockedSub').textContent='Sites live — go send those emails';
   }
   // Streak
-  const streak = s.streak || 1;
-  document.getElementById('streakNum').textContent = streak;
-  if (streak <= 1) document.getElementById('streakBar').classList.add('hidden');
-  // Quran
-  document.getElementById('quranStreak').textContent = '📿 ' + (s.quranStreak || 0) + ' days';
+  document.getElementById('streakNum').textContent=s.streak||1;
+  document.getElementById('quranStreak').textContent=(s.quranStreak||0)+' days';
+  updateBanner();checkBuildsForUnlock();
+  // Service worker
+  if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});
 }
 
-function updateUI() {
-  const rows = document.querySelectorAll('.task-row[data-id]');
-  const total = rows.length;
-  const done = Array.from(rows).filter(r => r.classList.contains('done')).length;
-  const pct = total ? Math.round((done / total) * 100) : 0;
-
-  // Ring
-  const circ = 188.5;
-  document.getElementById('ringFg').style.strokeDashoffset = circ - (circ * pct / 100);
-  document.getElementById('ringPct').textContent = pct + '%';
-
-  // Next task
-  const next = Array.from(rows).find(r => !r.classList.contains('done'));
-  if (next) {
-    document.getElementById('nextName').textContent = next.querySelector('.task-name').textContent;
-    document.getElementById('nextBar').style.display = 'flex';
-  } else {
-    document.getElementById('nextBar').style.display = 'none';
-  }
-
-  // Check if builds done → show unlock
-  const s = getState();
-  const buildDone = s.tasks && s.tasks['build-pv'] && s.tasks['build-ag'];
-  if (buildDone && !s.emailsUnlocked) {
-    document.getElementById('unlockBtn').style.display = 'flex';
-    document.getElementById('blockedSub').textContent = '✓ Both sites live — ready to send';
-  }
-
-  // All done?
-  if (done === total) {
-    setTimeout(() => {
-      document.getElementById('doneScreen').style.display = 'flex';
-      // Bump streak
-      const st = getState();
-      st.streak = (st.streak || 0) + 1;
-      st.completedToday = true;
-      saveState(st);
-    }, 600);
-  }
-}
-
-// ── TASK TOGGLE ──
-function toggleTask(row) {
-  const wasDone = row.classList.contains('done');
-  row.classList.toggle('done');
-  if (!wasDone) burst(row);
-  const s = getState();
-  if (!s.tasks) s.tasks = {};
-  s.tasks[row.dataset.id] = !wasDone;
-  saveState(s);
-  updateUI();
-}
-
-function toggleBlocked(row) {
-  if (!row.classList.contains('unlocked')) return;
-  const wasDone = row.classList.contains('done');
-  row.classList.toggle('done');
-  if (!wasDone) burst(row);
-  const s = getState();
-  if (!s.emails) s.emails = {};
-  s.emails[row.id] = !wasDone;
-  saveState(s);
-}
-
-function unlockEmails() {
-  ['email-reiner','email-ag','email-pv'].forEach(id => {
-    document.getElementById(id).classList.add('unlocked');
-  });
-  document.getElementById('unlockBtn').style.display = 'none';
-  document.getElementById('blockedSub').textContent = 'Sites are live — go send those emails';
-  const s = getState();
-  s.emailsUnlocked = true;
-  saveState(s);
-}
-
-// ── SHOP ──
-function toggleShop(item) {
-  item.classList.toggle('got');
-}
-
-// ── PARKED ──
-function toggleParked() {
-  const body = document.getElementById('parkedBody');
-  const chev = document.getElementById('parkedChev');
-  body.classList.toggle('open');
-  chev.classList.toggle('open');
-}
-
-// ── QURAN ──
-function markQuran(btn) {
-  btn.textContent = '✓ Done — بارك الله فيك';
-  btn.style.background = 'rgba(52,199,89,0.25)';
-  btn.style.color = '#34C759';
-  btn.disabled = true;
-  const s = getState();
-  s.quranStreak = (s.quranStreak || 0) + 1;
-  saveState(s);
-  document.getElementById('quranStreak').textContent = '📿 ' + s.quranStreak + ' days';
-}
-
-// ── PUSH NOTIFICATIONS ──
-function urlBase64ToUint8Array(b64) {
-  const pad = '='.repeat((4 - b64.length % 4) % 4);
-  const raw = atob((b64 + pad).replace(/-/g, '+').replace(/_/g, '/'));
-  const out = new Uint8Array(raw.length);
-  for (let i = 0; i < raw.length; ++i) out[i] = raw.charCodeAt(i);
-  return out;
-}
-
-async function toggleNotify(btn) {
-  // iOS push only works from installed PWA (Add to Home Screen)
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-    || window.navigator.standalone === true;
-  if (!isStandalone) {
-    alert('To enable notifications:\n\n1. Tap the Share button in Safari\n2. Tap "Add to Home Screen"\n3. Open the app from your Home Screen\n4. Tap this button again');
-    return;
-  }
-  if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
-    alert('Push notifications require iOS 16.4+ with the app installed to Home Screen.');
-    return;
-  }
-  const status = document.getElementById('notifyStatus');
-  if (status.classList.contains('notify-on')) {
-    try {
-      const reg = await navigator.serviceWorker.ready;
-      const sub = await reg.pushManager.getSubscription();
-      if (sub) {
-        await fetch(WORKER_URL + '/subscribe', {method:'DELETE', headers:{'Content-Type':'application/json'}, body: JSON.stringify(sub)});
-        await sub.unsubscribe();
-      }
-    } catch(e) {}
-    status.textContent = 'OFF'; status.className = 'notify-status notify-off';
-    return;
-  }
-  try {
-    const perm = await Notification.requestPermission();
-    if (perm !== 'granted') { alert('Notifications blocked — go to Settings → [Your App] → Notifications and enable them.'); return; }
-    const reg = await navigator.serviceWorker.ready;
-    const sub = await reg.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC)
-    });
-    await fetch(WORKER_URL + '/subscribe', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify(sub)
-    });
-    status.textContent = 'ON ✓'; status.className = 'notify-status notify-on';
-  } catch(e) {
-    alert('Could not enable notifications: ' + e.message);
-  }
-}
-
-// ── PARTICLE BURST ──
-function burst(el) {
-  const rect = el.getBoundingClientRect();
-  const cx = rect.left + rect.width / 2;
-  const cy = rect.top + rect.height / 2;
-  const colors = ['#007AFF','#34C759','#AF52DE','#FF9500','#FFD60A'];
-  for (let i = 0; i < 12; i++) {
-    const p = document.createElement('div');
-    p.className = 'particle';
-    const angle = (i / 12) * 360;
-    const dist = 40 + Math.random() * 40;
-    p.style.cssText = `
-      left:${cx - 4}px; top:${cy - 4}px;
-      background:${colors[i % colors.length]};
-      --dx:${Math.cos(angle * Math.PI/180) * dist}px;
-      --dy:${Math.sin(angle * Math.PI/180) * dist}px;
-    `;
-    document.body.appendChild(p);
-    setTimeout(() => p.remove(), 700);
-  }
-}
-
-// ── DATE ──
-function setDate() {
-  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  const now = new Date();
-  document.getElementById('greetLabel').textContent = days[now.getDay()] + ' · ' + months[now.getMonth()] + ' ' + now.getDate();
-  const h = now.getHours();
-  const greet = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
-  document.getElementById('dateLabel').textContent = greet + ', Adam';
-}
-
-// ── SERVICE WORKER ──
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').catch(() => {});
-}
-
-// ── INIT ──
-setDate();
-checkPinSession();
+init();
 </script>
-
-<style>
-@keyframes shake {
-  0%,100% { transform: translateX(0); }
-  20% { transform: translateX(-12px); }
-  40% { transform: translateX(12px); }
-  60% { transform: translateX(-8px); }
-  80% { transform: translateX(8px); }
-}
-</style>
 </body>
 </html>
