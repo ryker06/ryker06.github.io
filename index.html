@@ -36,9 +36,9 @@ body.dark .sidebar,body.dark .tab-bar{background:#111}
 .s-fab{margin-top:auto;width:44px;height:44px;border-radius:50%;background:var(--orange);border:none;color:white;font-size:22px;font-weight:300;cursor:pointer;box-shadow:0 4px 14px rgba(255,107,43,.4)}
 #main{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
 .pages{flex:1;overflow:hidden;position:relative}
-.page{position:absolute;inset:0;overflow-y:auto;opacity:0;transform:translateY(12px);transition:opacity .22s,transform .22s;pointer-events:none;padding-bottom:calc(var(--tab-h) + var(--safe-bot) + 20px)}
+.page{position:absolute;inset:0;overflow-y:auto;opacity:0;transform:translateY(12px);transition:opacity .22s,transform .22s;pointer-events:none;padding-bottom:20px}
 .page.active{opacity:1;transform:none;pointer-events:auto}
-.tab-bar{position:fixed;bottom:0;left:0;right:0;z-index:100;height:calc(var(--tab-h) + var(--safe-bot));background:var(--card);border-top:1px solid var(--sep);display:flex;align-items:flex-start;padding-top:10px}
+.tab-bar{flex-shrink:0;z-index:100;height:calc(var(--tab-h) + var(--safe-bot));background:var(--card);border-top:1px solid var(--sep);display:flex;align-items:flex-start;padding-top:10px}
 .t-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--text3);cursor:pointer;padding:0 4px}
 .t-btn svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .t-btn span{font-size:10px;font-weight:500}
@@ -550,7 +550,7 @@ body.dark .banner{background:#2C2C2E}
       <span class="me-row-val">→</span>
     </div>
   </div>
-  <div style="padding:16px 20px 20px;text-align:center;font-size:12px;color:var(--text3)">Do It · v2.9 · <span id="buildDate"></span></div>
+  <div style="padding:16px 20px 20px;text-align:center;font-size:12px;color:var(--text3)">Do It · v2.10 · <span id="buildDate"></span></div>
   <div style="height:20px"></div>
 </div>
 
@@ -590,8 +590,6 @@ body.dark .banner{background:#2C2C2E}
 </div>
 
 </div><!-- end .pages -->
-</div><!-- end #main -->
-</div><!-- end #shell -->
 
 <!-- TAB BAR -->
 <nav class="tab-bar">
@@ -609,6 +607,9 @@ body.dark .banner{background:#2C2C2E}
     <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Me</span>
   </button>
 </nav>
+</div><!-- end #main -->
+</div><!-- end #shell -->
+
 
 <!-- ADD TASK MODAL -->
 <div id="addModal" onclick="if(event.target===this)closeAdd()">
@@ -1017,4 +1018,24 @@ function init(){
   // Quran
   document.getElementById('quranStreak').textContent=(s.quranStreak||0)+' days';
   // Notify badge
-  if(navigator.servi
+  if(navigator.serviceWorker&&window.PushManager){
+    navigator.serviceWorker.ready.then(reg=>reg.pushManager.getSubscription()).then(sub=>{
+      if(sub){const b=document.getElementById('notifyBadge');b.textContent='ON ✓';b.className='notify-badge on';const sl=document.getElementById('notifySub');if(sl)sl.textContent='Daily push at 8:00 AM enabled';}
+    }).catch(()=>{});
+  }
+  updateBanner();checkBuilds();refreshMeStats();
+  // Service worker — push-only, no caching. controllerchange is the reliable reload trigger.
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('/sw.js').then(reg=>{
+      reg.update();
+    }).catch(()=>{});
+    navigator.serviceWorker.addEventListener('controllerchange',()=>{
+      window.location.reload();
+    });
+  }
+}
+
+init();
+</script>
+</body>
+</html>
