@@ -972,7 +972,21 @@ function init(){
   document.getElementById('quranStreak').textContent=(s.quranStreak||0)+' days';
   updateBanner();checkBuildsForUnlock();
   // Service worker
-  if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('/sw.js').then(reg=>{
+      // Force check for SW update on every app load
+      reg.update();
+      reg.addEventListener('updatefound',()=>{
+        const nw=reg.installing;
+        nw.addEventListener('statechange',()=>{
+          // New SW activated — reload to get fresh HTML (network-first handles it)
+          if(nw.state==='activated'&&navigator.serviceWorker.controller){
+            window.location.reload();
+          }
+        });
+      });
+    }).catch(()=>{});
+  }
 }
 
 init();
