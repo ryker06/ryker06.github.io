@@ -53,7 +53,7 @@ a{text-decoration:none;color:inherit}
 .sidebar-logo{
   width:42px;height:42px;background:var(--orange);border-radius:12px;
   display:flex;align-items:center;justify-content:center;
-  font-size:20px;font-weight:900;color:white;letter-spacing:-1px;
+  font-size:20px;font-weight:500;color:white;letter-spacing:-1px;
   margin-bottom:16px;
 }
 .sidebar-tab{
@@ -62,7 +62,7 @@ a{text-decoration:none;color:inherit}
   gap:3px;color:var(--text3);transition:all 0.2s var(--ease);cursor:pointer;
 }
 .sidebar-tab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.sidebar-tab span{font-size:9px;font-weight:600;letter-spacing:0.3px}
+.sidebar-tab span{font-size:9px;font-weight:500;letter-spacing:0.3px}
 .sidebar-tab.active{background:var(--orange-light);color:var(--orange)}
 .sidebar-tab:active{transform:scale(0.93)}
 .sidebar-fab{
@@ -90,20 +90,20 @@ a{text-decoration:none;color:inherit}
   gap:12px;
 }
 .top-bar-left{flex:1;display:flex;align-items:center;gap:10px}
-.app-wordmark{font-size:22px;font-weight:900;color:var(--text);letter-spacing:-0.8px}
+.app-wordmark{font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.8px}
 .app-wordmark span{color:var(--orange)}
 .top-bar-right{display:flex;align-items:center;gap:8px}
 .icon-btn{width:36px;height:36px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm)}
 .icon-btn svg{width:18px;height:18px;stroke:var(--text);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .avatar-self{
   width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);
-  display:flex;align-items:center;justify-content:center;color:white;font-size:13px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;color:white;font-size:13px;font-weight:500;
 }
 
 /* ── HERO ── */
 .hero{padding:10px 20px 20px}
-.hero-greeting{font-size:13px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px}
-.hero-title{font-size:34px;font-weight:900;line-height:1.1;letter-spacing:-1.2px;color:var(--text)}
+.hero-greeting{font-size:13px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px}
+.hero-title{font-size:34px;font-weight:700;line-height:1.1;letter-spacing:-1.2px;color:var(--text)}
 .hero-title em{font-style:normal;color:var(--orange)}
 
 /* ── CATEGORY FILTER ── */
@@ -111,7 +111,7 @@ a{text-decoration:none;color:inherit}
 .cat-scroll::-webkit-scrollbar{display:none}
 .cat-pill{
   flex-shrink:0;padding:7px 16px;border-radius:var(--r-pill);
-  font-size:13px;font-weight:600;background:var(--card);color:var(--text2);
+  font-size:13px;font-weight:500;background:var(--card);color:var(--text2);
   box-shadow:var(--shadow-sm);transition:all 0.18s var(--ease);white-space:nowrap;
 }
 .cat-pill.active{background:var(--orange);color:white}
@@ -132,8 +132,8 @@ a{text-decoration:none;color:inherit}
 
 /* ── SECTION HEADER ── */
 .sec-hdr{display:flex;align-items:center;justify-content:space-between;padding:0 20px 12px}
-.sec-title{font-size:20px;font-weight:800;letter-spacing:-0.4px}
-.sec-link{font-size:14px;font-weight:600;color:var(--orange)}
+.sec-title{font-size:20px;font-weight:600;letter-spacing:-0.4px}
+.sec-link{font-size:14px;font-weight:500;color:var(--orange)}
 
 /* ── TASK CARDS ── */
 .task-list{display:flex;flex-direction:column;gap:12px;padding:0 20px}
@@ -156,13 +156,13 @@ a{text-decoration:none;color:inherit}
 .task-card.done .check-circle svg{opacity:1;transform:scale(1)}
 .task-card.done .task-name{text-decoration:line-through;color:var(--text3)}
 .task-body{flex:1;min-width:0}
-.task-name{font-size:16px;font-weight:700;color:var(--text);line-height:1.3;transition:color 0.2s}
+.task-name{font-size:16px;font-weight:500;color:var(--text);line-height:1.3;transition:color 0.2s}
 .task-sub{font-size:13px;color:var(--text3);margin-top:3px;line-height:1.4}
 .task-menu-btn{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:18px;flex-shrink:0}
 .task-menu-btn:active{background:var(--bg)}
 .task-card-bottom{display:flex;align-items:center;justify-content:space-between;padding-bottom:16px}
 .task-tag{
-  font-size:11px;font-weight:700;padding:4px 10px;border-radius:var(--r-pill);
+  font-size:11px;font-weight:500;padding:4px 10px;border-radius:var(--r-pill);
   letter-spacing:0.3px;
 }
 .tag-body{background:rgba(52,199,89,0.12);color:#1a8a37}
@@ -172,7 +172,7 @@ a{text-decoration:none;color:inherit}
 .tag-soul{background:rgba(175,82,222,0.12);color:#6b2fa0}
 .tag-blocked{background:rgba(255,59,48,0.1);color:var(--red)}
 .task-progress-wrap{display:flex;align-items:center;gap:8px}
-.task-pct{font-size:12px;font-weight:700;color:var(--text3)}
+.task-pct{font-size:12px;font-weight:500;color:var(--text3)}
 .task-card.done .task-pct{color:var(--green)}
 /* Progress bar sits at bottom of card */
 .progress-track{
@@ -192,13 +192,13 @@ a{text-decoration:none;color:inherit}
 }
 .blocked-pill{
   background:rgba(255,59,48,0.1);border-radius:var(--r-pill);padding:5px 12px;
-  font-size:12px;font-weight:700;color:var(--red);
+  font-size:12px;font-weight:500;color:var(--red);
 }
-.blocked-label{flex:1;font-size:14px;font-weight:700;color:var(--text)}
+.blocked-label{flex:1;font-size:14px;font-weight:500;color:var(--text)}
 .blocked-sublabel{font-size:12px;color:var(--text3);margin-top:2px}
 .unlock-btn{
   background:var(--green);color:white;border-radius:var(--r-pill);
-  padding:7px 14px;font-size:12px;font-weight:700;display:none;
+  padding:7px 14px;font-size:12px;font-weight:500;display:none;
   transition:transform 0.15s;
 }
 .unlock-btn:active{transform:scale(0.95)}
@@ -220,7 +220,7 @@ a{text-decoration:none;color:inherit}
   transform:translateX(-50%) translateY(20px);
   background:#1C1C1E;color:white;
   padding:12px 20px;border-radius:var(--r-pill);
-  font-size:14px;font-weight:600;
+  font-size:14px;font-weight:500;
   display:flex;align-items:center;gap:8px;
   opacity:0;transition:opacity 0.25s var(--ease),transform 0.3s var(--spring);
   pointer-events:none;z-index:9999;white-space:nowrap;
@@ -231,7 +231,7 @@ a{text-decoration:none;color:inherit}
 
 /* ── MEALS PAGE ── */
 .meal-hero{padding:10px 20px 24px}
-.meal-hero h1{font-size:30px;font-weight:900;letter-spacing:-0.8px}
+.meal-hero h1{font-size:30px;font-weight:500;letter-spacing:-0.8px}
 .meal-hero p{font-size:14px;color:var(--text3);margin-top:4px}
 .meal-cards{display:flex;flex-direction:column;gap:12px;padding:0 20px}
 .meal-card{
@@ -240,11 +240,11 @@ a{text-decoration:none;color:inherit}
 }
 .meal-emoji{font-size:36px;flex-shrink:0}
 .meal-body{flex:1}
-.meal-name{font-size:16px;font-weight:700}
+.meal-name{font-size:16px;font-weight:500}
 .meal-desc{font-size:13px;color:var(--text3);margin-top:3px}
-.meal-kcal{font-size:20px;font-weight:800;color:var(--text3)}
+.meal-kcal{font-size:20px;font-weight:500;color:var(--text3)}
 .shop-section{padding:24px 20px 0}
-.shop-title{font-size:20px;font-weight:800;letter-spacing:-0.4px;margin-bottom:12px}
+.shop-title{font-size:20px;font-weight:500;letter-spacing:-0.4px;margin-bottom:12px}
 .shop-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .shop-item{
   background:var(--card);border-radius:var(--r-sm);padding:14px;
@@ -265,7 +265,7 @@ a{text-decoration:none;color:inherit}
 
 /* ── VISION PAGE ── */
 .vision-hero{padding:10px 20px 24px}
-.vision-hero h1{font-size:30px;font-weight:900;letter-spacing:-0.8px}
+.vision-hero h1{font-size:30px;font-weight:500;letter-spacing:-0.8px}
 .vision-hero p{font-size:14px;color:var(--text3);margin-top:4px}
 .vision-list{display:flex;flex-direction:column;gap:10px;padding:0 20px}
 .vision-item{
@@ -275,34 +275,34 @@ a{text-decoration:none;color:inherit}
 .vision-num{
   width:32px;height:32px;border-radius:50%;background:var(--bg);
   display:flex;align-items:center;justify-content:center;
-  font-size:12px;font-weight:700;color:var(--text3);flex-shrink:0;
+  font-size:12px;font-weight:500;color:var(--text3);flex-shrink:0;
 }
 .vision-text{font-size:14px;font-weight:500;color:var(--text);line-height:1.4;flex:1}
 
 /* ── ME PAGE ── */
 .me-section{padding:10px 20px 24px}
-.me-section h1{font-size:30px;font-weight:900;letter-spacing:-0.8px;margin-bottom:4px}
+.me-section h1{font-size:30px;font-weight:500;letter-spacing:-0.8px;margin-bottom:4px}
 .me-section p{font-size:14px;color:var(--text3)}
 .me-cards{display:flex;flex-direction:column;gap:12px;padding:0 20px}
 .me-card{background:var(--card);border-radius:var(--r);padding:18px;box-shadow:var(--shadow)}
-.me-card-title{font-size:16px;font-weight:700;margin-bottom:4px}
+.me-card-title{font-size:16px;font-weight:500;margin-bottom:4px}
 .me-card-sub{font-size:13px;color:var(--text3)}
 .notify-row{display:flex;align-items:center;gap:14px}
 .notify-icon-wrap{width:44px;height:44px;border-radius:12px;background:var(--orange-light);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
 .notify-body{flex:1}
-.notify-title{font-size:15px;font-weight:700}
+.notify-title{font-size:15px;font-weight:500}
 .notify-sub{font-size:12px;color:var(--text3);margin-top:2px}
-.notify-status{font-size:12px;font-weight:700;padding:4px 10px;border-radius:var(--r-pill)}
+.notify-status{font-size:12px;font-weight:500;padding:4px 10px;border-radius:var(--r-pill)}
 .notify-on{background:rgba(52,199,89,0.12);color:var(--green)}
 .notify-off{background:var(--bg);color:var(--text3)}
 .streak-card{display:flex;align-items:center;gap:14px}
-.streak-num{font-size:44px;font-weight:900;color:var(--orange);line-height:1}
-.streak-label{font-size:14px;font-weight:600;color:var(--text)}
+.streak-num{font-size:44px;font-weight:700;color:var(--orange);line-height:1}
+.streak-label{font-size:14px;font-weight:500;color:var(--text)}
 .streak-sub{font-size:12px;color:var(--text3);margin-top:2px}
 .quran-card-inner{background:linear-gradient(135deg,#1a1a2e,#16213e 60%,#0f3460);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)}
 .quran-ayah{font-size:22px;color:white;text-align:right;line-height:1.8;margin:12px 0;font-family:'Traditional Arabic','Scheherazade',serif}
 .quran-ref{font-size:12px;color:rgba(255,255,255,0.5)}
-.quran-btn{margin-top:14px;background:rgba(255,255,255,0.12);color:white;border-radius:var(--r-sm);padding:11px;font-size:14px;font-weight:600;width:100%;transition:background 0.15s}
+.quran-btn{margin-top:14px;background:rgba(255,255,255,0.12);color:white;border-radius:var(--r-sm);padding:11px;font-size:14px;font-weight:500;width:100%;transition:background 0.15s}
 .quran-btn:active{background:rgba(255,255,255,0.2)}
 
 /* ── TAB BAR (mobile) ── */
@@ -318,7 +318,7 @@ a{text-decoration:none;color:inherit}
 }
 .tab-btn.active{color:var(--orange)}
 .tab-btn svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke 0.18s}
-.tab-btn span{font-size:10px;font-weight:600;letter-spacing:0.2px}
+.tab-btn span{font-size:10px;font-weight:500;letter-spacing:0.2px}
 .tab-btn:active svg{transform:scale(0.88);transition:transform 0.1s var(--spring)}
 .tab-fab-wrap{flex:1;display:flex;justify-content:center;align-items:flex-start;padding-top:0}
 .tab-fab{
@@ -340,9 +340,9 @@ a{text-decoration:none;color:inherit}
 }
 .done-trophy{font-size:80px;margin-bottom:20px;animation:pop 0.6s var(--spring)}
 @keyframes pop{0%{transform:scale(0)}100%{transform:scale(1)}}
-.done-title{font-size:38px;font-weight:900;color:white;letter-spacing:-1px;margin-bottom:8px}
+.done-title{font-size:38px;font-weight:700;color:white;letter-spacing:-1px;margin-bottom:8px}
 .done-sub{font-size:18px;color:rgba(255,255,255,0.7);margin-bottom:40px;line-height:1.5}
-.done-close{background:white;color:#052e16;border-radius:var(--r-sm);padding:16px 44px;font-size:17px;font-weight:800;transition:transform 0.15s}
+.done-close{background:white;color:#052e16;border-radius:var(--r-sm);padding:16px 44px;font-size:17px;font-weight:600;transition:transform 0.15s}
 .done-close:active{transform:scale(0.96)}
 
 /* ── PARTICLES ── */
@@ -446,15 +446,7 @@ a{text-decoration:none;color:inherit}
     <h1 class="hero-title" id="heroTitle">Get It Done,<br>Adam <em>✌️</em></h1>
   </div>
 
-  <!-- Category pills -->
-  <div class="cat-scroll" id="catScroll">
-    <div class="cat-pill active" onclick="filterTasks('all',this)">All</div>
-    <div class="cat-pill" onclick="filterTasks('body',this)">💪 Body</div>
-    <div class="cat-pill" onclick="filterTasks('home',this)">🏠 Home</div>
-    <div class="cat-pill" onclick="filterTasks('work',this)">⚡ Work</div>
-    <div class="cat-pill" onclick="filterTasks('money',this)">💰 Money</div>
-    <div class="cat-pill" onclick="filterTasks('soul',this)">🌙 Soul</div>
-  </div>
+
 
   <!-- Banner -->
   <div class="task-banner" id="taskBanner">
@@ -478,7 +470,7 @@ a{text-decoration:none;color:inherit}
           <div class="task-name">Go Gym</div>
           <div class="task-sub">11:30 – 12:45 · Energy first. Everything else follows.</div>
         </div>
-        <button class="task-menu-btn" onclick="event.stopPropagation()">···</button>
+        <button class="task-menu-btn" onclick="openSubtaskDrawer(event,this.closest('.task-card'))">···</button>
       </div>
       <div class="task-card-bottom">
         <span class="task-tag tag-body">Body</span>
@@ -494,7 +486,7 @@ a{text-decoration:none;color:inherit}
           <div class="task-name">Shop — Groceries</div>
           <div class="task-sub">12:45 – 13:15 · List in the Meals tab. In and out.</div>
         </div>
-        <button class="task-menu-btn" onclick="event.stopPropagation()">···</button>
+        <button class="task-menu-btn" onclick="openSubtaskDrawer(event,this.closest('.task-card'))">···</button>
       </div>
       <div class="task-card-bottom">
         <span class="task-tag tag-home">Home</span>
@@ -510,7 +502,7 @@ a{text-decoration:none;color:inherit}
           <div class="task-name">Reply WhatsApp + New Employee</div>
           <div class="task-sub">13:15 – 13:45 · One message at a time. Don't overthink.</div>
         </div>
-        <button class="task-menu-btn" onclick="event.stopPropagation()">···</button>
+        <button class="task-menu-btn" onclick="openSubtaskDrawer(event,this.closest('.task-card'))">···</button>
       </div>
       <div class="task-card-bottom">
         <span class="task-tag tag-work">Work</span>
@@ -526,7 +518,7 @@ a{text-decoration:none;color:inherit}
           <div class="task-name">eBay — List the Jacket</div>
           <div class="task-sub">13:45 – 14:00 · Photos, post, done. 15 min max.</div>
         </div>
-        <button class="task-menu-btn" onclick="event.stopPropagation()">···</button>
+        <button class="task-menu-btn" onclick="openSubtaskDrawer(event,this.closest('.task-card'))">···</button>
       </div>
       <div class="task-card-bottom">
         <span class="task-tag tag-money">Money</span>
@@ -542,7 +534,7 @@ a{text-decoration:none;color:inherit}
           <div class="task-name">Build Personalvermittler Site</div>
           <div class="task-sub">14:00 – 16:00 · Manychat CTA. Unlocks cold emails.</div>
         </div>
-        <button class="task-menu-btn" onclick="event.stopPropagation()">···</button>
+        <button class="task-menu-btn" onclick="openSubtaskDrawer(event,this.closest('.task-card'))">···</button>
       </div>
       <div class="task-card-bottom">
         <span class="task-tag tag-money">Money</span>
@@ -558,7 +550,7 @@ a{text-decoration:none;color:inherit}
           <div class="task-name">Build Arbeitgeber Site</div>
           <div class="task-sub">16:00 – 18:00 · Video slot + Manychat CTA.</div>
         </div>
-        <button class="task-menu-btn" onclick="event.stopPropagation()">···</button>
+        <button class="task-menu-btn" onclick="openSubtaskDrawer(event,this.closest('.task-card'))">···</button>
       </div>
       <div class="task-card-bottom">
         <span class="task-tag tag-money">Money</span>
@@ -574,7 +566,7 @@ a{text-decoration:none;color:inherit}
           <div class="task-name">Video für Arbeitgeber</div>
           <div class="task-sub">18:00 – 18:30 · Record it. First take counts.</div>
         </div>
-        <button class="task-menu-btn" onclick="event.stopPropagation()">···</button>
+        <button class="task-menu-btn" onclick="openSubtaskDrawer(event,this.closest('.task-card'))">···</button>
       </div>
       <div class="task-card-bottom">
         <span class="task-tag tag-work">Work</span>
@@ -590,7 +582,7 @@ a{text-decoration:none;color:inherit}
           <div class="task-name">Learn Islam / Quran</div>
           <div class="task-sub">Evening · 20 minutes. Soul before sleep.</div>
         </div>
-        <button class="task-menu-btn" onclick="event.stopPropagation()">···</button>
+        <button class="task-menu-btn" onclick="openSubtaskDrawer(event,this.closest('.task-card'))">···</button>
       </div>
       <div class="task-card-bottom">
         <span class="task-tag tag-soul">Soul</span>
@@ -970,6 +962,19 @@ function init(){
   // Streak
   document.getElementById('streakNum').textContent=s.streak||1;
   document.getElementById('quranStreak').textContent=(s.quranStreak||0)+' days';
+  // Restore subtask progress on cards
+  document.querySelectorAll('.task-card[data-id]').forEach(card=>{
+    const id=card.dataset.id;
+    const subtasks=getSubtasks(id);
+    if(subtasks.length>0){
+      const done=subtasks.filter(s=>s.done).length;
+      const pct=Math.round((done/subtasks.length)*100);
+      const pctEl=card.querySelector('.task-pct');
+      const fill=card.querySelector('.progress-fill');
+      if(pctEl)pctEl.textContent=pct+'%';
+      if(fill)fill.style.width=pct+'%';
+    }
+  });
   updateBanner();checkBuildsForUnlock();
   // Service worker
   if('serviceWorker' in navigator){
@@ -990,6 +995,148 @@ function init(){
 }
 
 init();
+
+/* ── SUBTASK DRAWER ── */
+let activeDrawerTaskId = null;
+const TASK_ICON_MAP = {gym:'💪',shop:'🛒',whatsapp:'💬',ebay:'💰','build-pv':'🚀','build-ag':'🚀',video:'🎬','quran-task':'🌙'};
+const TASK_NAME_MAP = {gym:'Go Gym',shop:'Shop — Groceries',whatsapp:'Reply WhatsApp + New Employee',ebay:'eBay — List the Jacket','build-pv':'Build Personalvermittler Site','build-ag':'Build Arbeitgeber Site',video:'Video für Arbeitgeber','quran-task':'Learn Islam / Quran'};
+
+function openSubtaskDrawer(e, card) {
+  e.stopPropagation();
+  const id = card.dataset.id;
+  activeDrawerTaskId = id;
+  document.getElementById('drawerTaskIcon').textContent = TASK_ICON_MAP[id] || '📋';
+  document.getElementById('drawerTaskName').textContent = card.querySelector('.task-name').textContent;
+  renderSubtasks(id);
+  document.getElementById('subtaskInput').value = '';
+  const overlay = document.getElementById('subtaskOverlay');
+  const drawer = document.getElementById('subtaskDrawer');
+  overlay.style.display = 'block';
+  drawer.style.display = 'block';
+  requestAnimationFrame(() => { drawer.style.transform = 'translateY(0)'; });
+}
+
+function closeSubtaskDrawer() {
+  const drawer = document.getElementById('subtaskDrawer');
+  drawer.style.transform = 'translateY(100%)';
+  setTimeout(() => {
+    document.getElementById('subtaskOverlay').style.display = 'none';
+    drawer.style.display = 'none';
+  }, 320);
+  // Update progress for the task
+  if (activeDrawerTaskId) updateTaskProgress(activeDrawerTaskId);
+  activeDrawerTaskId = null;
+}
+
+function getSubtasks(taskId) {
+  const s = getState();
+  return (s.subtasks && s.subtasks[taskId]) || [];
+}
+
+function saveSubtasks(taskId, subtasks) {
+  const s = getState();
+  if (!s.subtasks) s.subtasks = {};
+  s.subtasks[taskId] = subtasks;
+  saveState(s);
+}
+
+function renderSubtasks(taskId) {
+  const list = document.getElementById('subtaskList');
+  const subtasks = getSubtasks(taskId);
+  if (subtasks.length === 0) {
+    list.innerHTML = '<div style="padding:16px 0;text-align:center;color:var(--text3);font-size:14px">No subtasks yet — add one below</div>';
+    return;
+  }
+  list.innerHTML = subtasks.map((st, i) => `
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--sep)">
+      <div onclick="toggleSubtask(${i})" style="width:22px;height:22px;border-radius:50%;border:2px solid ${st.done ? 'var(--green)' : 'var(--sep)'};background:${st.done ? 'var(--green)' : 'transparent'};display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all 0.15s">
+        ${st.done ? '<svg width="10" height="7" viewBox="0 0 12 9" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4.5L4.5 8L11 1"/></svg>' : ''}
+      </div>
+      <div style="flex:1;font-size:15px;color:var(--text);${st.done ? 'text-decoration:line-through;color:var(--text3)' : ''}">${st.text}</div>
+      <button onclick="deleteSubtask(${i})" style="background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:4px;line-height:1">×</button>
+    </div>
+  `).join('');
+}
+
+function toggleSubtask(index) {
+  const id = activeDrawerTaskId;
+  const subtasks = getSubtasks(id);
+  subtasks[index].done = !subtasks[index].done;
+  saveSubtasks(id, subtasks);
+  renderSubtasks(id);
+  updateTaskProgress(id);
+}
+
+function deleteSubtask(index) {
+  const id = activeDrawerTaskId;
+  const subtasks = getSubtasks(id);
+  subtasks.splice(index, 1);
+  saveSubtasks(id, subtasks);
+  renderSubtasks(id);
+  updateTaskProgress(id);
+}
+
+function addSubtask() {
+  const input = document.getElementById('subtaskInput');
+  const text = input.value.trim();
+  if (!text) return;
+  const id = activeDrawerTaskId;
+  const subtasks = getSubtasks(id);
+  subtasks.push({ text, done: false });
+  saveSubtasks(id, subtasks);
+  input.value = '';
+  renderSubtasks(id);
+  updateTaskProgress(id);
+}
+
+function updateTaskProgress(taskId) {
+  const card = document.querySelector(`.task-card[data-id="${taskId}"]`);
+  if (!card) return;
+  const subtasks = getSubtasks(taskId);
+  if (subtasks.length === 0) return;
+  const done = subtasks.filter(s => s.done).length;
+  const pct = Math.round((done / subtasks.length) * 100);
+  const pctEl = card.querySelector('.task-pct');
+  const fill = card.querySelector('.progress-fill');
+  if (pctEl) pctEl.textContent = pct + '%';
+  if (fill) fill.style.width = pct + '%';
+  if (pct === 100 && !card.classList.contains('done')) {
+    card.classList.add('done');
+    burst(card);
+    showToast('✓', card.querySelector('.task-name').textContent + ' — done!');
+    const s = getState();
+    if (!s.tasks) s.tasks = {};
+    s.tasks[taskId] = true;
+    saveState(s);
+    updateBanner(); checkBuildsForUnlock(); checkAllDone();
+  } else if (pct < 100 && card.classList.contains('done')) {
+    card.classList.remove('done');
+    const s = getState();
+    if (s.tasks) s.tasks[taskId] = false;
+    saveState(s);
+    updateBanner();
+  }
+}
+
 </script>
+
+<!-- SUBTASK DRAWER -->
+<div id="subtaskOverlay" style="display:none;position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px)" onclick="closeSubtaskDrawer()"></div>
+<div id="subtaskDrawer" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:8001;background:var(--card);border-radius:20px 20px 0 0;padding:0 0 env(safe-area-inset-bottom);max-height:70vh;overflow-y:auto;transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.32,0.72,0,1)">
+  <div style="width:36px;height:4px;background:var(--sep);border-radius:2px;margin:10px auto 0"></div>
+  <div style="padding:16px 20px 8px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--sep)">
+    <div id="drawerTaskIcon" style="font-size:22px"></div>
+    <div style="flex:1">
+      <div id="drawerTaskName" style="font-size:17px;font-weight:600;color:var(--text)"></div>
+      <div style="font-size:12px;color:var(--text3);margin-top:1px">Subtasks</div>
+    </div>
+    <button onclick="closeSubtaskDrawer()" style="background:var(--sep);border:none;width:28px;height:28px;border-radius:50%;font-size:15px;color:var(--text2);cursor:pointer">×</button>
+  </div>
+  <div id="subtaskList" style="padding:8px 20px 0"></div>
+  <div style="padding:12px 20px 20px;display:flex;gap:10px;border-top:1px solid var(--sep);margin-top:8px">
+    <input id="subtaskInput" placeholder="Add subtask…" style="flex:1;padding:10px 14px;border-radius:10px;border:1.5px solid var(--sep);font-size:15px;font-family:inherit;background:var(--bg);color:var(--text);outline:none" onkeydown="if(event.key==='Enter')addSubtask()" />
+    <button onclick="addSubtask()" style="background:var(--orange);color:white;border:none;border-radius:10px;padding:10px 16px;font-size:15px;font-weight:600;cursor:pointer">Add</button>
+  </div>
+</div>
 </body>
 </html>
