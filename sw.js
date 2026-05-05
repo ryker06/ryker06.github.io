@@ -1,9 +1,9 @@
-const CACHE = 'adam-today-v2';
-const ASSETS = ['/', '/index.html', '/manifest.json'];
+const CACHE = 'doit-v3';
+const STATIC = ['/manifest.json'];
 
 self.addEventListener('install', e => {
   e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting())
+    caches.open(CACHE).then(c => c.addAll(STATIC)).then(() => self.skipWaiting())
   );
 });
 
@@ -17,12 +17,27 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
+
+  // Navigation (HTML pages) — network-first so updates land immediately
+  if (e.request.mode === 'navigate') {
+    e.respondWith(
+      fetch(e.request).then(res => {
+        if (res.ok) {
+          const clone = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+        }
+        return res;
+      }).catch(() => caches.match(e.request))
+    );
+    return;
+  }
+
+  // Everything else — cache-first
   e.respondWith(
     caches.match(e.request).then(cached => {
       const fresh = fetch(e.request).then(res => {
         if (res && res.status === 200 && res.type === 'basic') {
-          const clone = res.clone();
-          caches.open(CACHE).then(c => c.put(e.request, clone));
+          caches.open(CACHE).then(c => c.put(e.request, res.clone()));
         }
         return res;
       });
@@ -32,14 +47,14 @@ self.addEventListener('fetch', e => {
 });
 
 self.addEventListener('push', e => {
-  let data = { title: "Today's List is Ready", body: "Adam — your day is set. Let's go." };
+  let data = { title: "Do It", body: "Your day is ready." };
   try { data = e.data.json(); } catch (_) {}
   e.waitUntil(
-    self.registration.showNotification(data.title || "Today · Adam", {
+    self.registration.showNotification(data.title || "Do It", {
       body: data.body || "Your daily tasks are ready.",
       icon: '/icon-192.png',
       badge: '/icon-192.png',
-      tag: 'adam-today',
+      tag: 'doit-daily',
       renotify: true,
       data: { url: '/' }
     })
