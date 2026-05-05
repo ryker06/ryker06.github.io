@@ -847,7 +847,7 @@ function urlBase64ToUint8Array(b64) {
 }
 
 async function toggleNotify(btn) {
-  if (WORKER_URL === 'https://adam-today-push.adamlashin2.workers.dev') {
+  if (!WORKER_URL || WORKER_URL === '') {
     alert('Push notifications coming soon — Cloudflare setup pending.');
     return;
   }
