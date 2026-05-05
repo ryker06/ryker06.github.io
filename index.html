@@ -9,399 +9,257 @@
 <meta name="theme-color" content="#FF6B2B">
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/icon-192.png">
-<link rel="apple-touch-icon" sizes="192x192" href="/icon-192.png">
-<link rel="apple-touch-icon" sizes="512x512" href="/icon-512.png">
 <title>Do It · Adam</title>
-<meta name="app-version" content="2.7">
 <style>
-/* ── TOKENS ── */
 :root {
-  --bg: #F5F5F5;
-  --card: #FFFFFF;
-  --orange: #FF6B2B;
-  --orange-light: rgba(255,107,43,0.1);
-  --green: #34C759;
-  --red: #FF3B30;
-  --blue: #007AFF;
-  --text: #1C1C1E;
-  --text2: #636366;
-  --text3: #AEAEB2;
-  --sep: rgba(0,0,0,0.08);
-  --shadow: 0 2px 16px rgba(0,0,0,0.07);
-  --shadow-sm: 0 1px 6px rgba(0,0,0,0.05);
-  --r: 20px;
-  --r-sm: 14px;
-  --r-pill: 100px;
-  --tab-h: 82px;
-  --safe-bot: env(safe-area-inset-bottom, 0px);
-  --safe-top: env(safe-area-inset-top, 0px);
-  --sidebar-w: 72px;
-  --spring: cubic-bezier(0.34,1.56,0.64,1);
-  --ease: cubic-bezier(0.4,0,0.2,1);
+  --bg:#F5F5F5; --card:#FFFFFF; --orange:#FF6B2B; --ol:rgba(255,107,43,.12);
+  --green:#34C759; --red:#FF3B30; --blue:#007AFF;
+  --text:#111; --text2:#444; --text3:#888; --sep:#E8E8E8;
+  --r:16px; --r-sm:12px; --pill:100px;
+  --tab-h:72px; --safe-bot:env(safe-area-inset-bottom,0px);
+  --sidebar-w:72px;
+  --font:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif;
 }
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',sans-serif;color:var(--text);overscroll-behavior:none}
-button{border:none;background:none;cursor:pointer;font-family:inherit}
-a{text-decoration:none;color:inherit}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:var(--font);background:var(--bg);color:var(--text);overscroll-behavior:none;-webkit-font-smoothing:antialiased}
+body.dark{--bg:#000;--card:#1C1C1E;--text:#FFF;--text2:#EBEBF5CC;--text3:#EBEBF560;--sep:#38383A}
+body.dark .sidebar,body.dark .tab-bar{background:#111}
 
 /* ── LAYOUT ── */
-#shell{display:flex;height:100vh;overflow:hidden}
-
-/* ── SIDEBAR (desktop) ── */
-.sidebar{
-  display:none;width:var(--sidebar-w);background:var(--card);
-  flex-direction:column;align-items:center;padding:20px 0 30px;
-  border-right:1px solid var(--sep);position:relative;z-index:10;
-  flex-shrink:0;gap:8px;
-}
-.sidebar-logo{
-  width:42px;height:42px;background:var(--orange);border-radius:12px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:20px;font-weight:500;color:white;letter-spacing:-1px;
-  margin-bottom:16px;
-}
-.sidebar-tab{
-  width:52px;height:52px;border-radius:var(--r-sm);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:3px;color:var(--text3);transition:all 0.2s var(--ease);cursor:pointer;
-}
-.sidebar-tab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.sidebar-tab span{font-size:9px;font-weight:500;letter-spacing:0.3px}
-.sidebar-tab.active{background:var(--orange-light);color:var(--orange)}
-.sidebar-tab:active{transform:scale(0.93)}
-.sidebar-fab{
-  margin-top:auto;width:44px;height:44px;border-radius:50%;
-  background:var(--orange);display:flex;align-items:center;justify-content:center;
-  color:white;font-size:22px;font-weight:300;box-shadow:0 4px 14px rgba(255,107,43,0.4);
-  transition:transform 0.2s var(--spring);
-}
-.sidebar-fab:active{transform:scale(0.92)}
-
-/* ── MAIN SCROLL AREA ── */
+#shell{display:flex;flex-direction:row;height:100dvh;overflow:hidden}
+.sidebar{display:none;width:var(--sidebar-w);flex-direction:column;align-items:center;background:var(--card);border-right:1px solid var(--sep);padding:20px 0 20px;gap:4px;flex-shrink:0}
+.s-logo{font-size:20px;font-weight:700;color:var(--orange);margin-bottom:12px}
+.s-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 6px;border-radius:12px;border:none;background:none;color:var(--text3);cursor:pointer;width:56px}
+.s-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.s-btn span{font-size:9px;font-weight:500}
+.s-btn.active{background:var(--ol);color:var(--orange)}
+.s-fab{margin-top:auto;width:44px;height:44px;border-radius:50%;background:var(--orange);border:none;color:white;font-size:22px;font-weight:300;cursor:pointer;box-shadow:0 4px 14px rgba(255,107,43,.4)}
 #main{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
 .pages{flex:1;overflow:hidden;position:relative}
-.page{
-  position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;
-  padding-bottom:calc(var(--tab-h) + var(--safe-bot) + 20px);
-  display:none;opacity:0;transform:translateY(12px);
-  transition:opacity 0.25s var(--ease),transform 0.25s var(--ease);
-}
-.page.active{display:block;opacity:1;transform:translateY(0)}
+.page{position:absolute;inset:0;overflow-y:auto;opacity:0;transform:translateY(12px);transition:opacity .22s,transform .22s;pointer-events:none;padding-bottom:calc(var(--tab-h) + var(--safe-bot) + 20px)}
+.page.active{opacity:1;transform:none;pointer-events:auto}
+.tab-bar{position:relative;z-index:100;height:calc(var(--tab-h) + var(--safe-bot));background:var(--card);border-top:1px solid var(--sep);display:flex;align-items:flex-start;padding-top:10px}
+.t-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--text3);cursor:pointer;padding:0 4px}
+.t-btn svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.t-btn span{font-size:10px;font-weight:500}
+.t-btn.active{color:var(--orange)}
+.t-fab-wrap{flex:1;display:flex;justify-content:center;align-items:flex-start;padding-top:0}
+.t-fab{width:52px;height:52px;border-radius:50%;background:var(--orange);border:none;color:white;font-size:26px;font-weight:300;line-height:1;box-shadow:0 4px 16px rgba(255,107,43,.45);cursor:pointer;transform:translateY(-14px)}
+.t-fab:active{transform:translateY(-14px) scale(.93)}
 
 /* ── TOP BAR ── */
-.top-bar{
-  display:flex;align-items:center;padding:calc(var(--safe-top) + 14px) 20px 10px;
-  gap:12px;
-}
-.top-bar-left{flex:1;display:flex;align-items:center;gap:10px}
-.app-wordmark{font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.8px}
-.app-wordmark span{color:var(--orange)}
-.top-bar-right{display:flex;align-items:center;gap:8px}
-.icon-btn{width:36px;height:36px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm)}
-.icon-btn svg{width:18px;height:18px;stroke:var(--text);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.avatar-self{
-  width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);
-  display:flex;align-items:center;justify-content:center;color:white;font-size:13px;font-weight:500;
-}
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px 8px;position:sticky;top:0;background:var(--bg);z-index:50}
+body.dark .top-bar{background:var(--bg)}
+.wordmark{font-size:22px;font-weight:700;color:var(--text);letter-spacing:-.5px}
+.wordmark span{color:var(--orange)}
+.top-right{display:flex;align-items:center;gap:4px}
+.i-btn{width:34px;height:34px;border-radius:50%;background:none;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2)}
+.i-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.avatar{width:30px;height:30px;border-radius:50%;background:var(--orange);color:white;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer}
 
 /* ── HERO ── */
-.hero{padding:10px 20px 20px}
-.hero-greeting{font-size:13px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px}
-.hero-title{font-size:34px;font-weight:700;line-height:1.1;letter-spacing:-1.2px;color:var(--text)}
-.hero-title em{font-style:normal;color:var(--orange)}
+.hero{padding:8px 20px 12px}
+.hero-date{font-size:13px;font-weight:500;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
+.hero-title{font-size:32px;font-weight:700;line-height:1.15;letter-spacing:-.6px;color:var(--text)}
+.hero-title em{font-style:normal}
 
-/* ── CATEGORY FILTER ── */
-.cat-scroll{display:flex;gap:8px;padding:0 20px 16px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
-.cat-scroll::-webkit-scrollbar{display:none}
-.cat-pill{
-  flex-shrink:0;padding:7px 16px;border-radius:var(--r-pill);
-  font-size:13px;font-weight:500;background:var(--card);color:var(--text2);
-  box-shadow:var(--shadow-sm);transition:all 0.18s var(--ease);white-space:nowrap;
-}
-.cat-pill.active{background:var(--orange);color:white}
-.cat-pill:active{transform:scale(0.95)}
+/* ── SEARCH ── */
+.search-bar{padding:0 20px 10px;display:none}
+.search-bar.open{display:block}
+.search-input{width:100%;padding:10px 14px;border-radius:12px;border:1.5px solid var(--sep);font-size:15px;font-family:inherit;background:var(--card);color:var(--text);outline:none;-webkit-appearance:none}
 
 /* ── BANNER ── */
-.task-banner{
-  margin:0 20px 20px;background:#1C1C1E;border-radius:var(--r-pill);
-  padding:12px 16px;display:flex;align-items:center;gap:10px;
-}
-.task-banner.hidden{display:none}
-.banner-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.6;transform:scale(1.3)}}
-.banner-text{flex:1;font-size:14px;font-weight:500;color:white}
-.banner-text strong{color:var(--orange)}
-.banner-x{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.15);color:white;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.banner-x:active{background:rgba(255,255,255,0.25)}
+.banner{display:flex;align-items:center;gap:10px;margin:0 20px 16px;background:#1C1C1E;border-radius:14px;padding:12px 14px}
+.banner.hidden{display:none}
+body.dark .banner{background:#2C2C2E}
+.banner-dot{width:8px;height:8px;border-radius:50%;background:var(--orange);flex-shrink:0}
+.banner-txt{flex:1;font-size:14px;font-weight:400;color:white}
+.banner-x{background:none;border:none;color:#888;font-size:18px;cursor:pointer;padding:0 2px;line-height:1}
 
 /* ── SECTION HEADER ── */
-.sec-hdr{display:flex;align-items:center;justify-content:space-between;padding:0 20px 12px}
-.sec-title{font-size:20px;font-weight:600;letter-spacing:-0.4px}
-.sec-link{font-size:14px;font-weight:500;color:var(--orange)}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;padding:0 20px 10px}
+.sec-title{font-size:18px;font-weight:600;color:var(--text)}
+.sec-link{font-size:14px;font-weight:500;color:var(--orange);cursor:pointer}
 
 /* ── TASK CARDS ── */
-.task-list{display:flex;flex-direction:column;gap:12px;padding:0 20px}
-.task-card{
-  background:var(--card);border-radius:var(--r);padding:18px 18px 0;
-  box-shadow:var(--shadow);cursor:pointer;
-  transition:transform 0.15s var(--ease),box-shadow 0.15s var(--ease);
-  overflow:hidden;position:relative;
-}
-.task-card:active{transform:scale(0.985);box-shadow:var(--shadow-sm)}
-.task-card.done{opacity:0.6}
-.task-card-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
-.check-circle{
-  width:28px;height:28px;border-radius:50%;border:2px solid var(--sep);
-  flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:2px;
-  transition:all 0.25s var(--spring);background:transparent;
-}
-.check-circle svg{opacity:0;transform:scale(0.2);transition:all 0.25s var(--spring);stroke:white;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
-.task-card.done .check-circle{background:var(--green);border-color:var(--green)}
-.task-card.done .check-circle svg{opacity:1;transform:scale(1)}
+.task-list{padding:0 20px;display:flex;flex-direction:column;gap:10px}
+.task-card{background:var(--card);border-radius:var(--r);padding:14px 14px 0;cursor:pointer;transition:transform .12s,box-shadow .12s;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.task-card:active{transform:scale(.985)}
+.task-card.done{opacity:.55}
 .task-card.done .task-name{text-decoration:line-through;color:var(--text3)}
-.task-body{flex:1;min-width:0}
-.task-name{font-size:16px;font-weight:500;color:var(--text);line-height:1.3;transition:color 0.2s}
-.task-sub{font-size:13px;color:var(--text3);margin-top:3px;line-height:1.4}
-.task-menu-btn{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:18px;flex-shrink:0}
-.task-menu-btn:active{background:var(--bg)}
-.task-card-bottom{display:flex;align-items:center;justify-content:space-between;padding-bottom:16px}
-.task-tag{
-  font-size:11px;font-weight:500;padding:4px 10px;border-radius:var(--r-pill);
-  letter-spacing:0.3px;
-}
-.tag-body{background:rgba(52,199,89,0.12);color:#1a8a37}
-.tag-home{background:rgba(255,149,0,0.12);color:#b56800}
-.tag-work{background:rgba(0,122,255,0.1);color:#0055cc}
-.tag-money{background:rgba(255,107,43,0.12);color:#cc4400}
-.tag-soul{background:rgba(175,82,222,0.12);color:#6b2fa0}
-.tag-blocked{background:rgba(255,59,48,0.1);color:var(--red)}
-.task-progress-wrap{display:flex;align-items:center;gap:8px}
+.tc-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.check-circle{width:24px;height:24px;border-radius:50%;border:2px solid var(--sep);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;margin-top:1px}
+.check-circle svg{stroke:white;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;opacity:0;transition:opacity .15s}
+.task-card.done .check-circle{background:var(--green);border-color:var(--green)}
+.task-card.done .check-circle svg{opacity:1}
+.tc-body{flex:1;min-width:0}
+.task-name{font-size:15px;font-weight:500;color:var(--text);line-height:1.3}
+.task-sub{font-size:12px;font-weight:400;color:var(--text3);margin-top:3px;line-height:1.4}
+.menu-btn{background:none;border:none;color:var(--text3);font-size:18px;letter-spacing:1px;cursor:pointer;padding:0 4px;line-height:1;flex-shrink:0;border-radius:6px}
+.menu-btn:active{background:var(--sep)}
+.tc-bot{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
+.task-tag{font-size:11px;font-weight:500;padding:3px 8px;border-radius:var(--pill)}
+.tag-body{background:#FFF0E8;color:#C85000} .tag-work{background:#E8F0FF;color:#0050C8}
+.tag-money{background:#E8FFE8;color:#007700} .tag-home{background:#F0E8FF;color:#6600CC}
+.tag-soul{background:#FFF8E0;color:#886600}
 .task-pct{font-size:12px;font-weight:500;color:var(--text3)}
-.task-card.done .task-pct{color:var(--green)}
-/* Progress bar sits at bottom of card */
-.progress-track{
-  height:4px;background:var(--bg);margin:0 -18px;
-}
-.progress-fill{
-  height:100%;background:var(--green);border-radius:0;width:0%;
-  transition:width 0.5s var(--ease);
-}
-.task-card.done .progress-fill{width:100%}
+.prog-track{height:4px;background:var(--sep);border-radius:2px;overflow:hidden;margin:0 0 14px}
+.prog-fill{height:100%;background:var(--green);border-radius:2px;width:0%;transition:width .4s}
+.task-card.done .prog-fill{width:100%!important;background:var(--green)}
 
-/* ── BLOCKED SECTION ── */
-.blocked-header{
-  margin:24px 20px 0;background:var(--card);border-radius:var(--r) var(--r) 0 0;
-  padding:16px 18px;display:flex;align-items:center;gap:12px;
-  border-bottom:1px solid var(--sep);
-}
-.blocked-pill{
-  background:rgba(255,59,48,0.1);border-radius:var(--r-pill);padding:5px 12px;
-  font-size:12px;font-weight:500;color:var(--red);
-}
-.blocked-label{flex:1;font-size:14px;font-weight:500;color:var(--text)}
-.blocked-sublabel{font-size:12px;color:var(--text3);margin-top:2px}
-.unlock-btn{
-  background:var(--green);color:white;border-radius:var(--r-pill);
-  padding:7px 14px;font-size:12px;font-weight:500;display:none;
-  transition:transform 0.15s;
-}
-.unlock-btn:active{transform:scale(0.95)}
-.blocked-list{margin:0 20px 24px;background:var(--card);border-radius:0 0 var(--r) var(--r)}
-.blocked-row{
-  display:flex;align-items:center;gap:12px;padding:14px 18px;
-  opacity:0.45;pointer-events:none;cursor:default;
-}
-.blocked-row+.blocked-row{border-top:1px solid var(--sep)}
-.blocked-row.unlocked{opacity:1;pointer-events:auto;cursor:pointer}
-.blocked-row.unlocked:active{background:var(--bg)}
+/* ── BLOCKED ── */
+.blocked-hdr{display:flex;align-items:center;gap:12px;margin:16px 20px 8px;background:var(--card);border-radius:var(--r);padding:14px}
+.blocked-pill{font-size:11px;font-weight:600;background:#FFE0E0;color:var(--red);padding:4px 10px;border-radius:var(--pill)}
+.blocked-lbl{font-size:14px;font-weight:500;color:var(--text)}
+.blocked-sub{font-size:12px;color:var(--text3);margin-top:2px}
+.unlock-btn{margin-left:auto;font-size:12px;font-weight:600;padding:7px 14px;border-radius:var(--pill);background:var(--green);color:white;border:none;cursor:pointer;display:none}
+.blocked-list{margin:0 20px;display:flex;flex-direction:column;gap:8px}
+.blocked-row{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:var(--r-sm);padding:12px 14px;opacity:.5;cursor:default}
+.blocked-row.unlocked{opacity:1;cursor:pointer}
 .blocked-row.done .task-name{text-decoration:line-through;color:var(--text3)}
 .blocked-row.done .check-circle{background:var(--green);border-color:var(--green)}
-.blocked-row.done .check-circle svg{opacity:1;transform:scale(1)}
+.blocked-row.done .check-circle svg{opacity:1}
 
-/* ── TOAST NOTIFICATION ── */
-.toast{
-  position:fixed;bottom:calc(var(--tab-h) + var(--safe-bot) + 12px);left:50%;
-  transform:translateX(-50%) translateY(20px);
-  background:#1C1C1E;color:white;
-  padding:12px 20px;border-radius:var(--r-pill);
-  font-size:14px;font-weight:500;
-  display:flex;align-items:center;gap:8px;
-  opacity:0;transition:opacity 0.25s var(--ease),transform 0.3s var(--spring);
-  pointer-events:none;z-index:9999;white-space:nowrap;
-  box-shadow:0 8px 32px rgba(0,0,0,0.25);
-}
+/* ── TOAST ── */
+.toast{position:fixed;bottom:calc(var(--tab-h) + var(--safe-bot) + 14px);left:50%;transform:translateX(-50%) translateY(20px);background:#1C1C1E;color:white;padding:10px 18px;border-radius:var(--pill);font-size:14px;font-weight:500;display:flex;align-items:center;gap:8px;z-index:9999;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast-icon{font-size:16px}
 
-/* ── MEALS PAGE ── */
-.meal-hero{padding:10px 20px 24px}
-.meal-hero h1{font-size:30px;font-weight:500;letter-spacing:-0.8px}
-.meal-hero p{font-size:14px;color:var(--text3);margin-top:4px}
-.meal-cards{display:flex;flex-direction:column;gap:12px;padding:0 20px}
-.meal-card{
-  background:var(--card);border-radius:var(--r);padding:18px;
-  box-shadow:var(--shadow);display:flex;align-items:center;gap:16px;
-}
-.meal-emoji{font-size:36px;flex-shrink:0}
-.meal-body{flex:1}
-.meal-name{font-size:16px;font-weight:500}
-.meal-desc{font-size:13px;color:var(--text3);margin-top:3px}
-.meal-kcal{font-size:20px;font-weight:500;color:var(--text3)}
-.shop-section{padding:24px 20px 0}
-.shop-title{font-size:20px;font-weight:500;letter-spacing:-0.4px;margin-bottom:12px}
-.shop-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.shop-item{
-  background:var(--card);border-radius:var(--r-sm);padding:14px;
-  display:flex;align-items:center;gap:10px;cursor:pointer;
-  box-shadow:var(--shadow-sm);transition:opacity 0.2s;
-}
-.shop-item.got{opacity:0.4}
-.shop-item:active{transform:scale(0.97)}
-.shop-check{
-  width:22px;height:22px;border-radius:50%;border:2px solid var(--sep);
-  flex-shrink:0;display:flex;align-items:center;justify-content:center;
-  transition:all 0.2s var(--spring);
-}
-.shop-check svg{opacity:0;transform:scale(0.2);transition:all 0.2s var(--spring);stroke:white;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
-.shop-item.got .shop-check{background:var(--green);border-color:var(--green)}
-.shop-item.got .shop-check svg{opacity:1;transform:scale(1)}
-.shop-name{font-size:13px;font-weight:500;color:var(--text)}
-
-/* ── VISION PAGE ── */
-.vision-hero{padding:10px 20px 24px}
-.vision-hero h1{font-size:30px;font-weight:500;letter-spacing:-0.8px}
-.vision-hero p{font-size:14px;color:var(--text3);margin-top:4px}
-.vision-list{display:flex;flex-direction:column;gap:10px;padding:0 20px}
-.vision-item{
-  background:var(--card);border-radius:var(--r-sm);padding:16px;
-  display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);
-}
-.vision-num{
-  width:32px;height:32px;border-radius:50%;background:var(--bg);
-  display:flex;align-items:center;justify-content:center;
-  font-size:12px;font-weight:500;color:var(--text3);flex-shrink:0;
-}
-.vision-text{font-size:14px;font-weight:500;color:var(--text);line-height:1.4;flex:1}
-
-/* ── ME PAGE ── */
-.me-section{padding:10px 20px 24px}
-.me-section h1{font-size:30px;font-weight:500;letter-spacing:-0.8px;margin-bottom:4px}
-.me-section p{font-size:14px;color:var(--text3)}
-.me-cards{display:flex;flex-direction:column;gap:12px;padding:0 20px}
-.me-card{background:var(--card);border-radius:var(--r);padding:18px;box-shadow:var(--shadow)}
-.me-card-title{font-size:16px;font-weight:500;margin-bottom:4px}
-.me-card-sub{font-size:13px;color:var(--text3)}
-.notify-row{display:flex;align-items:center;gap:14px}
-.notify-icon-wrap{width:44px;height:44px;border-radius:12px;background:var(--orange-light);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.notify-body{flex:1}
-.notify-title{font-size:15px;font-weight:500}
-.notify-sub{font-size:12px;color:var(--text3);margin-top:2px}
-.notify-status{font-size:12px;font-weight:500;padding:4px 10px;border-radius:var(--r-pill)}
-.notify-on{background:rgba(52,199,89,0.12);color:var(--green)}
-.notify-off{background:var(--bg);color:var(--text3)}
-.streak-card{display:flex;align-items:center;gap:14px}
-.streak-num{font-size:44px;font-weight:700;color:var(--orange);line-height:1}
-.streak-label{font-size:14px;font-weight:500;color:var(--text)}
-.streak-sub{font-size:12px;color:var(--text3);margin-top:2px}
-.quran-card-inner{background:linear-gradient(135deg,#1a1a2e,#16213e 60%,#0f3460);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)}
-.quran-ayah{font-size:22px;color:white;text-align:right;line-height:1.8;margin:12px 0;font-family:'Traditional Arabic','Scheherazade',serif}
-.quran-ref{font-size:12px;color:rgba(255,255,255,0.5)}
-.quran-btn{margin-top:14px;background:rgba(255,255,255,0.12);color:white;border-radius:var(--r-sm);padding:11px;font-size:14px;font-weight:500;width:100%;transition:background 0.15s}
-.quran-btn:active{background:rgba(255,255,255,0.2)}
-
-/* ── TAB BAR (mobile) ── */
-.tab-bar{
-  position:fixed;bottom:0;left:0;right:0;height:calc(var(--tab-h) + var(--safe-bot));
-  background:white;border-top:1px solid var(--sep);
-  display:flex;align-items:flex-start;padding-top:10px;
-  z-index:100;
-}
-.tab-btn{
-  flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
-  color:var(--text3);transition:color 0.18s var(--ease);padding:0 4px;
-}
-.tab-btn.active{color:var(--orange)}
-.tab-btn svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke 0.18s}
-.tab-btn span{font-size:10px;font-weight:500;letter-spacing:0.2px}
-.tab-btn:active svg{transform:scale(0.88);transition:transform 0.1s var(--spring)}
-.tab-fab-wrap{flex:1;display:flex;justify-content:center;align-items:flex-start;padding-top:0}
-.tab-fab{
-  width:54px;height:54px;border-radius:50%;background:var(--orange);
-  display:flex;align-items:center;justify-content:center;
-  color:white;font-size:26px;font-weight:300;line-height:1;
-  box-shadow:0 4px 18px rgba(255,107,43,0.45);
-  transform:translateY(-14px);
-  transition:transform 0.2s var(--spring);
-}
-.tab-fab:active{transform:translateY(-14px) scale(0.92)}
+/* ── PARTICLE ── */
+.particle{position:fixed;pointer-events:none;z-index:9997;width:7px;height:7px;border-radius:50%;animation:pburst .65s ease-out forwards}
+@keyframes pburst{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0}}
 
 /* ── DONE OVERLAY ── */
-#doneOverlay{
-  position:fixed;inset:0;z-index:9998;
-  background:linear-gradient(160deg,#052e16,#14532d,#166534);
-  display:none;flex-direction:column;align-items:center;justify-content:center;
-  text-align:center;padding:40px;
-}
-.done-trophy{font-size:80px;margin-bottom:20px;animation:pop 0.6s var(--spring)}
+#doneOverlay{display:none;position:fixed;inset:0;z-index:9998;background:linear-gradient(160deg,#1a3a1a,#0a2a0a);flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px}
+.done-trophy{font-size:80px;margin-bottom:20px;animation:pop .6s cubic-bezier(0.34,1.56,0.64,1)}
 @keyframes pop{0%{transform:scale(0)}100%{transform:scale(1)}}
-.done-title{font-size:38px;font-weight:700;color:white;letter-spacing:-1px;margin-bottom:8px}
-.done-sub{font-size:18px;color:rgba(255,255,255,0.7);margin-bottom:40px;line-height:1.5}
-.done-close{background:white;color:#052e16;border-radius:var(--r-sm);padding:16px 44px;font-size:17px;font-weight:600;transition:transform 0.15s}
-.done-close:active{transform:scale(0.96)}
+.done-title{font-size:36px;font-weight:700;color:white;letter-spacing:-.8px;margin-bottom:8px}
+.done-sub{font-size:17px;color:rgba(255,255,255,.65);margin-bottom:40px;line-height:1.5}
+.done-close{background:white;color:#052e16;border-radius:var(--r-sm);padding:15px 44px;font-size:16px;font-weight:600;border:none;cursor:pointer}
 
+/* ── MEALS ── */
+.page-hero{padding:12px 20px 16px}
+.page-hero h1{font-size:28px;font-weight:700;letter-spacing:-.5px;color:var(--text)}
+.page-hero p{font-size:14px;color:var(--text3);margin-top:4px}
+.meal-cards{padding:0 20px;display:flex;flex-direction:column;gap:10px}
+.meal-card{background:var(--card);border-radius:var(--r);padding:14px;display:flex;align-items:center;gap:12px}
+.meal-emoji{font-size:32px;flex-shrink:0}
+.meal-body{flex:1}
+.meal-name{font-size:15px;font-weight:500;color:var(--text)}
+.meal-desc{font-size:12px;color:var(--text3);margin-top:2px}
+.meal-kcal{font-size:18px;font-weight:600;color:var(--text3)}
 
-/* ── SHOP ROWS ── */
-.shop-row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--sep);cursor:pointer;transition:opacity 0.2s}
+/* ── SHOP ── */
+.shop-section{padding:16px 20px 0}
+.shop-section h2{font-size:18px;font-weight:600;margin-bottom:6px}
+.shop-cat-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin:12px 0 6px}
+.shop-group{background:var(--card);border-radius:var(--r);overflow:hidden;margin-bottom:4px}
+.shop-row{display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:1px solid var(--sep);cursor:pointer}
 .shop-row:last-child{border-bottom:none}
-.shop-row.got{opacity:0.45}
-.shop-row-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--sep);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
-.shop-row.got .shop-row-check{background:var(--green);border-color:var(--green)}
-.shop-row.got .shop-row-name{text-decoration:line-through;color:var(--text3)}
-.shop-row-name{font-size:15px;font-weight:400;color:var(--text)}
+.shop-row.got .shop-name{text-decoration:line-through;color:var(--text3)}
+.shop-row.got .s-check{background:var(--green);border-color:var(--green)}
+.s-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--sep);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.s-check svg{stroke:white;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+.shop-row.got .s-check svg{opacity:1}
+.shop-name{font-size:15px;font-weight:400;color:var(--text)}
+.shop-add{display:flex;gap:8px;margin-top:10px}
+.shop-add input{flex:1;padding:10px 14px;border-radius:12px;border:1.5px solid var(--sep);font-size:15px;font-family:inherit;background:var(--card);color:var(--text);outline:none;-webkit-appearance:none}
+.shop-add button{background:var(--orange);color:white;border:none;border-radius:12px;padding:10px 16px;font-size:20px;font-weight:400;cursor:pointer}
+
+/* ── VISION ── */
+.vision-list{padding:0 20px;display:flex;flex-direction:column;gap:8px}
+.v-item{display:flex;align-items:flex-start;gap:12px;background:var(--card);border-radius:12px;padding:12px 14px}
+.v-num{font-size:12px;font-weight:600;color:var(--orange);min-width:24px;padding-top:1px}
+.v-text{font-size:14px;font-weight:400;color:var(--text);line-height:1.4}
+
+/* ── ME ── */
+.me-section-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;padding:16px 20px 6px}
+.me-group{background:var(--card);border-radius:var(--r);overflow:hidden;margin:0 20px}
+.me-row{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--sep);cursor:pointer}
+.me-row:last-child{border-bottom:none}
+.me-row-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.me-row-body{flex:1}
+.me-row-title{font-size:15px;font-weight:500;color:var(--text)}
+.me-row-sub{font-size:12px;color:var(--text3);margin-top:1px}
+.me-row-val{font-size:13px;font-weight:500;color:var(--text3)}
+.me-row-val.on{color:var(--green)}
+.me-row-val.off{color:var(--text3)}
+.notify-badge{font-size:12px;font-weight:600;padding:4px 10px;border-radius:var(--pill)}
+.notify-badge.on{background:#E0FFE8;color:#007700}
+.notify-badge.off{background:var(--sep);color:var(--text3)}
+.stats-row{display:flex;gap:10px;margin:0 20px 4px}
+.stat-box{flex:1;background:var(--card);border-radius:14px;padding:14px;text-align:center}
+.stat-num{font-size:26px;font-weight:700;color:var(--orange)}
+.stat-lbl{font-size:11px;font-weight:500;color:var(--text3);margin-top:2px}
+.quran-card{background:linear-gradient(135deg,#1a3a5c,#0d2137);border-radius:var(--r);padding:20px;margin:0 20px}
+.quran-ayah{font-size:22px;color:white;text-align:center;margin:10px 0;line-height:1.5;font-family:'Amiri',serif}
+.quran-ref{font-size:12px;color:rgba(255,255,255,.55);text-align:center;margin-bottom:14px}
+.quran-btn{width:100%;background:rgba(255,255,255,.12);color:white;border:none;border-radius:var(--r-sm);padding:11px;font-size:14px;font-weight:500;cursor:pointer}
 
 /* ── TASK DETAIL PAGE ── */
-#page-task .top-bar{border-bottom:1px solid var(--sep)}
-#page-task .top-bar .icon-btn svg{stroke:var(--text)}
-
-/* ── DARK MODE ── */
-body.dark{--bg:#000;--card:#1C1C1E;--text:#fff;--text2:#ebebf599;--text3:#ebebf560;--sep:#38383A}
-body.dark .sidebar{background:#1C1C1E}
-body.dark .tab-bar{background:#1C1C1E}
+#page-task .top-bar{background:var(--card);border-bottom:1px solid var(--sep)}
+.back-btn{background:none;border:none;color:var(--orange);font-size:16px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:4px;padding:0}
+.back-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.td-hero{padding:16px 20px 8px;display:flex;align-items:center;gap:14px}
+.td-icon{font-size:40px;line-height:1}
+.td-title{font-size:22px;font-weight:700;color:var(--text);line-height:1.2}
+.td-sub{font-size:13px;color:var(--text3);margin-top:3px}
+.td-prog{padding:0 20px 16px}
+.td-prog-row{display:flex;justify-content:space-between;margin-bottom:6px}
+.td-prog-label{font-size:13px;font-weight:500;color:var(--text3)}
+.td-prog-pct{font-size:13px;font-weight:600;color:var(--orange)}
+.td-prog-track{height:6px;background:var(--sep);border-radius:3px;overflow:hidden}
+.td-prog-fill{height:100%;background:var(--orange);border-radius:3px;width:0%;transition:width .3s}
+.td-tabs{display:flex;gap:8px;padding:0 20px 14px}
+.td-tab{flex:1;padding:9px;border-radius:10px;border:none;font-size:14px;font-weight:500;cursor:pointer;transition:all .15s}
+.td-tab.active{background:var(--orange);color:white}
+.td-tab:not(.active){background:var(--sep);color:var(--text3)}
+.td-panel{padding:0 20px}
+.td-panel.hidden{display:none}
+.st-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--sep)}
+.st-row:last-child{border-bottom:none}
+.st-check{width:24px;height:24px;border-radius:50%;border:2px solid var(--sep);flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s}
+.st-check.done{background:var(--green);border-color:var(--green)}
+.st-check.done svg{opacity:1}
+.st-check svg{stroke:white;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;opacity:0;width:11px;height:8px}
+.st-text{flex:1;font-size:15px;color:var(--text)}
+.st-del{background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:4px;line-height:1}
+.td-empty{padding:16px 0;text-align:center;color:var(--text3);font-size:14px}
+.td-add-row{display:flex;gap:8px;margin-top:10px}
+.td-add-row input{flex:1;padding:11px 14px;border-radius:12px;border:1.5px solid var(--sep);font-size:15px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;-webkit-appearance:none}
+.td-add-row button{background:var(--orange);color:white;border:none;border-radius:12px;padding:11px 16px;font-size:15px;font-weight:600;cursor:pointer}
+.td-note{width:100%;height:160px;padding:14px;border-radius:12px;border:1.5px solid var(--sep);font-size:15px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;resize:none;-webkit-appearance:none}
+.td-reminder-time{width:100%;padding:12px;border-radius:12px;border:1.5px solid var(--sep);font-size:16px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;margin-bottom:10px}
+.td-btn{width:100%;padding:13px;border-radius:12px;border:1.5px solid var(--sep);font-size:15px;font-weight:500;color:var(--text);background:var(--bg);cursor:pointer;margin-top:8px;text-align:center}
+.td-btn.primary{background:var(--orange);color:white;border-color:var(--orange)}
+.td-status{font-size:13px;color:var(--text3);margin-top:8px;min-height:18px}
 
 /* ── ADD TASK MODAL ── */
-#addTaskModal{display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);align-items:flex-end}
-#addTaskModal.open{display:flex}
-#addTaskForm{background:var(--card);border-radius:24px 24px 0 0;padding:20px 20px calc(env(safe-area-inset-bottom)+20px);width:100%;box-sizing:border-box}
-#addTaskForm h3{font-size:18px;font-weight:600;margin-bottom:16px}
-.add-input{width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid var(--sep);font-size:15px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;box-sizing:border-box;margin-bottom:10px;-webkit-appearance:none}
-@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
-
-/* ── PARTICLES ── */
-.particle{position:fixed;pointer-events:none;z-index:9997;width:7px;height:7px;border-radius:50%;animation:pburst 0.65s ease-out forwards}
-@keyframes pburst{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0}}
+#addModal{display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);align-items:flex-end}
+#addModal.open{display:flex}
+#addForm{background:var(--card);border-radius:24px 24px 0 0;padding:20px 20px calc(var(--safe-bot) + 20px);width:100%}
+#addForm h3{font-size:18px;font-weight:600;margin-bottom:14px}
+.add-input{width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid var(--sep);font-size:15px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;-webkit-appearance:none;margin-bottom:10px;display:block}
+.add-row{display:flex;gap:10px}
+.add-row button{flex:1;padding:13px;border-radius:12px;font-size:15px;font-weight:600;border:none;cursor:pointer}
+.add-cancel{background:var(--sep);color:var(--text)}
+.add-submit{background:var(--orange);color:white}
 
 /* ── DESKTOP ── */
 @media(min-width:768px){
   .sidebar{display:flex}
   .tab-bar{display:none}
+  .page{padding-bottom:40px}
+  .pages{display:flex;flex-direction:column;align-items:center;overflow-y:auto}
+  .page{position:relative;transform:none;opacity:1;pointer-events:auto;display:none;width:100%;max-width:680px}
+  .page.active{display:block}
   .toast{bottom:30px;left:calc(var(--sidebar-w) + 50%);transform:translateX(-50%) translateY(20px)}
   .toast.show{transform:translateX(-50%) translateY(0)}
-  .hero-title{font-size:40px}
-  .shop-grid{grid-template-columns:1fr 1fr 1fr}
-  /* Key fix: center the page content column */
-  .pages{overflow-y:auto;display:flex;flex-direction:column;align-items:center}
-  .page{
-    position:relative;overflow:visible;transform:none;opacity:1;display:none;
-    width:100%;max-width:680px;padding-bottom:40px;
-    box-sizing:border-box;
-  }
-  .page.active{display:block}
 }
 </style>
 </head>
 <body>
 
-<!-- DONE OVERLAY -->
 <div id="doneOverlay">
   <div class="done-trophy">🏆</div>
   <div class="done-title">Day Complete.</div>
@@ -409,520 +267,325 @@ body.dark .tab-bar{background:#1C1C1E}
   <button class="done-close" onclick="document.getElementById('doneOverlay').style.display='none'">Back to Today</button>
 </div>
 
-<!-- TOAST -->
-<div class="toast" id="toast">
-  <span class="toast-icon" id="toastIcon">✓</span>
-  <span id="toastMsg">Done!</span>
-</div>
+<div class="toast" id="toast"><span class="toast-icon" id="ti"></span><span id="tm"></span></div>
 
-<!-- SHELL -->
 <div id="shell">
 
-<!-- SIDEBAR (desktop only) -->
+<!-- SIDEBAR -->
 <nav class="sidebar">
-  <div class="sidebar-logo">D.</div>
-  <div class="sidebar-tab active" id="stab-home" onclick="switchTab('home')">
+  <div class="s-logo">D.</div>
+  <button class="s-btn active" id="sb-home" onclick="go('home')">
     <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     <span>Today</span>
-  </div>
-  <div class="sidebar-tab" id="stab-meals" onclick="switchTab('meals')">
+  </button>
+  <button class="s-btn" id="sb-meals" onclick="go('meals')">
     <svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
     <span>Meals</span>
-  </div>
-  <div class="sidebar-tab" id="stab-vision" onclick="switchTab('vision')">
+  </button>
+  <button class="s-btn" id="sb-vision" onclick="go('vision')">
     <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
     <span>Vision</span>
-  </div>
-  <div class="sidebar-tab" id="stab-me" onclick="switchTab('me')">
+  </button>
+  <button class="s-btn" id="sb-me" onclick="go('me')">
     <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     <span>Me</span>
-  </div>
-  <button class="sidebar-fab" onclick="openAddTask()">+</button>
+  </button>
+  <button class="s-fab" onclick="openAdd()">+</button>
 </nav>
 
 <div id="main">
 <div class="pages">
 
-<!-- ╔══════════════════════╗ -->
-<!-- ║   HOME / TODAY       ║ -->
-<!-- ╚══════════════════════╝ -->
+<!-- TODAY -->
 <div class="page active" id="page-home">
-  <!-- Top Bar -->
   <div class="top-bar">
-    <div class="top-bar-left">
-      <div class="app-wordmark">Do It<span>.</span></div>
-    </div>
-    <div class="top-bar-right">
-      <button class="icon-btn" onclick="toggleSearch()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
-      <button class="icon-btn" id="bellBtn" onclick="switchTab('me')"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></button>
-      <button class="icon-btn" onclick="switchTab('me')"><div class="avatar-self" style="width:30px;height:30px;font-size:13px;margin:0">A</div></button>
+    <div class="wordmark">Do It<span>.</span></div>
+    <div class="top-right">
+      <button class="i-btn" onclick="toggleSearch()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+      <button class="i-btn" onclick="go('me')"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></button>
+      <div class="avatar" onclick="go('me')">A</div>
     </div>
   </div>
-
-  <!-- Search bar (hidden) -->
-  <div id="searchBar" style="display:none;padding:0 20px 12px;animation:fadeIn 0.2s">
-    <input id="searchInput" type="search" placeholder="Search tasks…" oninput="filterSearch(this.value)"
-      style="width:100%;padding:11px 16px;border-radius:12px;border:1.5px solid var(--sep);font-size:15px;font-family:inherit;background:var(--card);color:var(--text);outline:none;box-sizing:border-box;-webkit-appearance:none"/>
+  <div class="search-bar" id="searchBar">
+    <input class="search-input" id="searchInput" type="search" placeholder="Search tasks…" oninput="doSearch(this.value)">
   </div>
-
-  <!-- Hero -->
   <div class="hero">
-    <div class="hero-greeting" id="heroDate">Tuesday · May 5</div>
+    <div class="hero-date" id="heroDate"></div>
     <h1 class="hero-title" id="heroTitle">Get It Done,<br>Adam <em>✌️</em></h1>
   </div>
-
-
-
-  <!-- Banner -->
-  <div class="task-banner" id="taskBanner">
+  <div class="banner" id="banner">
     <div class="banner-dot"></div>
-    <div class="banner-text">You have <strong id="remainCount">8</strong> tasks today.</div>
-    <button class="banner-x" onclick="document.getElementById('taskBanner').classList.add('hidden')">×</button>
+    <div class="banner-txt">You have <strong id="remCount">8</strong> tasks today.</div>
+    <button class="banner-x" onclick="this.parentElement.classList.add('hidden')">×</button>
   </div>
-
-  <!-- Today Tasks -->
-  <div class="sec-hdr">
-    <div class="sec-title">Today Tasks</div>
-    <div class="sec-link">See All ›</div>
-  </div>
-
+  <div class="sec-hdr"><div class="sec-title">Today Tasks</div><div class="sec-link" onclick="openAdd()">+ Add</div></div>
   <div class="task-list" id="taskList">
 
-    <div class="task-card" data-id="gym" data-cat="body" onclick="toggleTask(this)">
-      <div class="task-card-top">
-        <div class="check-circle"><svg width="12" height="9" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="task-body">
-          <div class="task-name">Go Gym</div>
-          <div class="task-sub">11:30 – 12:45 · Energy first. Everything else follows.</div>
-        </div>
-        <button class="task-menu-btn" onclick="openTaskDetail(event,this.closest('.task-card'))">···</button>
+    <div class="task-card" data-id="gym" data-cat="body" onclick="tap(event,this)">
+      <div class="tc-top">
+        <div class="check-circle"><svg viewBox="0 0 12 9" width="12" height="9"><path d="M1 4.5L4.5 8L11 1"/></svg></div>
+        <div class="tc-body"><div class="task-name">Go Gym</div><div class="task-sub">11:30–12:45 · Energy first. Everything else follows.</div></div>
+        <button class="menu-btn" onclick="openDetail(event,this.closest('.task-card'))">···</button>
       </div>
-      <div class="task-card-bottom">
-        <span class="task-tag tag-body">Body</span>
-        <div class="task-progress-wrap"><span class="task-pct">0%</span></div>
-      </div>
-      <div class="progress-track"><div class="progress-fill"></div></div>
+      <div class="tc-bot"><span class="task-tag tag-body">Body</span><span class="task-pct">0%</span></div>
+      <div class="prog-track"><div class="prog-fill"></div></div>
     </div>
 
-    <div class="task-card" data-id="shop" data-cat="home" onclick="toggleTask(this)">
-      <div class="task-card-top">
-        <div class="check-circle"><svg width="12" height="9" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="task-body">
-          <div class="task-name">Shop — Groceries</div>
-          <div class="task-sub">12:45 – 13:15 · List in the Meals tab. In and out.</div>
-        </div>
-        <button class="task-menu-btn" onclick="openTaskDetail(event,this.closest('.task-card'))">···</button>
+    <div class="task-card" data-id="shop" data-cat="home" onclick="tap(event,this)">
+      <div class="tc-top">
+        <div class="check-circle"><svg viewBox="0 0 12 9" width="12" height="9"><path d="M1 4.5L4.5 8L11 1"/></svg></div>
+        <div class="tc-body"><div class="task-name">Shop — Groceries</div><div class="task-sub">12:45–13:15 · List in Meals tab. In and out.</div></div>
+        <button class="menu-btn" onclick="openDetail(event,this.closest('.task-card'))">···</button>
       </div>
-      <div class="task-card-bottom">
-        <span class="task-tag tag-home">Home</span>
-        <div class="task-progress-wrap"><span class="task-pct">0%</span></div>
-      </div>
-      <div class="progress-track"><div class="progress-fill"></div></div>
+      <div class="tc-bot"><span class="task-tag tag-home">Home</span><span class="task-pct">0%</span></div>
+      <div class="prog-track"><div class="prog-fill"></div></div>
     </div>
 
-    <div class="task-card" data-id="whatsapp" data-cat="work" onclick="toggleTask(this)">
-      <div class="task-card-top">
-        <div class="check-circle"><svg width="12" height="9" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="task-body">
-          <div class="task-name">Reply WhatsApp + New Employee</div>
-          <div class="task-sub">13:15 – 13:45 · One message at a time. Don't overthink.</div>
-        </div>
-        <button class="task-menu-btn" onclick="openTaskDetail(event,this.closest('.task-card'))">···</button>
+    <div class="task-card" data-id="whatsapp" data-cat="work" onclick="tap(event,this)">
+      <div class="tc-top">
+        <div class="check-circle"><svg viewBox="0 0 12 9" width="12" height="9"><path d="M1 4.5L4.5 8L11 1"/></svg></div>
+        <div class="tc-body"><div class="task-name">Reply WhatsApp + New Employee</div><div class="task-sub">13:15–13:45 · One message at a time.</div></div>
+        <button class="menu-btn" onclick="openDetail(event,this.closest('.task-card'))">···</button>
       </div>
-      <div class="task-card-bottom">
-        <span class="task-tag tag-work">Work</span>
-        <div class="task-progress-wrap"><span class="task-pct">0%</span></div>
-      </div>
-      <div class="progress-track"><div class="progress-fill"></div></div>
+      <div class="tc-bot"><span class="task-tag tag-work">Work</span><span class="task-pct">0%</span></div>
+      <div class="prog-track"><div class="prog-fill"></div></div>
     </div>
 
-    <div class="task-card" data-id="ebay" data-cat="money" onclick="toggleTask(this)">
-      <div class="task-card-top">
-        <div class="check-circle"><svg width="12" height="9" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="task-body">
-          <div class="task-name">eBay — List the Jacket</div>
-          <div class="task-sub">13:45 – 14:00 · Photos, post, done. 15 min max.</div>
-        </div>
-        <button class="task-menu-btn" onclick="openTaskDetail(event,this.closest('.task-card'))">···</button>
+    <div class="task-card" data-id="ebay" data-cat="money" onclick="tap(event,this)">
+      <div class="tc-top">
+        <div class="check-circle"><svg viewBox="0 0 12 9" width="12" height="9"><path d="M1 4.5L4.5 8L11 1"/></svg></div>
+        <div class="tc-body"><div class="task-name">eBay — List the Jacket</div><div class="task-sub">13:45–14:00 · Photos, post, done. 15 min max.</div></div>
+        <button class="menu-btn" onclick="openDetail(event,this.closest('.task-card'))">···</button>
       </div>
-      <div class="task-card-bottom">
-        <span class="task-tag tag-money">Money</span>
-        <div class="task-progress-wrap"><span class="task-pct">0%</span></div>
-      </div>
-      <div class="progress-track"><div class="progress-fill"></div></div>
+      <div class="tc-bot"><span class="task-tag tag-money">Money</span><span class="task-pct">0%</span></div>
+      <div class="prog-track"><div class="prog-fill"></div></div>
     </div>
 
-    <div class="task-card" data-id="build-pv" data-cat="money" onclick="toggleTask(this)">
-      <div class="task-card-top">
-        <div class="check-circle"><svg width="12" height="9" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="task-body">
-          <div class="task-name">Build Personalvermittler Site</div>
-          <div class="task-sub">14:00 – 16:00 · Manychat CTA. Unlocks cold emails.</div>
-        </div>
-        <button class="task-menu-btn" onclick="openTaskDetail(event,this.closest('.task-card'))">···</button>
+    <div class="task-card" data-id="build-pv" data-cat="money" onclick="tap(event,this)">
+      <div class="tc-top">
+        <div class="check-circle"><svg viewBox="0 0 12 9" width="12" height="9"><path d="M1 4.5L4.5 8L11 1"/></svg></div>
+        <div class="tc-body"><div class="task-name">Build Personalvermittler Site</div><div class="task-sub">14:00–16:00 · Manychat CTA. Unlocks cold emails.</div></div>
+        <button class="menu-btn" onclick="openDetail(event,this.closest('.task-card'))">···</button>
       </div>
-      <div class="task-card-bottom">
-        <span class="task-tag tag-money">Money</span>
-        <div class="task-progress-wrap"><span class="task-pct">0%</span></div>
-      </div>
-      <div class="progress-track"><div class="progress-fill"></div></div>
+      <div class="tc-bot"><span class="task-tag tag-money">Money</span><span class="task-pct">0%</span></div>
+      <div class="prog-track"><div class="prog-fill"></div></div>
     </div>
 
-    <div class="task-card" data-id="build-ag" data-cat="money" onclick="toggleTask(this)">
-      <div class="task-card-top">
-        <div class="check-circle"><svg width="12" height="9" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="task-body">
-          <div class="task-name">Build Arbeitgeber Site</div>
-          <div class="task-sub">16:00 – 18:00 · Video slot + Manychat CTA.</div>
-        </div>
-        <button class="task-menu-btn" onclick="openTaskDetail(event,this.closest('.task-card'))">···</button>
+    <div class="task-card" data-id="build-ag" data-cat="money" onclick="tap(event,this)">
+      <div class="tc-top">
+        <div class="check-circle"><svg viewBox="0 0 12 9" width="12" height="9"><path d="M1 4.5L4.5 8L11 1"/></svg></div>
+        <div class="tc-body"><div class="task-name">Build Arbeitgeber Site</div><div class="task-sub">16:00–18:00 · Video slot + Manychat CTA.</div></div>
+        <button class="menu-btn" onclick="openDetail(event,this.closest('.task-card'))">···</button>
       </div>
-      <div class="task-card-bottom">
-        <span class="task-tag tag-money">Money</span>
-        <div class="task-progress-wrap"><span class="task-pct">0%</span></div>
-      </div>
-      <div class="progress-track"><div class="progress-fill"></div></div>
+      <div class="tc-bot"><span class="task-tag tag-money">Money</span><span class="task-pct">0%</span></div>
+      <div class="prog-track"><div class="prog-fill"></div></div>
     </div>
 
-    <div class="task-card" data-id="video" data-cat="work" onclick="toggleTask(this)">
-      <div class="task-card-top">
-        <div class="check-circle"><svg width="12" height="9" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="task-body">
-          <div class="task-name">Video für Arbeitgeber</div>
-          <div class="task-sub">18:00 – 18:30 · Record it. First take counts.</div>
-        </div>
-        <button class="task-menu-btn" onclick="openTaskDetail(event,this.closest('.task-card'))">···</button>
+    <div class="task-card" data-id="video" data-cat="work" onclick="tap(event,this)">
+      <div class="tc-top">
+        <div class="check-circle"><svg viewBox="0 0 12 9" width="12" height="9"><path d="M1 4.5L4.5 8L11 1"/></svg></div>
+        <div class="tc-body"><div class="task-name">Video für Arbeitgeber</div><div class="task-sub">18:00–18:30 · Record it. First take counts.</div></div>
+        <button class="menu-btn" onclick="openDetail(event,this.closest('.task-card'))">···</button>
       </div>
-      <div class="task-card-bottom">
-        <span class="task-tag tag-work">Work</span>
-        <div class="task-progress-wrap"><span class="task-pct">0%</span></div>
-      </div>
-      <div class="progress-track"><div class="progress-fill"></div></div>
+      <div class="tc-bot"><span class="task-tag tag-work">Work</span><span class="task-pct">0%</span></div>
+      <div class="prog-track"><div class="prog-fill"></div></div>
     </div>
 
-    <div class="task-card" data-id="quran-task" data-cat="soul" onclick="toggleTask(this)">
-      <div class="task-card-top">
-        <div class="check-circle"><svg width="12" height="9" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="task-body">
-          <div class="task-name">Learn Islam / Quran</div>
-          <div class="task-sub">Evening · 20 minutes. Soul before sleep.</div>
-        </div>
-        <button class="task-menu-btn" onclick="openTaskDetail(event,this.closest('.task-card'))">···</button>
+    <div class="task-card" data-id="quran-task" data-cat="soul" onclick="tap(event,this)">
+      <div class="tc-top">
+        <div class="check-circle"><svg viewBox="0 0 12 9" width="12" height="9"><path d="M1 4.5L4.5 8L11 1"/></svg></div>
+        <div class="tc-body"><div class="task-name">Learn Islam / Quran</div><div class="task-sub">Evening · 20 minutes. Soul before sleep.</div></div>
+        <button class="menu-btn" onclick="openDetail(event,this.closest('.task-card'))">···</button>
       </div>
-      <div class="task-card-bottom">
-        <span class="task-tag tag-soul">Soul</span>
-        <div class="task-progress-wrap"><span class="task-pct">0%</span></div>
-      </div>
-      <div class="progress-track"><div class="progress-fill"></div></div>
+      <div class="tc-bot"><span class="task-tag tag-soul">Soul</span><span class="task-pct">0%</span></div>
+      <div class="prog-track"><div class="prog-fill"></div></div>
     </div>
 
   </div>
 
-  <!-- Blocked Emails -->
-  <div class="blocked-header" id="blockedHeader">
+  <!-- Blocked emails -->
+  <div class="blocked-hdr" id="blockedHdr" style="margin-top:16px">
     <div class="blocked-pill">🔒 Blocked</div>
-    <div>
-      <div class="blocked-label">Cold Emails</div>
-      <div class="blocked-sublabel" id="blockedSub">Complete both Build tasks to unlock</div>
-    </div>
+    <div style="flex:1;margin-left:10px"><div class="blocked-lbl">Cold Emails</div><div class="blocked-sub" id="blockedSub">Complete both Build tasks to unlock</div></div>
     <button class="unlock-btn" id="unlockBtn" onclick="unlockEmails()">Unlock ✓</button>
   </div>
   <div class="blocked-list" id="blockedList">
-    <div class="blocked-row" id="email-reiner" onclick="toggleBlocked(this)">
-      <div class="check-circle"><svg width="12" height="9" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="task-body"><div class="task-name">Cold Email — Reiner</div><div class="task-sub">Draft → send. One email.</div></div>
+    <div class="blocked-row" id="em-reiner" onclick="tapBlocked(this)">
+      <div class="check-circle"><svg viewBox="0 0 12 9" width="12" height="9"><path d="M1 4.5L4.5 8L11 1"/></svg></div>
+      <div class="tc-body"><div class="task-name">Cold Email — Reiner</div><div class="task-sub">Draft → send. One email.</div></div>
       <span class="task-tag tag-money">Money</span>
     </div>
-    <div class="blocked-row" id="email-ag" onclick="toggleBlocked(this)">
-      <div class="check-circle"><svg width="12" height="9" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="task-body"><div class="task-name">Cold Email — Arbeitgeber</div><div class="task-sub">Copy structure. Adapt. Send.</div></div>
+    <div class="blocked-row" id="em-ag" onclick="tapBlocked(this)">
+      <div class="check-circle"><svg viewBox="0 0 12 9" width="12" height="9"><path d="M1 4.5L4.5 8L11 1"/></svg></div>
+      <div class="tc-body"><div class="task-name">Cold Email — Arbeitgeber</div><div class="task-sub">Copy structure. Adapt. Send.</div></div>
       <span class="task-tag tag-money">Money</span>
     </div>
-    <div class="blocked-row" id="email-pv" onclick="toggleBlocked(this)">
-      <div class="check-circle"><svg width="12" height="9" viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="task-body"><div class="task-name">Cold Email — Personalvermittler</div><div class="task-sub">Same rhythm. Send today.</div></div>
+    <div class="blocked-row" id="em-pv" onclick="tapBlocked(this)">
+      <div class="check-circle"><svg viewBox="0 0 12 9" width="12" height="9"><path d="M1 4.5L4.5 8L11 1"/></svg></div>
+      <div class="tc-body"><div class="task-name">Cold Email — Personalvermittler</div><div class="task-sub">Same rhythm. Send today.</div></div>
       <span class="task-tag tag-money">Money</span>
     </div>
   </div>
-
   <div style="height:20px"></div>
-</div><!-- end page-home -->
+</div>
 
-<!-- ╔══════════════════════╗ -->
-<!-- ║   MEALS              ║ -->
-<!-- ╚══════════════════════╝ -->
+<!-- MEALS -->
 <div class="page" id="page-meals">
-  <div class="top-bar">
-    <div class="app-wordmark">Do It<span>.</span></div>
-    <div class="avatar-self">A</div>
-  </div>
-  <div class="meal-hero">
-    <h1>Fuel Up 🥗</h1>
-    <p>Eat for performance, not comfort.</p>
-  </div>
+  <div class="top-bar"><div class="wordmark">Do It<span>.</span></div><div class="avatar" onclick="go('me')">A</div></div>
+  <div class="page-hero"><h1>Fuel Up 🥗</h1><p>Eat for performance, not comfort.</p></div>
   <div class="meal-cards">
-    <div class="meal-card">
-      <div class="meal-emoji">🥚</div>
-      <div class="meal-body"><div class="meal-name">Eggs + Avocado Toast</div><div class="meal-desc">Breakfast · Protein + healthy fats</div></div>
-      <div class="meal-kcal">450</div>
-    </div>
-    <div class="meal-card">
-      <div class="meal-emoji">🍗</div>
-      <div class="meal-body"><div class="meal-name">Chicken Rice Bowl</div><div class="meal-desc">Lunch · Lean protein + complex carbs</div></div>
-      <div class="meal-kcal">620</div>
-    </div>
-    <div class="meal-card">
-      <div class="meal-emoji">🐟</div>
-      <div class="meal-body"><div class="meal-name">Salmon + Sweet Potato</div><div class="meal-desc">Dinner · Omega-3 + slow carbs</div></div>
-      <div class="meal-kcal">580</div>
-    </div>
+    <div class="meal-card"><div class="meal-emoji">🥚</div><div class="meal-body"><div class="meal-name">Eggs + Avocado Toast</div><div class="meal-desc">Breakfast · Protein + healthy fats</div></div><div class="meal-kcal">450</div></div>
+    <div class="meal-card"><div class="meal-emoji">🍗</div><div class="meal-body"><div class="meal-name">Chicken Rice Bowl</div><div class="meal-desc">Lunch · Lean protein + complex carbs</div></div><div class="meal-kcal">620</div></div>
+    <div class="meal-card"><div class="meal-emoji">🐟</div><div class="meal-body"><div class="meal-name">Salmon + Sweet Potato</div><div class="meal-desc">Dinner · Omega-3 + slow carbs</div></div><div class="meal-kcal">580</div></div>
   </div>
-  <!-- Shopping List -->
-  <div style="padding:0 20px 20px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-      <div style="font-size:20px;font-weight:600">Shopping List 🛒</div>
-      <button onclick="clearCheckedShop()" style="font-size:13px;font-weight:500;color:var(--orange);background:none;border:none;cursor:pointer">Clear done</button>
+  <div class="shop-section">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <h2>Shopping List 🛒</h2>
+      <button onclick="clearShop()" style="font-size:13px;font-weight:500;color:var(--orange);background:none;border:none;cursor:pointer">Clear done</button>
     </div>
-    <!-- Add item -->
-    <div style="display:flex;gap:8px;margin-bottom:16px">
-      <input id="shopAddInput" placeholder="Add item…" style="flex:1;padding:10px 14px;border-radius:12px;border:1.5px solid var(--sep);font-size:15px;font-family:inherit;background:var(--card);color:var(--text);outline:none;-webkit-appearance:none" onkeydown="if(event.key==='Enter')addShopItem()" />
-      <button onclick="addShopItem()" style="background:var(--orange);color:white;border:none;border-radius:12px;padding:10px 16px;font-size:15px;font-weight:600;cursor:pointer">+</button>
+    <div class="shop-cat-label">🥩 Protein</div>
+    <div class="shop-group" id="sg-protein">
+      <div class="shop-row" onclick="tshop(this)"><div class="s-check"><svg viewBox="0 0 12 9" width="10" height="7"><path d="M1 4.5L4.5 8L11 1"/></svg></div><div class="shop-name">Eggs (6)</div></div>
+      <div class="shop-row" onclick="tshop(this)"><div class="s-check"><svg viewBox="0 0 12 9" width="10" height="7"><path d="M1 4.5L4.5 8L11 1"/></svg></div><div class="shop-name">Salmon (200g)</div></div>
+      <div class="shop-row" onclick="tshop(this)"><div class="s-check"><svg viewBox="0 0 12 9" width="10" height="7"><path d="M1 4.5L4.5 8L11 1"/></svg></div><div class="shop-name">Chicken thighs (2)</div></div>
+      <div class="shop-row" onclick="tshop(this)"><div class="s-check"><svg viewBox="0 0 12 9" width="10" height="7"><path d="M1 4.5L4.5 8L11 1"/></svg></div><div class="shop-name">Greek yogurt</div></div>
     </div>
-    <!-- Protein -->
-    <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">🥩 Protein</div>
-    <div id="shopList-protein" style="background:var(--card);border-radius:14px;overflow:hidden;margin-bottom:14px">
-      <div class="shop-row" onclick="toggleShopRow(this)"><div class="shop-row-check"></div><div class="shop-row-name">Eggs (6)</div></div>
-      <div class="shop-row" onclick="toggleShopRow(this)"><div class="shop-row-check"></div><div class="shop-row-name">Salmon (200g)</div></div>
-      <div class="shop-row" onclick="toggleShopRow(this)"><div class="shop-row-check"></div><div class="shop-row-name">Chicken thighs (2)</div></div>
-      <div class="shop-row" onclick="toggleShopRow(this)"><div class="shop-row-check"></div><div class="shop-row-name">Greek yogurt</div></div>
+    <div class="shop-cat-label">🥦 Produce</div>
+    <div class="shop-group">
+      <div class="shop-row" onclick="tshop(this)"><div class="s-check"><svg viewBox="0 0 12 9" width="10" height="7"><path d="M1 4.5L4.5 8L11 1"/></svg></div><div class="shop-name">Avocado (2)</div></div>
+      <div class="shop-row" onclick="tshop(this)"><div class="s-check"><svg viewBox="0 0 12 9" width="10" height="7"><path d="M1 4.5L4.5 8L11 1"/></svg></div><div class="shop-name">Sweet potato (2)</div></div>
+      <div class="shop-row" onclick="tshop(this)"><div class="s-check"><svg viewBox="0 0 12 9" width="10" height="7"><path d="M1 4.5L4.5 8L11 1"/></svg></div><div class="shop-name">Broccoli</div></div>
+      <div class="shop-row" onclick="tshop(this)"><div class="s-check"><svg viewBox="0 0 12 9" width="10" height="7"><path d="M1 4.5L4.5 8L11 1"/></svg></div><div class="shop-name">Bananas</div></div>
+      <div class="shop-row" onclick="tshop(this)"><div class="s-check"><svg viewBox="0 0 12 9" width="10" height="7"><path d="M1 4.5L4.5 8L11 1"/></svg></div><div class="shop-name">Mixed berries</div></div>
+      <div class="shop-row" onclick="tshop(this)"><div class="s-check"><svg viewBox="0 0 12 9" width="10" height="7"><path d="M1 4.5L4.5 8L11 1"/></svg></div><div class="shop-name">Garlic</div></div>
     </div>
-    <!-- Produce -->
-    <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">🥦 Produce</div>
-    <div id="shopList-produce" style="background:var(--card);border-radius:14px;overflow:hidden;margin-bottom:14px">
-      <div class="shop-row" onclick="toggleShopRow(this)"><div class="shop-row-check"></div><div class="shop-row-name">Avocado (2)</div></div>
-      <div class="shop-row" onclick="toggleShopRow(this)"><div class="shop-row-check"></div><div class="shop-row-name">Sweet potato (2)</div></div>
-      <div class="shop-row" onclick="toggleShopRow(this)"><div class="shop-row-check"></div><div class="shop-row-name">Broccoli</div></div>
-      <div class="shop-row" onclick="toggleShopRow(this)"><div class="shop-row-check"></div><div class="shop-row-name">Bananas</div></div>
-      <div class="shop-row" onclick="toggleShopRow(this)"><div class="shop-row-check"></div><div class="shop-row-name">Mixed berries</div></div>
-      <div class="shop-row" onclick="toggleShopRow(this)"><div class="shop-row-check"></div><div class="shop-row-name">Garlic</div></div>
+    <div class="shop-cat-label">🍚 Pantry</div>
+    <div class="shop-group">
+      <div class="shop-row" onclick="tshop(this)"><div class="s-check"><svg viewBox="0 0 12 9" width="10" height="7"><path d="M1 4.5L4.5 8L11 1"/></svg></div><div class="shop-name">Rice (200g)</div></div>
+      <div class="shop-row" onclick="tshop(this)"><div class="s-check"><svg viewBox="0 0 12 9" width="10" height="7"><path d="M1 4.5L4.5 8L11 1"/></svg></div><div class="shop-name">Peanut butter</div></div>
     </div>
-    <!-- Pantry -->
-    <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">🍚 Pantry</div>
-    <div id="shopList-pantry" style="background:var(--card);border-radius:14px;overflow:hidden;margin-bottom:14px">
-      <div class="shop-row" onclick="toggleShopRow(this)"><div class="shop-row-check"></div><div class="shop-row-name">Rice (200g)</div></div>
-      <div class="shop-row" onclick="toggleShopRow(this)"><div class="shop-row-check"></div><div class="shop-row-name">Peanut butter</div></div>
+    <div class="shop-add">
+      <input id="shopInput" placeholder="Add item…" onkeydown="if(event.key==='Enter')addShopItem()" style="-webkit-appearance:none">
+      <button onclick="addShopItem()">+</button>
     </div>
-    <!-- Added items -->
-    <div id="shopList-custom" style="background:var(--card);border-radius:14px;overflow:hidden;margin-bottom:14px"></div>
+    <div class="shop-group" id="sg-custom" style="margin-top:8px"></div>
   </div>
   <div style="height:20px"></div>
 </div>
 
-<!-- ╔══════════════════════╗ -->
-<!-- ║   VISION             ║ -->
-<!-- ╚══════════════════════╝ -->
+<!-- VISION -->
 <div class="page" id="page-vision">
-  <div class="top-bar">
-    <div class="app-wordmark">Do It<span>.</span></div>
-    <div class="avatar-self">A</div>
-  </div>
-  <div class="vision-hero">
-    <h1>The Vision ✦</h1>
-    <p>Parked — not forgotten. The big picture lives here.</p>
-  </div>
+  <div class="top-bar"><div class="wordmark">Do It<span>.</span></div><div class="avatar" onclick="go('me')">A</div></div>
+  <div class="page-hero"><h1>The Vision ✦</h1><p>Parked — not forgotten. The big picture lives here.</p></div>
   <div class="vision-list">
-    <div class="vision-item"><div class="vision-num">1</div><div class="vision-text">Brain — Standalone knowledge system</div></div>
-    <div class="vision-item"><div class="vision-num">2</div><div class="vision-text">Jarvis + Brain — Co-evolution engine</div></div>
-    <div class="vision-item"><div class="vision-num">3</div><div class="vision-text">Launch Webuild / Digitalo Company</div></div>
-    <div class="vision-item"><div class="vision-num">4</div><div class="vision-text">Make the 3-Sided Website</div></div>
-    <div class="vision-item"><div class="vision-num">5</div><div class="vision-text">Set up Manychat — Customers + Business Owners</div></div>
-    <div class="vision-item"><div class="vision-num">6</div><div class="vision-text">Launch Meta-Ads for employers</div></div>
-    <div class="vision-item"><div class="vision-num">7</div><div class="vision-text">Company that builds websites &amp; systems</div></div>
-    <div class="vision-item"><div class="vision-num">8</div><div class="vision-text">Framer Templates → Design Extractor → AI</div></div>
-    <div class="vision-item"><div class="vision-num">9</div><div class="vision-text">Pre-made sites → Template Library → Scale</div></div>
-    <div class="vision-item"><div class="vision-num">10</div><div class="vision-text">Kentnissprüfung App, Site and Videos</div></div>
-    <div class="vision-item"><div class="vision-num">11</div><div class="vision-text">Plan For Dr. Lashin</div></div>
-    <div class="vision-item"><div class="vision-num">12</div><div class="vision-text">Plan for Webuild</div></div>
-    <div class="vision-item"><div class="vision-num">13</div><div class="vision-text">Jarvis → Claude Hybrid Model (Notion bridge)</div></div>
-    <div class="vision-item"><div class="vision-num">14</div><div class="vision-text">Startup video for Jarvis + fix speed + design</div></div>
-    <div class="vision-item"><div class="vision-num">15</div><div class="vision-text">Download WhatsApp messages → Claude replies</div></div>
-    <div class="vision-item"><div class="vision-num">16</div><div class="vision-text">Redesign Home (table, glass, balcony)</div></div>
-    <div class="vision-item"><div class="vision-num">17</div><div class="vision-text">Sell Baba's furniture, add stuff to home</div></div>
-    <div class="vision-item"><div class="vision-num">18</div><div class="vision-text">Claude + Higgsfield setup</div></div>
-    <div class="vision-item"><div class="vision-num">19</div><div class="vision-text">Claude code as Jarvis coder via Notion</div></div>
-    <div class="vision-item"><div class="vision-num">20</div><div class="vision-text">Openclaw on old laptop</div></div>
+    <div class="v-item"><div class="v-num">1</div><div class="v-text">Brain — Standalone knowledge system</div></div>
+    <div class="v-item"><div class="v-num">2</div><div class="v-text">Jarvis + Brain — Co-evolution engine</div></div>
+    <div class="v-item"><div class="v-num">3</div><div class="v-text">Launch Webuild / Digitalo Company</div></div>
+    <div class="v-item"><div class="v-num">4</div><div class="v-text">Make the 3-Sided Website</div></div>
+    <div class="v-item"><div class="v-num">5</div><div class="v-text">Set up Manychat — Customers + Business Owners</div></div>
+    <div class="v-item"><div class="v-num">6</div><div class="v-text">Launch Meta-Ads for employers</div></div>
+    <div class="v-item"><div class="v-num">7</div><div class="v-text">Company that builds websites &amp; systems</div></div>
+    <div class="v-item"><div class="v-num">8</div><div class="v-text">Framer Templates → Design Extractor → AI</div></div>
+    <div class="v-item"><div class="v-num">9</div><div class="v-text">Pre-made sites → Template Library → Scale</div></div>
+    <div class="v-item"><div class="v-num">10</div><div class="v-text">Kentnissprüfung App, Site and Videos</div></div>
+    <div class="v-item"><div class="v-num">11</div><div class="v-text">Plan For Dr. Lashin</div></div>
+    <div class="v-item"><div class="v-num">12</div><div class="v-text">Plan for Webuild</div></div>
+    <div class="v-item"><div class="v-num">13</div><div class="v-text">Jarvis → Claude Hybrid Model (Notion bridge)</div></div>
+    <div class="v-item"><div class="v-num">14</div><div class="v-text">Startup video for Jarvis + fix speed + design</div></div>
+    <div class="v-item"><div class="v-num">15</div><div class="v-text">Download WhatsApp messages → Claude replies</div></div>
+    <div class="v-item"><div class="v-num">16</div><div class="v-text">Redesign Home (table, glass, balcony)</div></div>
+    <div class="v-item"><div class="v-num">17</div><div class="v-text">Sell Baba's furniture, add stuff to home</div></div>
+    <div class="v-item"><div class="v-num">18</div><div class="v-text">Claude + Higgsfield setup</div></div>
+    <div class="v-item"><div class="v-num">19</div><div class="v-text">Claude code as Jarvis coder via Notion</div></div>
+    <div class="v-item"><div class="v-num">20</div><div class="v-text">Openclaw on old laptop</div></div>
   </div>
   <div style="height:20px"></div>
 </div>
 
-<!-- ╔══════════════════════╗ -->
-<!-- ║   ME                 ║ -->
-<!-- ╚══════════════════════╝ -->
+<!-- ME -->
 <div class="page" id="page-me">
-  <div class="top-bar">
-    <div class="app-wordmark">Do It<span>.</span></div>
-  </div>
-
-  <!-- Profile -->
-  <div style="padding:20px 20px 0;display:flex;align-items:center;gap:16px">
-    <div style="width:64px;height:64px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:white;flex-shrink:0">A</div>
+  <div class="top-bar"><div class="wordmark">Do It<span>.</span></div></div>
+  <div style="padding:16px 20px 16px;display:flex;align-items:center;gap:16px">
+    <div style="width:60px;height:60px;border-radius:50%;background:var(--orange);color:white;font-size:24px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">A</div>
     <div>
-      <div style="font-size:22px;font-weight:700;color:var(--text)">Adam</div>
-      <div style="font-size:14px;color:var(--text3);margin-top:2px">🔥 <span id="streakNum">1</span> day streak</div>
+      <div style="font-size:22px;font-weight:700">Adam</div>
+      <div style="font-size:13px;color:var(--text3);margin-top:2px">🔥 <span id="streakDisp">1</span> day streak</div>
     </div>
   </div>
-
-  <!-- Stats row -->
-  <div style="display:flex;gap:10px;padding:16px 20px 0">
-    <div style="flex:1;background:var(--card);border-radius:14px;padding:14px;text-align:center">
-      <div id="tasksCompletedStat" style="font-size:28px;font-weight:700;color:var(--orange)">0</div>
-      <div style="font-size:11px;color:var(--text3);margin-top:2px;font-weight:500">Done today</div>
+  <div class="stats-row">
+    <div class="stat-box"><div class="stat-num" id="statDone">0</div><div class="stat-lbl">Done today</div></div>
+    <div class="stat-box"><div class="stat-num" id="statStreak">1</div><div class="stat-lbl">Day streak</div></div>
+    <div class="stat-box"><div class="stat-num" id="statRem">8</div><div class="stat-lbl">Remaining</div></div>
+  </div>
+  <div class="me-section-label">Notifications</div>
+  <div class="me-group">
+    <div class="me-row" onclick="toggleNotify()">
+      <div class="me-row-icon" style="background:var(--ol)">🔔</div>
+      <div class="me-row-body"><div class="me-row-title">Daily Push (8 AM)</div><div class="me-row-sub" id="notifySub">Enable to get morning reminders</div></div>
+      <span class="notify-badge off" id="notifyBadge">OFF</span>
     </div>
-    <div style="flex:1;background:var(--card);border-radius:14px;padding:14px;text-align:center">
-      <div id="streakStatNum" style="font-size:28px;font-weight:700;color:var(--orange)">1</div>
-      <div style="font-size:11px;color:var(--text3);margin-top:2px;font-weight:500">Day streak</div>
-    </div>
-    <div style="flex:1;background:var(--card);border-radius:14px;padding:14px;text-align:center">
-      <div id="tasksRemainingMeStat" style="font-size:28px;font-weight:700;color:var(--text)">8</div>
-      <div style="font-size:11px;color:var(--text3);margin-top:2px;font-weight:500">Remaining</div>
+    <div class="me-row" onclick="testPush()">
+      <div class="me-row-icon" style="background:#fff3e0">⚡</div>
+      <div class="me-row-body"><div class="me-row-title">Send Test Push</div><div class="me-row-sub">Fire a real push to your phone now</div></div>
+      <span class="me-row-val" id="testPushVal">→</span>
     </div>
   </div>
-
-  <!-- Section: Notifications -->
-  <div style="padding:20px 20px 8px">
-    <div style="font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Notifications</div>
-    <div style="background:var(--card);border-radius:16px;overflow:hidden">
-      <div onclick="toggleNotify(this)" style="display:flex;align-items:center;gap:14px;padding:14px 16px;cursor:pointer;border-bottom:1px solid var(--sep)">
-        <div style="width:36px;height:36px;border-radius:10px;background:var(--orange-light);display:flex;align-items:center;justify-content:center;font-size:18px">🔔</div>
-        <div style="flex:1">
-          <div style="font-size:15px;font-weight:500;color:var(--text)">Daily 8:00 AM Push</div>
-          <div style="font-size:12px;color:var(--text3);margin-top:1px">Get notified when your list is ready</div>
-        </div>
-        <div class="notify-status notify-off" id="notifyStatus">OFF</div>
-      </div>
-      <div onclick="testPushNow()" style="display:flex;align-items:center;gap:14px;padding:14px 16px;cursor:pointer">
-        <div style="width:36px;height:36px;border-radius:10px;background:#fff3e0;display:flex;align-items:center;justify-content:center;font-size:18px">⚡</div>
-        <div style="flex:1">
-          <div style="font-size:15px;font-weight:500;color:var(--text)">Send Test Notification</div>
-          <div id="testPushStatusSub" style="font-size:12px;color:var(--text3);margin-top:1px">Tap to fire a push to your phone now</div>
-        </div>
-        <div id="testPushStatus" style="font-size:12px;font-weight:500;color:var(--text3)">→</div>
-      </div>
+  <div class="me-section-label">Daily Remembrance</div>
+  <div class="quran-card">
+    <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:1px">Surah Al-Inshirah · <span id="quranStreak">0 days</span></div>
+    <div class="quran-ayah">إِنَّ مَعَ الْعُسْرِ يُسْرًا</div>
+    <div class="quran-ref">"Indeed, with hardship comes ease." — 94:6</div>
+    <button class="quran-btn" id="quranBtn" onclick="markQuran()">✓ Done for Today</button>
+  </div>
+  <div class="me-section-label">Settings</div>
+  <div class="me-group">
+    <div class="me-row" onclick="toggleDark()">
+      <div class="me-row-icon" style="background:#f0f0f0">🌙</div>
+      <div class="me-row-body"><div class="me-row-title">Dark Mode</div></div>
+      <span class="me-row-val" id="darkVal">OFF</span>
+    </div>
+    <div class="me-row" onclick="resetDay()">
+      <div class="me-row-icon" style="background:#fff0f0">🔄</div>
+      <div class="me-row-body"><div class="me-row-title">Reset Today</div><div class="me-row-sub">Uncheck all tasks</div></div>
+      <span class="me-row-val">→</span>
     </div>
   </div>
-
-  <!-- Section: Daily Remembrance -->
-  <div style="padding:0 20px 8px">
-    <div style="font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Daily Remembrance</div>
-    <div class="quran-card-inner">
-      <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px">Surah Al-Inshirah · <span id="quranStreak">0 days</span></div>
-      <div class="quran-ayah">إِنَّ مَعَ الْعُسْرِ يُسْرًا</div>
-      <div class="quran-ref">"Indeed, with hardship comes ease." — 94:6</div>
-      <button class="quran-btn" id="quranBtn" onclick="markQuran(this)">✓ Done for Today</button>
-    </div>
-  </div>
-
-  <!-- Section: Settings -->
-  <div style="padding:0 20px 8px">
-    <div style="font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Settings</div>
-    <div style="background:var(--card);border-radius:16px;overflow:hidden">
-      <div onclick="toggleDarkMode()" style="display:flex;align-items:center;gap:14px;padding:14px 16px;cursor:pointer;border-bottom:1px solid var(--sep)">
-        <div style="width:36px;height:36px;border-radius:10px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:18px">🌙</div>
-        <div style="flex:1"><div style="font-size:15px;font-weight:500;color:var(--text)">Dark Mode</div></div>
-        <div id="darkModeStatus" style="font-size:12px;font-weight:500;color:var(--text3)">OFF</div>
-      </div>
-      <div onclick="confirmResetDay()" style="display:flex;align-items:center;gap:14px;padding:14px 16px;cursor:pointer;border-bottom:1px solid var(--sep)">
-        <div style="width:36px;height:36px;border-radius:10px;background:#fff0f0;display:flex;align-items:center;justify-content:center;font-size:18px">🔄</div>
-        <div style="flex:1"><div style="font-size:15px;font-weight:500;color:var(--text)">Reset Today's Tasks</div><div style="font-size:12px;color:var(--text3);margin-top:1px">Uncheck all for a fresh start</div></div>
-        <div style="font-size:12px;color:var(--text3)">→</div>
-      </div>
-      <div onclick="switchTab('vision')" style="display:flex;align-items:center;gap:14px;padding:14px 16px;cursor:pointer">
-        <div style="width:36px;height:36px;border-radius:10px;background:#f0f4ff;display:flex;align-items:center;justify-content:center;font-size:18px">✦</div>
-        <div style="flex:1"><div style="font-size:15px;font-weight:500;color:var(--text)">The Vision Board</div></div>
-        <div style="font-size:12px;color:var(--text3)">→</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Version footer -->
-  <div style="padding:12px 20px 20px;text-align:center;font-size:12px;color:var(--text3)">
-    Do It · v2.7 · <span id="buildDateDisplay"></span>
-  </div>
-
+  <div style="padding:16px 20px 20px;text-align:center;font-size:12px;color:var(--text3)">Do It · v2.8 · <span id="buildDate"></span></div>
   <div style="height:20px"></div>
 </div>
 
-
-<!-- ╔══════════════════════╗ -->
-<!-- ║   TASK DETAIL        ║ -->
-<!-- ╚══════════════════════╝ -->
+<!-- TASK DETAIL -->
 <div class="page" id="page-task">
-  <div class="top-bar">
-    <button class="icon-btn" onclick="switchTab('home')" style="margin-left:-4px">
-      <svg viewBox="0 0 24 24" width="20" height="20"><polyline points="15 18 9 12 15 6" stroke-width="2.5"/></svg>
-    </button>
-    <div id="taskDetailName" style="flex:1;text-align:center;font-size:17px;font-weight:600;color:var(--text)"></div>
-    <div style="width:32px"></div>
+  <div class="top-bar" style="background:var(--card);border-bottom:1px solid var(--sep)">
+    <button class="back-btn" onclick="go('home')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Today</button>
+    <div id="td-name" style="flex:1;text-align:center;font-size:16px;font-weight:600;padding:0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+    <div style="width:60px"></div>
   </div>
-
-  <!-- Task hero -->
-  <div style="padding:20px 20px 0;display:flex;align-items:center;gap:14px">
-    <div id="taskDetailIcon" style="font-size:40px;line-height:1"></div>
-    <div style="flex:1">
-      <div id="taskDetailTitle" style="font-size:22px;font-weight:700;color:var(--text);line-height:1.2"></div>
-      <div id="taskDetailSub" style="font-size:13px;color:var(--text3);margin-top:4px"></div>
-    </div>
+  <div class="td-hero"><div class="td-icon" id="td-icon"></div><div><div class="td-title" id="td-title"></div><div class="td-sub" id="td-sub"></div></div></div>
+  <div class="td-prog">
+    <div class="td-prog-row"><span class="td-prog-label">Progress</span><span class="td-prog-pct" id="td-pct">0%</span></div>
+    <div class="td-prog-track"><div class="td-prog-fill" id="td-bar"></div></div>
   </div>
-
-  <!-- Progress bar -->
-  <div style="padding:16px 20px 0">
-    <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-      <span style="font-size:13px;font-weight:500;color:var(--text3)">Progress</span>
-      <span id="taskDetailPct" style="font-size:13px;font-weight:600;color:var(--orange)">0%</span>
-    </div>
-    <div style="height:6px;background:var(--sep);border-radius:3px;overflow:hidden">
-      <div id="taskDetailBar" style="height:100%;background:var(--orange);border-radius:3px;width:0%;transition:width 0.3s"></div>
-    </div>
+  <div class="td-tabs">
+    <button class="td-tab active" id="tdt-sub" onclick="tdTab('sub')">Subtasks</button>
+    <button class="td-tab" id="tdt-notes" onclick="tdTab('notes')">Notes</button>
+    <button class="td-tab" id="tdt-remind" onclick="tdTab('remind')">Reminder</button>
   </div>
-
-  <!-- Section tabs -->
-  <div style="display:flex;padding:16px 20px 0;gap:8px">
-    <button id="tdTab-subtasks" onclick="switchTaskDetailTab('subtasks')" style="flex:1;padding:9px 4px;border-radius:10px;border:none;background:var(--orange);color:white;font-size:14px;font-weight:500;cursor:pointer">Subtasks</button>
-    <button id="tdTab-notes" onclick="switchTaskDetailTab('notes')" style="flex:1;padding:9px 4px;border-radius:10px;border:none;background:var(--sep);color:var(--text3);font-size:14px;font-weight:500;cursor:pointer">Notes</button>
-    <button id="tdTab-reminder" onclick="switchTaskDetailTab('reminder')" style="flex:1;padding:9px 4px;border-radius:10px;border:none;background:var(--sep);color:var(--text3);font-size:14px;font-weight:500;cursor:pointer">Reminder</button>
+  <div class="td-panel" id="tdp-sub">
+    <div id="td-stlist"></div>
+    <div class="td-add-row"><input id="td-stinput" placeholder="Add subtask…" onkeydown="if(event.key==='Enter')tdAddSt()"><button onclick="tdAddSt()">Add</button></div>
   </div>
-
-  <!-- Subtasks panel -->
-  <div id="tdPanel-subtasks" style="padding:12px 20px 0">
-    <div id="taskDetailSubtaskList" style="margin-bottom:12px"></div>
-    <div style="display:flex;gap:10px">
-      <input id="taskDetailSubInput" placeholder="Add subtask…"
-        style="flex:1;padding:11px 14px;border-radius:12px;border:1.5px solid var(--sep);font-size:15px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;-webkit-appearance:none"
-        onkeydown="if(event.key==='Enter')addTaskDetailSubtask()" />
-      <button onclick="addTaskDetailSubtask()" style="background:var(--orange);color:white;border:none;border-radius:12px;padding:11px 16px;font-size:15px;font-weight:600;cursor:pointer">Add</button>
-    </div>
-  </div>
-
-  <!-- Notes panel -->
-  <div id="tdPanel-notes" style="padding:12px 20px 0;display:none">
-    <textarea id="taskDetailNotes" placeholder="Notes, links, context…"
-      style="width:100%;height:180px;padding:14px;border-radius:12px;border:1.5px solid var(--sep);font-size:15px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;resize:none;box-sizing:border-box;-webkit-appearance:none"
-      oninput="saveTaskDetailNotes()"></textarea>
+  <div class="td-panel hidden" id="tdp-notes">
+    <textarea class="td-note" id="td-note" placeholder="Notes, links, context…" oninput="tdSaveNote()"></textarea>
     <div style="font-size:12px;color:var(--text3);margin-top:6px">Auto-saved.</div>
   </div>
-
-  <!-- Reminder panel -->
-  <div id="tdPanel-reminder" style="padding:16px 20px 0;display:none">
-    <div style="font-size:14px;color:var(--text3);margin-bottom:14px">Send a push notification at a set time.</div>
-    <div style="display:flex;gap:10px;align-items:center">
-      <input type="time" id="tdReminderTime"
-        style="flex:1;padding:12px;border-radius:12px;border:1.5px solid var(--sep);font-size:16px;font-family:inherit;background:var(--bg);color:var(--text);outline:none" />
-      <button onclick="setTaskReminder()" style="background:var(--orange);color:white;border:none;border-radius:12px;padding:12px 18px;font-size:15px;font-weight:600;cursor:pointer">Set</button>
-    </div>
-    <div id="tdReminderStatus" style="font-size:13px;color:var(--text3);margin-top:10px"></div>
-    <button onclick="sendPushForTask()" style="margin-top:16px;width:100%;background:var(--bg);border:1.5px solid var(--sep);border-radius:12px;padding:13px;font-size:15px;font-weight:500;color:var(--text);cursor:pointer">⚡ Push this task to phone now</button>
+  <div class="td-panel hidden" id="tdp-remind">
+    <div style="font-size:14px;color:var(--text3);margin-bottom:12px">Set a push notification for this task.</div>
+    <input type="time" class="td-reminder-time" id="td-rtime">
+    <button class="td-btn primary" onclick="tdSetRemind()">Set Reminder</button>
+    <button class="td-btn" onclick="tdPushNow()">⚡ Push this task to phone now</button>
+    <div class="td-status" id="td-rstatus"></div>
   </div>
-
   <div style="height:40px"></div>
 </div>
 
@@ -930,234 +593,374 @@ body.dark .tab-bar{background:#1C1C1E}
 </div><!-- end #main -->
 </div><!-- end #shell -->
 
-<!-- TAB BAR (mobile) -->
+<!-- TAB BAR -->
 <nav class="tab-bar">
-  <button class="tab-btn active" id="tab-home" onclick="switchTab('home')">
-    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-    <span>Today</span>
+  <button class="t-btn active" id="tb-home" onclick="go('home')">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Today</span>
   </button>
-  <button class="tab-btn" id="tab-meals" onclick="switchTab('meals')">
-    <svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
-    <span>Meals</span>
+  <button class="t-btn" id="tb-meals" onclick="go('meals')">
+    <svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg><span>Meals</span>
   </button>
-  <div class="tab-fab-wrap">
-    <button class="tab-fab" onclick="openAddTask()">+</button>
-  </div>
-  <button class="tab-btn" id="tab-vision" onclick="switchTab('vision')">
-    <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-    <span>Vision</span>
+  <div class="t-fab-wrap"><button class="t-fab" onclick="openAdd()">+</button></div>
+  <button class="t-btn" id="tb-vision" onclick="go('vision')">
+    <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><span>Vision</span>
   </button>
-  <button class="tab-btn" id="tab-me" onclick="switchTab('me')">
-    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    <span>Me</span>
+  <button class="t-btn" id="tb-me" onclick="go('me')">
+    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Me</span>
   </button>
 </nav>
 
+<!-- ADD TASK MODAL -->
+<div id="addModal" onclick="if(event.target===this)closeAdd()">
+  <div id="addForm">
+    <h3>New Task</h3>
+    <input id="at-name" class="add-input" placeholder="Task name…" onkeydown="if(event.key==='Enter')document.getElementById('at-time').focus()">
+    <input id="at-time" class="add-input" placeholder="Time (e.g. 14:00–15:00)" onkeydown="if(event.key==='Enter')submitAdd()">
+    <select id="at-cat" class="add-input" style="cursor:pointer">
+      <option value="body">💪 Body</option><option value="work">⚡ Work</option>
+      <option value="money">💰 Money</option><option value="home">🏠 Home</option><option value="soul">🌙 Soul</option>
+    </select>
+    <div class="add-row">
+      <button class="add-cancel" onclick="closeAdd()">Cancel</button>
+      <button class="add-submit" onclick="submitAdd()">Add Task</button>
+    </div>
+  </div>
+</div>
+
 <script>
-const WORKER_URL = 'https://adam-today-push.adamlashin2.workers.dev';
-const VAPID_PUBLIC = 'BAkRnXwUgj1gzn04jv2GCArscugp7Q_kb0vAP7ghTPHuOcDobGAQ61FXmiGoTMLEfjr_lvs3qwXKjIHFLK9tFwM';
-const STATE_KEY = 'doit_v2';
-const TODAY = new Date().toDateString();
+const WORKER = 'https://adam-today-push.adamlashin2.workers.dev';
+const VAPID  = 'BAkRnXwUgj1gzn04jv2GCArscugp7Q_kb0vAP7ghTPHuOcDobGAQ61FXmiGoTMLEfjr_lvs3qwXKjIHFLK9tFwM';
+const SK     = 'doit_v2';
+const TODAY  = new Date().toDateString();
+const ICONS  = {gym:'💪',shop:'🛒',whatsapp:'💬',ebay:'💰','build-pv':'🚀','build-ag':'🏗',video:'🎬','quran-task':'🌙'};
 
 /* ── STATE ── */
-function getState(){try{const s=JSON.parse(localStorage.getItem(STATE_KEY)||'{}');if(s.date!==TODAY){return{date:TODAY,tasks:{},emails:{},emailsUnlocked:false,streak:s.completedYesterday?(s.streak||0)+1:(s.streak||0)};}return s;}catch(e){return{date:TODAY,tasks:{},emails:{},emailsUnlocked:false,streak:0};}}
-function saveState(s){localStorage.setItem(STATE_KEY,JSON.stringify(s));}
+function gs(){
+  try{
+    const s=JSON.parse(localStorage.getItem(SK)||'{}');
+    if(s.date!==TODAY) return {date:TODAY,tasks:{},emails:{},emailsUnlocked:false,streak:s.completedYesterday?(s.streak||0)+1:(s.streak||0),subtasks:s.subtasks||{},notes:s.notes||{},reminders:s.reminders||{},quranStreak:s.quranStreak||0,darkMode:s.darkMode||false};
+    return s;
+  }catch(e){return {date:TODAY,tasks:{},emails:{},emailsUnlocked:false,streak:0,subtasks:{},notes:{},reminders:{},quranStreak:0,darkMode:false};}
+}
+function ss(s){localStorage.setItem(SK,JSON.stringify(s));}
 
 /* ── TOAST ── */
-let toastTimer;
-function showToast(icon,msg){
+let _tt;
+function toast(icon,msg){
   const t=document.getElementById('toast');
-  document.getElementById('toastIcon').textContent=icon;
-  document.getElementById('toastMsg').textContent=msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>t.classList.remove('show'),2600);
+  document.getElementById('ti').textContent=icon;
+  document.getElementById('tm').textContent=msg;
+  t.classList.add('show');clearTimeout(_tt);
+  _tt=setTimeout(()=>t.classList.remove('show'),2600);
 }
 
-
-/* ── SHOP ROWS ── */
-.shop-row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--sep);cursor:pointer;transition:opacity 0.2s}
-.shop-row:last-child{border-bottom:none}
-.shop-row.got{opacity:0.45}
-.shop-row-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--sep);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
-.shop-row.got .shop-row-check{background:var(--green);border-color:var(--green)}
-.shop-row.got .shop-row-name{text-decoration:line-through;color:var(--text3)}
-.shop-row-name{font-size:15px;font-weight:400;color:var(--text)}
-
-/* ── TASK DETAIL PAGE ── */
-#page-task .top-bar{border-bottom:1px solid var(--sep)}
-#page-task .top-bar .icon-btn svg{stroke:var(--text)}
-
-/* ── DARK MODE ── */
-body.dark{--bg:#000;--card:#1C1C1E;--text:#fff;--text2:#ebebf599;--text3:#ebebf560;--sep:#38383A}
-body.dark .sidebar{background:#1C1C1E}
-body.dark .tab-bar{background:#1C1C1E}
-
-/* ── ADD TASK MODAL ── */
-#addTaskModal{display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);align-items:flex-end}
-#addTaskModal.open{display:flex}
-#addTaskForm{background:var(--card);border-radius:24px 24px 0 0;padding:20px 20px calc(env(safe-area-inset-bottom)+20px);width:100%;box-sizing:border-box}
-#addTaskForm h3{font-size:18px;font-weight:600;margin-bottom:16px}
-.add-input{width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid var(--sep);font-size:15px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;box-sizing:border-box;margin-bottom:10px;-webkit-appearance:none}
-@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
-
-/* ── PARTICLES ── */
+/* ── BURST ── */
 function burst(el){
   const r=el.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
-  const colors=['#FF6B2B','#34C759','#007AFF','#AF52DE','#FFD60A'];
+  const cols=['#FF6B2B','#34C759','#007AFF','#AF52DE','#FFD60A'];
   for(let i=0;i<10;i++){
     const p=document.createElement('div');p.className='particle';
     const a=(i/10)*360,d=35+Math.random()*35;
-    p.style.cssText=`left:${cx-3.5}px;top:${cy-3.5}px;background:${colors[i%5]};--dx:${Math.cos(a*Math.PI/180)*d}px;--dy:${Math.sin(a*Math.PI/180)*d}px`;
+    p.style.cssText=`left:${cx-3.5}px;top:${cy-3.5}px;background:${cols[i%5]};--dx:${Math.cos(a*Math.PI/180)*d}px;--dy:${Math.sin(a*Math.PI/180)*d}px`;
     document.body.appendChild(p);setTimeout(()=>p.remove(),650);
   }
 }
 
-/* ── TOGGLE TASK ── */
-const TASK_NAMES={gym:'Go Gym',shop:'Groceries',whatsapp:'WhatsApp replied','build-pv':'Personalvermittler site','build-ag':'Arbeitgeber site',video:'Video recorded','quran-task':'Quran done',ebay:'Jacket listed'};
-const TASK_ICONS={gym:'💪',shop:'🛒',whatsapp:'✓',ebay:'💰','build-pv':'🚀','build-ag':'🚀',video:'🎬','quran-task':'🌙'};
+/* ── NAV ── */
+function go(tab){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  ['tb','sb'].forEach(pre=>{
+    document.querySelectorAll('[id^="'+pre+'-"]').forEach(b=>b.classList.remove('active'));
+  });
+  const page=document.getElementById('page-'+tab);
+  if(page) page.classList.add('active');
+  const tb=document.getElementById('tb-'+tab); if(tb) tb.classList.add('active');
+  const sb=document.getElementById('sb-'+tab); if(sb) sb.classList.add('active');
+  if(tab==='me') refreshMeStats();
+}
 
-function toggleTask(card){
+/* ── SEARCH ── */
+let searchOpen=false;
+function toggleSearch(){
+  searchOpen=!searchOpen;
+  const bar=document.getElementById('searchBar');
+  bar.classList.toggle('open',searchOpen);
+  if(searchOpen) document.getElementById('searchInput').focus();
+  else{ document.querySelectorAll('.task-card').forEach(c=>c.style.display=''); }
+}
+function doSearch(q){
+  const lq=q.toLowerCase().trim();
+  document.querySelectorAll('.task-card').forEach(c=>{
+    const name=c.querySelector('.task-name').textContent.toLowerCase();
+    const sub=(c.querySelector('.task-sub')||{}).textContent||'';
+    c.style.display=(!lq||name.includes(lq)||sub.toLowerCase().includes(lq))?'':'none';
+  });
+}
+
+/* ── TOGGLE TASK ── */
+function tap(e,card){
+  if(e.target.closest('.menu-btn')) return;
   const id=card.dataset.id;
-  const wasDone=card.classList.contains('done');
+  const was=card.classList.contains('done');
   card.classList.toggle('done');
   const pct=card.querySelector('.task-pct');
-  if(pct) pct.textContent=wasDone?'0%':'100%';
-  if(!wasDone){
-    burst(card);
-    showToast(TASK_ICONS[id]||'✓', (TASK_NAMES[id]||id)+' — done!');
-  }
-  const s=getState();if(!s.tasks)s.tasks={};
-  s.tasks[id]=!wasDone;saveState(s);
-  updateBanner();checkBuildsForUnlock();checkAllDone();
+  if(pct) pct.textContent=was?'0%':'100%';
+  const fill=card.querySelector('.prog-fill');
+  if(fill) fill.style.width=was?'0%':'100%';
+  if(!was){ burst(card); toast(ICONS[id]||'✓',(card.querySelector('.task-name').textContent)+' — done!'); }
+  const s=gs(); s.tasks[id]=!was; ss(s);
+  updateBanner(); checkBuilds(); checkAllDone();
 }
 
 /* ── BLOCKED EMAILS ── */
-function toggleBlocked(row){
-  if(!row.classList.contains('unlocked'))return;
-  const wasDone=row.classList.contains('done');
+function tapBlocked(row){
+  if(!row.classList.contains('unlocked')) return;
+  const was=row.classList.contains('done');
   row.classList.toggle('done');
-  if(!wasDone){burst(row);showToast('📧',row.querySelector('.task-name').textContent+' — sent!');}
-  const s=getState();if(!s.emails)s.emails={};
-  s.emails[row.id]=!wasDone;saveState(s);
+  if(!was){burst(row);toast('📧',row.querySelector('.task-name').textContent+' — sent!');}
+  const s=gs(); s.emails=s.emails||{}; s.emails[row.id]=!was; ss(s);
 }
-function checkBuildsForUnlock(){
-  const s=getState();
-  const buildsDone=s.tasks&&s.tasks['build-pv']&&s.tasks['build-ag'];
-  if(buildsDone&&!s.emailsUnlocked){
+function checkBuilds(){
+  const s=gs();
+  if(s.tasks['build-pv']&&s.tasks['build-ag']&&!s.emailsUnlocked){
     document.getElementById('unlockBtn').style.display='block';
     document.getElementById('blockedSub').textContent='✓ Both sites live — ready to send';
   }
 }
 function unlockEmails(){
-  ['email-reiner','email-ag','email-pv'].forEach(id=>{
-    const el=document.getElementById(id);if(el)el.classList.add('unlocked');
-  });
+  ['em-reiner','em-ag','em-pv'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('unlocked');});
   document.getElementById('unlockBtn').style.display='none';
   document.getElementById('blockedSub').textContent='Sites live — go send those emails';
-  const s=getState();s.emailsUnlocked=true;saveState(s);
-  showToast('🔓','Cold emails unlocked!');
+  const s=gs();s.emailsUnlocked=true;ss(s);
+  toast('🔓','Cold emails unlocked!');
 }
 
 /* ── BANNER ── */
 function updateBanner(){
   const cards=document.querySelectorAll('.task-card');
   const rem=Array.from(cards).filter(c=>!c.classList.contains('done')).length;
-  const el=document.getElementById('remainCount');if(el)el.textContent=rem;
-  if(rem===0)document.getElementById('taskBanner').classList.add('hidden');
+  const el=document.getElementById('remCount'); if(el) el.textContent=rem;
+  if(rem===0) document.getElementById('banner').classList.add('hidden');
 }
 
 /* ── ALL DONE ── */
 function checkAllDone(){
-  const cards=document.querySelectorAll('.task-card');
-  const allDone=Array.from(cards).every(c=>c.classList.contains('done'));
-  if(allDone){
-    setTimeout(()=>{
-      const o=document.getElementById('doneOverlay');o.style.display='flex';
-      const s=getState();s.completedYesterday=true;s.streak=(s.streak||0)+1;saveState(s);
-      document.getElementById('streakNum').textContent=s.streak;
-    },700);
-  }
+  const all=Array.from(document.querySelectorAll('.task-card')).every(c=>c.classList.contains('done'));
+  if(all) setTimeout(()=>{
+    const o=document.getElementById('doneOverlay'); o.style.display='flex';
+    const s=gs(); s.completedYesterday=true; s.streak=(s.streak||0)+1; ss(s);
+    refreshMeStats();
+  },700);
 }
 
 /* ── SHOP ── */
-function toggleShop(item){item.classList.toggle('got');}
-
-/* ── FILTER ── */
-function filterTasks(cat,pill){
-  document.querySelectorAll('.cat-pill').forEach(p=>p.classList.remove('active'));
-  pill.classList.add('active');
-  document.querySelectorAll('.task-card').forEach(card=>{
-    card.style.display=(cat==='all'||card.dataset.cat===cat)?'':'none';
-  });
+function tshop(row){
+  row.classList.toggle('got');
 }
-
-/* ── TAB SWITCH ── */
-function switchTab(tab){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.sidebar-tab').forEach(b=>b.classList.remove('active'));
-  const page=document.getElementById('page-'+tab);
-  if(page){page.classList.add('active');}
-  const mTab=document.getElementById('tab-'+tab);if(mTab)mTab.classList.add('active');
-  const sTab=document.getElementById('stab-'+tab);if(sTab)sTab.classList.add('active');
-  if(tab==='me') updateMeStats();
+function clearShop(){
+  document.querySelectorAll('.shop-row.got').forEach(r=>r.classList.remove('got'));
+  toast('🛒','List cleared');
+}
+function addShopItem(){
+  const inp=document.getElementById('shopInput');
+  const txt=inp.value.trim(); if(!txt) return;
+  const grp=document.getElementById('sg-custom');
+  const row=document.createElement('div'); row.className='shop-row'; row.onclick=()=>tshop(row);
+  row.innerHTML=`<div class="s-check"><svg viewBox="0 0 12 9" width="10" height="7"><path d="M1 4.5L4.5 8L11 1" stroke="white" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div><div class="shop-name">${txt}</div>`;
+  grp.appendChild(row); inp.value=''; toast('✓',txt+' added');
 }
 
 /* ── QURAN ── */
-function markQuran(btn){
-  btn.textContent='✓ Done — بارك الله فيك';btn.disabled=true;
-  btn.style.background='rgba(52,199,89,0.25)';btn.style.color='#34C759';
-  const s=getState();s.quranStreak=(s.quranStreak||0)+1;saveState(s);
+function markQuran(){
+  const btn=document.getElementById('quranBtn'); btn.textContent='✓ Done — بارك الله فيك'; btn.disabled=true;
+  btn.style.background='rgba(52,199,89,.25)'; btn.style.color='#34C759';
+  const s=gs(); s.quranStreak=(s.quranStreak||0)+1; ss(s);
   document.getElementById('quranStreak').textContent=s.quranStreak+' days';
-  showToast('🌙','Quran done — بارك الله فيك');
+  toast('🌙','Quran done — بارك الله فيك');
+}
+
+/* ── TASK DETAIL ── */
+let tdId=null;
+function openDetail(e,card){
+  e.stopPropagation();
+  tdId=card.dataset.id;
+  document.getElementById('td-icon').textContent=ICONS[tdId]||'📋';
+  document.getElementById('td-title').textContent=card.querySelector('.task-name').textContent;
+  document.getElementById('td-name').textContent=card.querySelector('.task-name').textContent;
+  document.getElementById('td-sub').textContent=(card.querySelector('.task-sub')||{}).textContent||'';
+  const s=gs();
+  // Progress
+  const sts=(s.subtasks&&s.subtasks[tdId])||[];
+  const pct=sts.length?Math.round(sts.filter(x=>x.done).length/sts.length*100):(s.tasks[tdId]?100:0);
+  document.getElementById('td-pct').textContent=pct+'%';
+  document.getElementById('td-bar').style.width=pct+'%';
+  // Note
+  document.getElementById('td-note').value=(s.notes&&s.notes[tdId])||'';
+  // Reminder
+  const rem=s.reminders&&s.reminders[tdId];
+  document.getElementById('td-rtime').value=rem||'';
+  document.getElementById('td-rstatus').textContent=rem?'🔔 Set for '+rem:'';
+  tdRender();
+  tdTab('sub');
+  go('task');
+}
+function tdTab(t){
+  ['sub','notes','remind'].forEach(x=>{
+    document.getElementById('tdt-'+x).classList.toggle('active',x===t);
+    document.getElementById('tdp-'+x).classList.toggle('hidden',x!==t);
+  });
+}
+function tdRender(){
+  if(!tdId) return;
+  const s=gs();
+  const sts=(s.subtasks&&s.subtasks[tdId])||[];
+  const list=document.getElementById('td-stlist');
+  if(sts.length===0){list.innerHTML='<div class="td-empty">No subtasks yet — add one below</div>';return;}
+  list.innerHTML=sts.map((st,i)=>`
+    <div class="st-row">
+      <div class="st-check ${st.done?'done':''}" onclick="tdToggleSt(${i})">
+        <svg viewBox="0 0 12 9"><path d="M1 4.5L4.5 8L11 1"/></svg>
+      </div>
+      <div class="st-text" style="${st.done?'text-decoration:line-through;color:var(--text3)':''}">${st.text}</div>
+      <button class="st-del" onclick="tdDelSt(${i})">×</button>
+    </div>`).join('');
+  // Update progress
+  const done=sts.filter(x=>x.done).length;
+  const pct=Math.round(done/sts.length*100);
+  document.getElementById('td-pct').textContent=pct+'%';
+  document.getElementById('td-bar').style.width=pct+'%';
+  // Update card
+  const card=document.querySelector('.task-card[data-id="'+tdId+'"]');
+  if(card){
+    const cpct=card.querySelector('.task-pct'); if(cpct) cpct.textContent=pct+'%';
+    const fill=card.querySelector('.prog-fill'); if(fill) fill.style.width=pct+'%';
+    if(pct===100&&!card.classList.contains('done')){card.classList.add('done');burst(card);toast('✓',card.querySelector('.task-name').textContent+' — done!');const sv=gs();sv.tasks[tdId]=true;ss(sv);updateBanner();checkAllDone();}
+    else if(pct<100&&card.classList.contains('done')){card.classList.remove('done');const sv=gs();sv.tasks[tdId]=false;ss(sv);updateBanner();}
+  }
+}
+function tdToggleSt(i){
+  const s=gs();if(!s.subtasks[tdId])s.subtasks[tdId]=[];
+  s.subtasks[tdId][i].done=!s.subtasks[tdId][i].done;ss(s);tdRender();
+}
+function tdDelSt(i){
+  const s=gs();if(!s.subtasks[tdId])return;
+  s.subtasks[tdId].splice(i,1);ss(s);tdRender();
+}
+function tdAddSt(){
+  const inp=document.getElementById('td-stinput');
+  const txt=inp.value.trim();if(!txt||!tdId)return;
+  const s=gs();if(!s.subtasks)s.subtasks={};if(!s.subtasks[tdId])s.subtasks[tdId]=[];
+  s.subtasks[tdId].push({text:txt,done:false});ss(s);inp.value='';tdRender();
+}
+function tdSaveNote(){
+  if(!tdId)return;
+  const s=gs();if(!s.notes)s.notes={};
+  s.notes[tdId]=document.getElementById('td-note').value;ss(s);
+}
+function tdSetRemind(){
+  const t=document.getElementById('td-rtime').value;if(!t)return;
+  const s=gs();if(!s.reminders)s.reminders={};s.reminders[tdId]=t;ss(s);
+  document.getElementById('td-rstatus').textContent='🔔 Reminder set for '+t;
+  toast('🔔','Reminder set for '+t);
+}
+function tdPushNow(){
+  const name=document.getElementById('td-title').textContent;
+  const icon=document.getElementById('td-icon').textContent;
+  document.getElementById('td-rstatus').textContent='Sending…';
+  fetch(WORKER+'/notify',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer adam_notify_2026'},body:JSON.stringify({title:'Do It — '+name,body:icon+' Do this now.'})})
+    .then(r=>r.json()).then(d=>{
+      const ok=d.sent>0;
+      document.getElementById('td-rstatus').textContent=ok?'✓ Push sent!':'⚠ No subscription — enable notifications in Me tab';
+      toast(ok?'🔔':'⚠️',ok?'Push sent!':'Enable notifications first');
+    }).catch(()=>{document.getElementById('td-rstatus').textContent='Error sending push';});
+}
+
+/* ── ADD TASK ── */
+function openAdd(){document.getElementById('addModal').classList.add('open');document.getElementById('at-name').focus();}
+function closeAdd(){document.getElementById('addModal').classList.remove('open');}
+function submitAdd(){
+  const name=document.getElementById('at-name').value.trim();if(!name)return;
+  const time=document.getElementById('at-time').value;
+  const cat=document.getElementById('at-cat').value;
+  const id='ut-'+Date.now();
+  const catIcons={body:'💪',work:'⚡',money:'💰',home:'🏠',soul:'🌙'};
+  const card=document.createElement('div');card.className='task-card';card.dataset.id=id;card.dataset.cat=cat;
+  card.innerHTML=`<div class="tc-top"><div class="check-circle"><svg viewBox="0 0 12 9" width="12" height="9"><path d="M1 4.5L4.5 8L11 1"/></svg></div><div class="tc-body"><div class="task-name">${name}</div><div class="task-sub">${time||'Today'}</div></div><button class="menu-btn" onclick="openDetail(event,this.closest('.task-card'))">···</button></div><div class="tc-bot"><span class="task-tag tag-${cat}">${catIcons[cat]||''} ${cat.charAt(0).toUpperCase()+cat.slice(1)}</span><span class="task-pct">0%</span></div><div class="prog-track"><div class="prog-fill"></div></div>`;
+  card.onclick=e=>{if(!e.target.closest('.menu-btn'))tap(e,card);};
+  document.getElementById('taskList').appendChild(card);
+  closeAdd();toast('✓',name+' added');updateBanner();
+  document.getElementById('at-name').value='';document.getElementById('at-time').value='';
+}
+
+/* ── ME ── */
+function refreshMeStats(){
+  const cards=document.querySelectorAll('.task-card');
+  const done=Array.from(cards).filter(c=>c.classList.contains('done')).length;
+  const rem=cards.length-done;
+  const s=gs();
+  const streakVal=s.streak||1;
+  const dEl=document.getElementById('statDone');if(dEl)dEl.textContent=done;
+  const rEl=document.getElementById('statRem');if(rEl)rEl.textContent=rem;
+  const sEl=document.getElementById('statStreak');if(sEl)sEl.textContent=streakVal;
+  const sdEl=document.getElementById('streakDisp');if(sdEl)sdEl.textContent=streakVal;
+}
+function toggleDark(){
+  const dark=document.body.classList.toggle('dark');
+  const s=gs();s.darkMode=dark;ss(s);
+  const el=document.getElementById('darkVal');if(el)el.textContent=dark?'ON':'OFF';
+  toast(dark?'🌙':'☀️',dark?'Dark mode on':'Light mode on');
+}
+function resetDay(){
+  if(!confirm('Reset all tasks for a fresh start?'))return;
+  const s=gs();s.tasks={};s.emails={};s.emailsUnlocked=false;ss(s);
+  document.querySelectorAll('.task-card').forEach(c=>{
+    c.classList.remove('done');
+    const p=c.querySelector('.task-pct');if(p)p.textContent='0%';
+    const f=c.querySelector('.prog-fill');if(f)f.style.width='0%';
+  });
+  ['em-reiner','em-ag','em-pv'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('done','unlocked');});
+  document.getElementById('unlockBtn').style.display='none';
+  updateBanner();toast('🔄','Day reset — fresh start');go('home');
 }
 
 /* ── NOTIFICATIONS ── */
-function urlBase64ToUint8Array(b64){const pad='='.repeat((4-b64.length%4)%4);const raw=atob((b64+pad).replace(/-/g,'+').replace(/_/g,'/'));const out=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)out[i]=raw.charCodeAt(i);return out;}
+function u8(b64){const pad='='.repeat((4-b64.length%4)%4);const raw=atob((b64+pad).replace(/-/g,'+').replace(/_/g,'/'));const out=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)out[i]=raw.charCodeAt(i);return out;}
 
-async function toggleNotify(card){
+async function toggleNotify(){
   const isStandalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
-  if(!isStandalone){alert('To enable push notifications:\n\n1. Open Safari → ryker06.github.io\n2. Tap the Share button (box with arrow)\n3. Tap "Add to Home Screen"\n4. Open the installed app\n5. Come back here and tap again');return;}
-  if(!('serviceWorker' in navigator)||!('PushManager' in window)){alert('Push not supported on this device/OS. Requires iOS 16.4+.');return;}
-  const status=document.getElementById('notifyStatus');
-  // TURN OFF
-  if(status.classList.contains('notify-on')){
-    try{
-      const reg=await navigator.serviceWorker.ready;
-      const sub=await reg.pushManager.getSubscription();
-      if(sub){
-        await fetch(WORKER_URL+'/subscribe',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub)});
-        await sub.unsubscribe();
-      }
-    }catch(e){}
-    status.textContent='OFF';status.className='notify-status notify-off';
-    showToast('🔕','Notifications off');
-    return;
+  if(!isStandalone){
+    alert('Push only works in the installed app.\n\nIn Safari:\n1. Tap the Share button\n2. Tap "Add to Home Screen"\n3. Open Do It from your home screen\n4. Try again');return;
   }
-  // TURN ON — always force fresh subscription
+  if(!('serviceWorker' in navigator)||!('PushManager' in window)){alert('Push not supported. Requires iOS 16.4+.');return;}
+  const badge=document.getElementById('notifyBadge');
+  const sub_lbl=document.getElementById('notifySub');
+  if(badge.classList.contains('on')){
+    try{const reg=await navigator.serviceWorker.ready;const sub=await reg.pushManager.getSubscription();if(sub){await fetch(WORKER+'/subscribe',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub)});await sub.unsubscribe();}}catch(e){}
+    badge.textContent='OFF';badge.className='notify-badge off';sub_lbl.textContent='Enable to get morning reminders';return;
+  }
   try{
-    if(!('Notification' in window)){alert('Notification API not available. Open this app from your Home Screen (not Safari).'); return;}
+    if(!('Notification' in window)){alert('Notification API unavailable.\nOpen this app from Home Screen, not Safari.');return;}
     const perm=await Notification.requestPermission();
-    if(perm!=='granted'){alert('Notifications blocked.\n\nGo to: Settings → Do It → Notifications → Allow'); return;}
+    if(perm!=='granted'){alert('Notifications denied.\nGo to Settings → Do It → Notifications → Allow');return;}
     const reg=await navigator.serviceWorker.ready;
-    // Unsubscribe any stale subscription first
     try{const old=await reg.pushManager.getSubscription();if(old)await old.unsubscribe();}catch(e){}
-    // Fresh subscribe
-    const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(VAPID_PUBLIC)});
-    const saveRes=await fetch(WORKER_URL+'/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub)});
-    const saveData=await saveRes.json();
-    if(!saveRes.ok) throw new Error('Server error: '+(saveData.error||saveRes.status));
-    status.textContent='ON ✓';status.className='notify-status notify-on';
-    showToast('🔔','Notifications enabled!');
-    // Immediately fire a test push so user knows it works
-    setTimeout(()=>{
-      fetch(WORKER_URL+'/notify',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer adam_notify_2026'},body:JSON.stringify({title:'Do It 🔔',body:'Notifications are working!'})});
-    },1500);
-  }catch(e){
-    alert('Could not enable notifications:\n'+e.message+
-      '\n\nMake sure:\n• App is installed to Home Screen\n• iOS 16.4 or later\n• Notifications allowed in Settings');
-  }
+    const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u8(VAPID)});
+    const res=await fetch(WORKER+'/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub)});
+    if(!res.ok) throw new Error('Server '+res.status);
+    badge.textContent='ON ✓';badge.className='notify-badge on';sub_lbl.textContent='Daily push at 8:00 AM enabled';
+    toast('🔔','Notifications enabled!');
+    setTimeout(()=>fetch(WORKER+'/notify',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer adam_notify_2026'},body:JSON.stringify({title:'Do It 🔔',body:'Push is working!'})}),1500);
+  }catch(e){alert('Could not enable:\n'+e.message);}
+}
+
+async function testPush(){
+  const el=document.getElementById('testPushVal');el.textContent='…';
+  try{
+    const d=await(await fetch(WORKER+'/notify',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer adam_notify_2026'},body:JSON.stringify({title:'Do It ⚡',body:'Test — push is working!'})})).json();
+    if(d.sent>0){el.textContent='✓';el.style.color='var(--green)';toast('🔔','Push sent — check your phone');}
+    else{el.textContent='✗';el.style.color='var(--red)';toast('⚠️','Enable notifications first (Daily Push above)');}
+  }catch(e){el.textContent='err';}
+  setTimeout(()=>{el.textContent='→';el.style.color='';},4000);
 }
 
 /* ── DATE ── */
@@ -1166,58 +969,54 @@ function setDate(){
   const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
   const n=new Date();
   document.getElementById('heroDate').textContent=days[n.getDay()]+' · '+months[n.getMonth()]+' '+n.getDate();
+  const bd=document.getElementById('buildDate');
+  if(bd)bd.textContent=n.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
 }
 
 /* ── INIT ── */
 function init(){
   setDate();
-  const s=getState();
+  const s=gs();
+  // Restore dark mode
+  if(s.darkMode){document.body.classList.add('dark');const dv=document.getElementById('darkVal');if(dv)dv.textContent='ON';}
   // Restore tasks
   document.querySelectorAll('.task-card[data-id]').forEach(card=>{
-    if(s.tasks&&s.tasks[card.dataset.id]){
+    const id=card.dataset.id;
+    if(s.tasks&&s.tasks[id]){
       card.classList.add('done');
-      const pct=card.querySelector('.task-pct');if(pct)pct.textContent='100%';
+      const p=card.querySelector('.task-pct');if(p)p.textContent='100%';
+      const f=card.querySelector('.prog-fill');if(f)f.style.width='100%';
+    } else if(s.subtasks&&s.subtasks[id]&&s.subtasks[id].length){
+      const sts=s.subtasks[id];
+      const pct=Math.round(sts.filter(x=>x.done).length/sts.length*100);
+      const p=card.querySelector('.task-pct');if(p)p.textContent=pct+'%';
+      const f=card.querySelector('.prog-fill');if(f)f.style.width=pct+'%';
     }
   });
   // Restore emails
-  ['email-reiner','email-ag','email-pv'].forEach(id=>{
+  ['em-reiner','em-ag','em-pv'].forEach(id=>{
     const el=document.getElementById(id);if(!el)return;
     if(s.emailsUnlocked)el.classList.add('unlocked');
     if(s.emails&&s.emails[id])el.classList.add('done');
   });
-  if(s.emailsUnlocked){
-    document.getElementById('unlockBtn').style.display='none';
-    document.getElementById('blockedSub').textContent='Sites live — go send those emails';
-  }
-  // Streak
-  document.getElementById('streakNum').textContent=s.streak||1;
+  if(s.emailsUnlocked){document.getElementById('unlockBtn').style.display='none';document.getElementById('blockedSub').textContent='Sites live — go send those emails';}
+  // Quran
   document.getElementById('quranStreak').textContent=(s.quranStreak||0)+' days';
-  // Restore subtask progress on cards
-  document.querySelectorAll('.task-card[data-id]').forEach(card=>{
-    const id=card.dataset.id;
-    const subtasks=getSubtasks(id);
-    if(subtasks.length>0){
-      const done=subtasks.filter(s=>s.done).length;
-      const pct=Math.round((done/subtasks.length)*100);
-      const pctEl=card.querySelector('.task-pct');
-      const fill=card.querySelector('.progress-fill');
-      if(pctEl)pctEl.textContent=pct+'%';
-      if(fill)fill.style.width=pct+'%';
-    }
-  });
-  updateBanner();checkBuildsForUnlock();
-  // Service worker
+  // Notify badge
+  if(navigator.serviceWorker&&window.PushManager){
+    navigator.serviceWorker.ready.then(reg=>reg.pushManager.getSubscription()).then(sub=>{
+      if(sub){const b=document.getElementById('notifyBadge');b.textContent='ON ✓';b.className='notify-badge on';const sl=document.getElementById('notifySub');if(sl)sl.textContent='Daily push at 8:00 AM enabled';}
+    }).catch(()=>{});
+  }
+  updateBanner();checkBuilds();refreshMeStats();
+  // Service worker — push-only, no caching
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('/sw.js').then(reg=>{
-      // Force check for SW update on every app load
-      reg.update();
+      reg.update(); // Check for new SW immediately
       reg.addEventListener('updatefound',()=>{
         const nw=reg.installing;
         nw.addEventListener('statechange',()=>{
-          // New SW activated — reload to get fresh HTML (network-first handles it)
-          if(nw.state==='activated'&&navigator.serviceWorker.controller){
-            window.location.reload();
-          }
+          if(nw.state==='activated'&&navigator.serviceWorker.controller) window.location.reload();
         });
       });
     }).catch(()=>{});
@@ -1225,199 +1024,6 @@ function init(){
 }
 
 init();
-
-/* ── SUBTASK DRAWER ── */
-let activeDrawerTaskId = null;
-const TASK_ICON_MAP = {gym:'💪',shop:'🛒',whatsapp:'💬',ebay:'💰','build-pv':'🚀','build-ag':'🚀',video:'🎬','quran-task':'🌙'};
-const TASK_NAME_MAP = {gym:'Go Gym',shop:'Shop — Groceries',whatsapp:'Reply WhatsApp + New Employee',ebay:'eBay — List the Jacket','build-pv':'Build Personalvermittler Site','build-ag':'Build Arbeitgeber Site',video:'Video für Arbeitgeber','quran-task':'Learn Islam / Quran'};
-
-function openSubtaskDrawer(e, card) {
-  e.stopPropagation();
-  const id = card.dataset.id;
-  activeDrawerTaskId = id;
-  document.getElementById('drawerTaskIcon').textContent = TASK_ICON_MAP[id] || '📋';
-  document.getElementById('drawerTaskName').textContent = card.querySelector('.task-name').textContent;
-  const sub = card.querySelector('.task-sub');
-  document.getElementById('drawerTaskTime').textContent = sub ? sub.textContent : '';
-  renderSubtasks(id);
-  document.getElementById('subtaskInput').value = '';
-  switchDrawerTab('subtasks');
-  const overlay = document.getElementById('subtaskOverlay');
-  const drawer = document.getElementById('subtaskDrawer');
-  overlay.style.display = 'block';
-  drawer.style.display = 'flex';
-  requestAnimationFrame(() => { drawer.style.transform = 'translateY(0)'; });
-}
-
-function closeSubtaskDrawer() {
-  const drawer = document.getElementById('subtaskDrawer');
-  drawer.style.transform = 'translateY(100%)';
-  setTimeout(() => {
-    document.getElementById('subtaskOverlay').style.display = 'none';
-    drawer.style.display = 'none';
-    drawer.style.display = ''; // reset to none from inline flex
-  }, 320);
-  if (activeDrawerTaskId) updateTaskProgress(activeDrawerTaskId);
-  activeDrawerTaskId = null;
-}
-
-function getSubtasks(taskId) {
-  const s = getState();
-  return (s.subtasks && s.subtasks[taskId]) || [];
-}
-
-function saveSubtasks(taskId, subtasks) {
-  const s = getState();
-  if (!s.subtasks) s.subtasks = {};
-  s.subtasks[taskId] = subtasks;
-  saveState(s);
-}
-
-function renderSubtasks(taskId) {
-  const list = document.getElementById('subtaskList');
-  const subtasks = getSubtasks(taskId);
-  if (subtasks.length === 0) {
-    list.innerHTML = '<div style="padding:16px 0;text-align:center;color:var(--text3);font-size:14px">No subtasks yet — add one below</div>';
-    return;
-  }
-  list.innerHTML = subtasks.map((st, i) => `
-    <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--sep)">
-      <div onclick="toggleSubtask(${i})" style="width:22px;height:22px;border-radius:50%;border:2px solid ${st.done ? 'var(--green)' : 'var(--sep)'};background:${st.done ? 'var(--green)' : 'transparent'};display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all 0.15s">
-        ${st.done ? '<svg width="10" height="7" viewBox="0 0 12 9" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4.5L4.5 8L11 1"/></svg>' : ''}
-      </div>
-      <div style="flex:1;font-size:15px;color:var(--text);${st.done ? 'text-decoration:line-through;color:var(--text3)' : ''}">${st.text}</div>
-      <button onclick="deleteSubtask(${i})" style="background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:4px;line-height:1">×</button>
-    </div>
-  `).join('');
-}
-
-function toggleSubtask(index) {
-  const id = activeDrawerTaskId;
-  const subtasks = getSubtasks(id);
-  subtasks[index].done = !subtasks[index].done;
-  saveSubtasks(id, subtasks);
-  renderSubtasks(id);
-  updateTaskProgress(id);
-}
-
-function deleteSubtask(index) {
-  const id = activeDrawerTaskId;
-  const subtasks = getSubtasks(id);
-  subtasks.splice(index, 1);
-  saveSubtasks(id, subtasks);
-  renderSubtasks(id);
-  updateTaskProgress(id);
-}
-
-function addSubtask() {
-  const input = document.getElementById('subtaskInput');
-  const text = input.value.trim();
-  if (!text) return;
-  const id = activeDrawerTaskId;
-  const subtasks = getSubtasks(id);
-  subtasks.push({ text, done: false });
-  saveSubtasks(id, subtasks);
-  input.value = '';
-  renderSubtasks(id);
-  updateTaskProgress(id);
-}
-
-function updateTaskProgress(taskId) {
-  const card = document.querySelector(`.task-card[data-id="${taskId}"]`);
-  if (!card) return;
-  const subtasks = getSubtasks(taskId);
-  if (subtasks.length === 0) return;
-  const done = subtasks.filter(s => s.done).length;
-  const pct = Math.round((done / subtasks.length) * 100);
-  const pctEl = card.querySelector('.task-pct');
-  const fill = card.querySelector('.progress-fill');
-  if (pctEl) pctEl.textContent = pct + '%';
-  if (fill) fill.style.width = pct + '%';
-  if (pct === 100 && !card.classList.contains('done')) {
-    card.classList.add('done');
-    burst(card);
-    showToast('✓', card.querySelector('.task-name').textContent + ' — done!');
-    const s = getState();
-    if (!s.tasks) s.tasks = {};
-    s.tasks[taskId] = true;
-    saveState(s);
-    updateBanner(); checkBuildsForUnlock(); checkAllDone();
-  } else if (pct < 100 && card.classList.contains('done')) {
-    card.classList.remove('done');
-    const s = getState();
-    if (s.tasks) s.tasks[taskId] = false;
-    saveState(s);
-    updateBanner();
-  }
-}
-
 </script>
-
-<!-- TASK ACTION SHEET -->
-<div id="subtaskOverlay" style="display:none;position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,0.45);backdrop-filter:blur(6px)" onclick="closeSubtaskDrawer()"></div>
-<div id="subtaskDrawer" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:8001;background:var(--card);border-radius:24px 24px 0 0;padding-bottom:env(safe-area-inset-bottom,20px);max-height:82vh;display:none;flex-direction:column;transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.32,0.72,0,1)">
-  <!-- Handle -->
-  <div style="width:36px;height:4px;background:var(--sep);border-radius:2px;margin:12px auto 0;flex-shrink:0"></div>
-  <!-- Header -->
-  <div style="padding:14px 20px 12px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--sep);flex-shrink:0">
-    <div id="drawerTaskIcon" style="font-size:24px"></div>
-    <div style="flex:1">
-      <div id="drawerTaskName" style="font-size:17px;font-weight:600;color:var(--text);line-height:1.2"></div>
-      <div id="drawerTaskTime" style="font-size:12px;color:var(--text3);margin-top:2px"></div>
-    </div>
-    <button onclick="closeSubtaskDrawer()" style="background:var(--sep);border:none;width:30px;height:30px;border-radius:50%;font-size:17px;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
-  </div>
-  <!-- Tabs -->
-  <div style="display:flex;border-bottom:1px solid var(--sep);flex-shrink:0">
-    <button id="drawerTab-subtasks" onclick="switchDrawerTab('subtasks')" style="flex:1;padding:10px;font-size:14px;font-weight:500;border:none;background:none;color:var(--orange);border-bottom:2px solid var(--orange);cursor:pointer">Subtasks</button>
-    <button id="drawerTab-reminder" onclick="switchDrawerTab('reminder')" style="flex:1;padding:10px;font-size:14px;font-weight:500;border:none;background:none;color:var(--text3);border-bottom:2px solid transparent;cursor:pointer">Reminder</button>
-    <button id="drawerTab-notes" onclick="switchDrawerTab('notes')" style="flex:1;padding:10px;font-size:14px;font-weight:500;border:none;background:none;color:var(--text3);border-bottom:2px solid transparent;cursor:pointer">Notes</button>
-  </div>
-  <!-- Tab: Subtasks -->
-  <div id="drawerPanel-subtasks" style="flex:1;overflow-y:auto;min-height:0">
-    <div id="subtaskList" style="padding:4px 20px 0"></div>
-    <div style="padding:12px 20px 16px;display:flex;gap:10px">
-      <input id="subtaskInput" placeholder="Add subtask…" style="flex:1;padding:10px 14px;border-radius:12px;border:1.5px solid var(--sep);font-size:15px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;-webkit-appearance:none" onkeydown="if(event.key==='Enter')addSubtask()" />
-      <button onclick="addSubtask()" style="background:var(--orange);color:white;border:none;border-radius:12px;padding:10px 16px;font-size:15px;font-weight:600;cursor:pointer">Add</button>
-    </div>
-  </div>
-  <!-- Tab: Reminder -->
-  <div id="drawerPanel-reminder" style="flex:1;overflow-y:auto;min-height:0;display:none;padding:20px">
-    <div style="font-size:14px;color:var(--text3);margin-bottom:16px">Send a push notification to your phone at a specific time.</div>
-    <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px">
-      <input type="time" id="reminderTime" style="flex:1;padding:12px;border-radius:12px;border:1.5px solid var(--sep);font-size:16px;font-family:inherit;background:var(--bg);color:var(--text);outline:none" />
-      <button onclick="scheduleReminder()" style="background:var(--orange);color:white;border:none;border-radius:12px;padding:12px 18px;font-size:15px;font-weight:600;cursor:pointer">Set</button>
-    </div>
-    <div id="reminderStatus" style="font-size:13px;color:var(--text3)"></div>
-    <div style="margin-top:20px;border-top:1px solid var(--sep);padding-top:16px">
-      <button onclick="sendTestPushForTask()" style="width:100%;background:var(--bg);border:1.5px solid var(--sep);border-radius:12px;padding:13px;font-size:15px;font-weight:500;color:var(--text);cursor:pointer">⚡ Send push for this task now</button>
-    </div>
-  </div>
-  <!-- Tab: Notes -->
-  <div id="drawerPanel-notes" style="flex:1;overflow-y:auto;min-height:0;display:none;padding:20px">
-    <textarea id="taskNotes" placeholder="Add notes, links, context…" style="width:100%;height:160px;padding:14px;border-radius:12px;border:1.5px solid var(--sep);font-size:15px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;resize:none;box-sizing:border-box;-webkit-appearance:none" oninput="saveTaskNotes()"></textarea>
-    <div style="font-size:12px;color:var(--text3);margin-top:8px">Notes are saved automatically.</div>
-  </div>
-</div>
-
-<!-- ADD TASK MODAL -->
-<div id="addTaskModal" onclick="if(event.target===this)closeAddTask()">
-  <div id="addTaskForm">
-    <h3>New Task</h3>
-    <input id="newTaskName" class="add-input" placeholder="Task name…" onkeydown="if(event.key==='Enter')document.getElementById('newTaskTime').focus()" />
-    <input id="newTaskTime" class="add-input" placeholder="Time (e.g. 14:00 – 15:00)" onkeydown="if(event.key==='Enter')submitNewTask()" />
-    <select id="newTaskCat" class="add-input" style="cursor:pointer">
-      <option value="body">💪 Body</option>
-      <option value="work">⚡ Work</option>
-      <option value="money">💰 Money</option>
-      <option value="home">🏠 Home</option>
-      <option value="soul">🌙 Soul</option>
-    </select>
-    <div style="display:flex;gap:10px;margin-top:4px">
-      <button onclick="closeAddTask()" style="flex:1;padding:13px;border-radius:12px;background:var(--sep);border:none;font-size:15px;font-weight:500;color:var(--text);cursor:pointer">Cancel</button>
-      <button onclick="submitNewTask()" style="flex:2;padding:13px;border-radius:12px;background:var(--orange);border:none;font-size:15px;font-weight:600;color:white;cursor:pointer">Add Task</button>
-    </div>
-  </div>
-</div>
 </body>
 </html>
