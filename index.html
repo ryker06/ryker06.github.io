@@ -847,13 +847,19 @@ function urlBase64ToUint8Array(b64) {
 }
 
 async function toggleNotify(btn) {
-  if (!WORKER_URL || WORKER_URL === '') {
-    alert('Push notifications coming soon — Cloudflare setup pending.');
+  // iOS push only works from installed PWA (Add to Home Screen)
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    || window.navigator.standalone === true;
+  if (!isStandalone) {
+    alert('To enable notifications:\n\n1. Tap the Share button in Safari\n2. Tap "Add to Home Screen"\n3. Open the app from your Home Screen\n4. Tap this button again');
+    return;
+  }
+  if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+    alert('Push notifications require iOS 16.4+ with the app installed to Home Screen.');
     return;
   }
   const status = document.getElementById('notifyStatus');
   if (status.classList.contains('notify-on')) {
-    // Unsubscribe
     try {
       const reg = await navigator.serviceWorker.ready;
       const sub = await reg.pushManager.getSubscription();
@@ -867,7 +873,7 @@ async function toggleNotify(btn) {
   }
   try {
     const perm = await Notification.requestPermission();
-    if (perm !== 'granted') { alert('Notifications blocked — enable in Settings.'); return; }
+    if (perm !== 'granted') { alert('Notifications blocked — go to Settings → [Your App] → Notifications and enable them.'); return; }
     const reg = await navigator.serviceWorker.ready;
     const sub = await reg.pushManager.subscribe({
       userVisibleOnly: true,
