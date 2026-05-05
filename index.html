@@ -3,813 +3,938 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<link rel="manifest" href="/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Today">
-<link rel="apple-touch-icon" href="/icon-192.png">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="Today">
-<title>Today — Adam</title>
+<meta name="theme-color" content="#ffffff">
+<link rel="manifest" href="manifest.json">
+<title>Today · Adam</title>
 <style>
-:root{--bg:#000;--card:#1C1C1E;--lift:#2C2C2E;--t1:#FFF;--t2:#8E8E93;--t3:#48484A;--sep:rgba(84,84,88,.45);--acc:#0A84FF;--grn:#30D158;--org:#FF9F0A;--red:#FF375F;--pur:#BF5AF2;--r:16px;}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;padding-bottom:140px;}
+:root {
+  --bg: #F2F2F7;
+  --card: #FFFFFF;
+  --card2: #F9F9F9;
+  --acc: #007AFF;
+  --grn: #34C759;
+  --red: #FF3B30;
+  --ora: #FF9500;
+  --purp: #AF52DE;
+  --text: #000000;
+  --text2: #3C3C43;
+  --text3: #8E8E93;
+  --sep: rgba(60,60,67,0.12);
+  --hero: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --radius: 16px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bot: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; background: var(--bg); font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif; }
 
-/* HEADER */
-.hdr{padding:52px 24px 0;}
-.streak-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.streak-pill{display:flex;align-items:center;gap:6px;background:rgba(255,159,10,.12);border-radius:20px;padding:6px 12px;}
-.streak-fire{font-size:18px;}
-.streak-text{font-size:14px;font-weight:700;color:var(--org);}
-.time-pill{font-size:13px;font-weight:600;color:var(--t2);background:var(--card);padding:6px 12px;border-radius:20px;}
-.eyebrow{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t2);margin-bottom:6px;}
-.title{font-size:34px;font-weight:700;line-height:1.1;letter-spacing:-.02em;}
-.title span{color:var(--acc);}
-.sub{font-size:14px;color:var(--t2);margin-top:8px;line-height:1.5;}
+/* ── PIN SCREEN ── */
+#pinScreen {
+  position: fixed; inset: 0; z-index: 9999;
+  background: linear-gradient(160deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 40px 24px calc(40px + var(--safe-bot));
+}
+.pin-icon { font-size: 52px; margin-bottom: 16px; filter: drop-shadow(0 4px 24px rgba(102,126,234,0.5)); }
+.pin-title { font-size: 28px; font-weight: 700; color: white; margin-bottom: 6px; letter-spacing: -0.5px; }
+.pin-sub { font-size: 15px; color: rgba(255,255,255,0.55); margin-bottom: 48px; }
+.pin-dots { display: flex; gap: 16px; margin-bottom: 48px; }
+.pin-dot {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.35);
+  transition: all 0.15s ease;
+  background: transparent;
+}
+.pin-dot.filled { background: white; border-color: white; transform: scale(1.1); }
+.pin-error { color: #FF6B6B; font-size: 14px; margin-top: -32px; margin-bottom: 16px; opacity: 0; transition: opacity 0.2s; }
+.pin-error.show { opacity: 1; }
+.pin-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; width: 100%; max-width: 300px; }
+.pin-key {
+  height: 72px; border-radius: 50%; background: rgba(255,255,255,0.12);
+  border: none; color: white; font-size: 22px; font-weight: 500;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 2px;
+  transition: transform 0.08s ease, background 0.1s;
+  -webkit-user-select: none;
+}
+.pin-key:active { transform: scale(0.92); background: rgba(255,255,255,0.22); }
+.pin-key .sub { font-size: 9px; letter-spacing: 1.5px; opacity: 0.65; font-weight: 600; }
+.pin-key.del { background: rgba(255,255,255,0.08); font-size: 18px; }
+.pin-key.empty { background: transparent; pointer-events: none; }
 
-/* NOW BANNER */
-.now-banner{margin:20px 24px 0;background:linear-gradient(135deg,rgba(10,132,255,.2),rgba(10,132,255,.08));border:1px solid rgba(10,132,255,.3);border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;gap:12px;}
-.now-dot{width:8px;height:8px;border-radius:50%;background:var(--acc);flex-shrink:0;animation:pulse 1.5s ease-in-out infinite;}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(1.3);}}
-.now-label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--acc);}
-.now-task{font-size:15px;font-weight:600;color:var(--t1);margin-top:2px;}
+/* ── MAIN APP ── */
+#app { display: none; min-height: 100vh; padding: 0 0 calc(24px + var(--safe-bot)); }
 
-/* PROGRESS */
-.prog-row{display:flex;align-items:center;gap:12px;padding:20px 24px 0;}
-.prog-track{flex:1;height:5px;background:var(--lift);border-radius:3px;overflow:hidden;}
-.prog-fill{height:100%;background:var(--grn);border-radius:3px;transition:width .6s cubic-bezier(.34,1.56,.64,1);width:0%;}
-.prog-label{font-size:13px;font-weight:700;color:var(--t2);min-width:44px;text-align:right;}
+/* ── HEADER ── */
+.header {
+  background: var(--hero);
+  padding: calc(var(--safe-top) + 54px) 20px 28px;
+  position: relative; overflow: hidden;
+}
+.header::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.12) 0%, transparent 60%);
+}
+.header-row { display: flex; align-items: flex-start; justify-content: space-between; position: relative; }
+.header-left {}
+.header-greeting { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 4px; }
+.header-date { font-size: 30px; font-weight: 700; color: white; letter-spacing: -0.8px; line-height: 1.1; }
+.header-sub { font-size: 14px; color: rgba(255,255,255,0.65); margin-top: 6px; line-height: 1.4; max-width: 220px; }
+.ring-wrap { flex-shrink: 0; }
+.ring-svg { transform: rotate(-90deg); }
+.ring-bg { fill: none; stroke: rgba(255,255,255,0.2); }
+.ring-fg { fill: none; stroke: white; stroke-linecap: round; transition: stroke-dashoffset 0.6s cubic-bezier(0.4,0,0.2,1); }
+.ring-pct { font-size: 15px; font-weight: 700; fill: white; text-anchor: middle; dominant-baseline: central; }
+.ring-label { font-size: 8px; fill: rgba(255,255,255,0.65); text-anchor: middle; }
+.ring-center { transform: rotate(90deg); transform-origin: center; }
 
-/* SECTION */
-.sec{padding:24px 24px 0;}
-.sec-title{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--t2);margin-bottom:10px;padding-left:4px;}
+/* ── STREAK BANNER ── */
+.streak-bar {
+  background: rgba(0,0,0,0.18); backdrop-filter: blur(10px);
+  margin: 0 16px 0; border-radius: 0 0 14px 14px;
+  padding: 10px 16px; display: flex; align-items: center; gap: 10px;
+  position: relative; margin-top: -1px;
+}
+.streak-bar.hidden { display: none; }
+.streak-flame { font-size: 20px; }
+.streak-text { font-size: 13px; color: rgba(255,255,255,0.9); font-weight: 500; }
+.streak-num { font-weight: 700; color: #FFD60A; }
+.next-task-bar {
+  background: linear-gradient(90deg, rgba(0,122,255,0.12) 0%, rgba(0,122,255,0.06) 100%);
+  border-left: 3px solid var(--acc); border-radius: 0 12px 12px 0;
+  margin: 12px 16px 0; padding: 10px 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.next-arrow { font-size: 16px; }
+.next-label { font-size: 11px; color: var(--text3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.next-name { font-size: 14px; color: var(--acc); font-weight: 600; }
 
-/* TASK GROUP */
-.tg{border-radius:var(--r);overflow:hidden;}
-.tc{background:var(--card);transition:opacity .3s;}
-.tc+.tc{border-top:.5px solid var(--sep);}
-.ti{display:flex;align-items:flex-start;gap:13px;padding:13px 16px;cursor:pointer;user-select:none;transition:background .12s;position:relative;overflow:hidden;}
-.ti:active{background:rgba(255,255,255,.04);}
+/* ── SECTIONS ── */
+.section { margin: 20px 16px 0; }
+.section-label {
+  font-size: 11px; font-weight: 700; color: var(--text3);
+  text-transform: uppercase; letter-spacing: 0.8px;
+  padding: 0 4px; margin-bottom: 10px;
+}
 
-/* RIPPLE */
-.ripple{position:absolute;border-radius:50%;background:rgba(48,209,88,.25);transform:scale(0);animation:ripple .5s ease-out forwards;pointer-events:none;}
-@keyframes ripple{to{transform:scale(4);opacity:0;}}
+/* ── TASK CARDS ── */
+.task-group { background: var(--card); border-radius: var(--radius); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.task-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; cursor: pointer;
+  transition: background 0.15s;
+  position: relative;
+}
+.task-row + .task-row { border-top: 0.5px solid var(--sep); }
+.task-row:active { background: rgba(0,0,0,0.04); }
+.task-check {
+  width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--sep);
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  background: transparent;
+}
+.task-check svg { opacity: 0; transform: scale(0.3); transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1); }
+.task-row.done .task-check { background: var(--grn); border-color: var(--grn); }
+.task-row.done .task-check svg { opacity: 1; transform: scale(1); }
+.task-body { flex: 1; min-width: 0; }
+.task-name { font-size: 16px; font-weight: 500; color: var(--text); line-height: 1.3; transition: color 0.2s; }
+.task-time { font-size: 12px; color: var(--text3); margin-top: 2px; font-weight: 400; }
+.task-row.done .task-name { text-decoration: line-through; color: var(--text3); }
+.task-tag {
+  font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 20px;
+  flex-shrink: 0; letter-spacing: 0.3px;
+}
+.tag-body { background: rgba(52,199,89,0.12); color: #1a8a37; }
+.tag-home { background: rgba(255,149,0,0.12); color: #b56800; }
+.tag-work { background: rgba(0,122,255,0.1); color: var(--acc); }
+.tag-money { background: rgba(175,82,222,0.12); color: #7b3da8; }
+.tag-soul { background: rgba(255,214,10,0.15); color: #8a6800; }
 
-.chk{width:24px;height:24px;border-radius:50%;border:2px solid var(--t3);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .25s cubic-bezier(.34,1.56,.64,1);margin-top:1px;}
-.chk svg{opacity:0;transform:scale(0);transition:all .2s cubic-bezier(.34,1.56,.64,1);}
-.tc.done .chk{background:var(--grn);border-color:var(--grn);}
-.tc.done .chk svg{opacity:1;transform:scale(1);}
-.tc.done .tn{text-decoration:line-through;color:var(--t3);}
-.tc.done .tt{color:var(--t3);}
-.tc.done .why{color:var(--t3);}
+/* ── BLOCKED EMAILS ── */
+.blocked-section { background: var(--card); border-radius: var(--radius); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.blocked-header {
+  padding: 14px 16px; background: rgba(255,59,48,0.06);
+  border-bottom: 0.5px solid rgba(255,59,48,0.15);
+  display: flex; align-items: center; gap: 10px;
+}
+.blocked-icon { font-size: 18px; }
+.blocked-title { font-size: 14px; font-weight: 700; color: var(--red); }
+.blocked-sub { font-size: 12px; color: var(--text3); margin-top: 1px; }
+.blocked-unlock {
+  margin-left: auto; background: var(--grn); color: white;
+  border: none; border-radius: 20px; padding: 6px 14px;
+  font-size: 12px; font-weight: 700; cursor: pointer; display: none;
+  transition: transform 0.15s;
+}
+.blocked-unlock:active { transform: scale(0.95); }
+.blocked-row {
+  display: flex; align-items: center; gap: 12px; padding: 13px 16px;
+  opacity: 0.5; pointer-events: none;
+}
+.blocked-row + .blocked-row { border-top: 0.5px solid var(--sep); }
+.blocked-row.unlocked { opacity: 1; pointer-events: auto; cursor: pointer; }
+.blocked-row.unlocked:active { background: rgba(0,0,0,0.04); }
+.blocked-row.done .task-name { text-decoration: line-through; color: var(--text3); }
+.blocked-row.done .task-check { background: var(--grn); border-color: var(--grn); }
+.blocked-row.done .task-check svg { opacity: 1; transform: scale(1); }
 
-.tx{flex:1;min-width:0;}
-.tn{font-size:15px;font-weight:500;line-height:1.3;transition:color .3s,text-decoration .3s;}
-.tt{font-size:12px;color:var(--t2);margin-top:2px;transition:color .3s;}
-.why{font-size:11px;color:var(--t3);margin-top:4px;line-height:1.4;font-style:italic;}
+/* ── MEALS ── */
+.meal-group { background: var(--card); border-radius: var(--radius); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.meal-row { display: flex; align-items: center; gap: 14px; padding: 13px 16px; }
+.meal-row + .meal-row { border-top: 0.5px solid var(--sep); }
+.meal-emoji { font-size: 28px; flex-shrink: 0; }
+.meal-body { flex: 1; }
+.meal-name { font-size: 15px; font-weight: 600; color: var(--text); }
+.meal-desc { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.meal-kcal { font-size: 13px; font-weight: 600; color: var(--text3); }
 
-.bdg{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;flex-shrink:0;margin-top:2px;letter-spacing:.02em;}
-.b-body{background:rgba(255,159,10,.12);color:var(--org);}
-.b-money{background:rgba(48,209,88,.12);color:var(--grn);}
-.b-work{background:rgba(48,209,88,.12);color:var(--grn);}
-.b-build{background:rgba(10,132,255,.12);color:var(--acc);}
-.b-focus{background:rgba(10,132,255,.12);color:var(--acc);}
-.b-home{background:rgba(191,90,242,.12);color:var(--pur);}
-.b-islam{background:rgba(255,255,255,.08);color:var(--t1);}
-.b-email{background:rgba(48,209,88,.12);color:var(--grn);}
+/* ── SHOPPING ── */
+.shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; background: var(--card); border-radius: var(--radius); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.shop-item {
+  display: flex; align-items: center; gap: 10px; padding: 13px 14px;
+  cursor: pointer; transition: background 0.15s;
+  border-right: 0.5px solid var(--sep); border-bottom: 0.5px solid var(--sep);
+}
+.shop-item:nth-child(2n) { border-right: none; }
+.shop-item:nth-last-child(-n+2) { border-bottom: none; }
+.shop-item:active { background: rgba(0,0,0,0.04); }
+.shop-item.got { opacity: 0.4; }
+.shop-check {
+  width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--sep);
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+}
+.shop-check svg { opacity: 0; transform: scale(0.3); transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+.shop-item.got .shop-check { background: var(--grn); border-color: var(--grn); }
+.shop-item.got .shop-check svg { opacity: 1; transform: scale(1); }
+.shop-name { font-size: 14px; color: var(--text); font-weight: 400; }
 
-/* NOW HIGHLIGHT */
-.tc.now-task-card{background:#1C2130;}
-.tc.now-task-card .tn{color:#fff;}
+/* ── QURAN ── */
+.quran-card {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+  border-radius: var(--radius); padding: 20px;
+  box-shadow: 0 2px 12px rgba(15,52,96,0.25);
+}
+.quran-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.quran-label { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; }
+.quran-streak { font-size: 13px; color: #FFD60A; font-weight: 700; }
+.quran-ayah { font-size: 22px; color: white; text-align: right; line-height: 1.8; font-weight: 400; margin-bottom: 10px; font-family: 'Traditional Arabic', 'Scheherazade', serif; }
+.quran-ref { font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 16px; }
+.quran-btn {
+  background: rgba(255,255,255,0.12); border: none; border-radius: 10px;
+  color: white; font-size: 14px; font-weight: 600; padding: 11px 20px;
+  cursor: pointer; width: 100%; transition: background 0.15s;
+}
+.quran-btn:active { background: rgba(255,255,255,0.2); }
 
-/* BLOCKED */
-.blk-hdr{background:var(--card);padding:9px 16px;display:flex;align-items:center;gap:8px;border-bottom:.5px solid var(--sep);}
-.blk-pill{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--red);background:rgba(255,55,95,.1);padding:3px 8px;border-radius:5px;}
-.blk-note{font-size:12px;color:var(--t2);}
-.tc.blocked .tn{color:var(--t3);}
-.tc.blocked .tt{color:var(--t3);}
-.tc.blocked .why{color:var(--t3);}
-.tc.blocked .chk{border-color:var(--t3);opacity:.4;}
-.tc.blocked .ti{cursor:default;}
+/* ── PARKED ── */
+.parked-card { background: var(--card); border-radius: var(--radius); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.parked-toggle {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px; cursor: pointer;
+}
+.parked-toggle:active { background: rgba(0,0,0,0.04); }
+.parked-left { display: flex; align-items: center; gap: 12px; }
+.parked-emoji { font-size: 22px; }
+.parked-title { font-size: 16px; font-weight: 600; color: var(--text); }
+.parked-count { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.parked-chev { font-size: 14px; color: var(--text3); transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1); }
+.parked-chev.open { transform: rotate(90deg); }
+.parked-body { display: none; border-top: 0.5px solid var(--sep); }
+.parked-body.open { display: block; }
+.parked-item { display: flex; align-items: center; gap: 10px; padding: 11px 16px; }
+.parked-item + .parked-item { border-top: 0.5px solid var(--sep); }
+.parked-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text3); flex-shrink: 0; }
+.parked-text { font-size: 14px; color: var(--text2); line-height: 1.4; }
 
-/* UNLOCK */
-.unlock-row{background:var(--card);border-radius:var(--r);padding:13px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-top:2px;}
-.unlock-row:active{background:rgba(255,255,255,.04);}
+/* ── NOTIFY BUTTON ── */
+.notify-btn {
+  background: var(--card); border-radius: var(--radius);
+  padding: 16px; display: flex; align-items: center; gap: 14px;
+  cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  border: none; width: 100%; text-align: left;
+  transition: transform 0.15s;
+}
+.notify-btn:active { transform: scale(0.98); }
+.notify-icon { font-size: 28px; }
+.notify-body { flex: 1; }
+.notify-title { font-size: 16px; font-weight: 600; color: var(--text); }
+.notify-sub { font-size: 13px; color: var(--text3); margin-top: 2px; }
+.notify-status { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
+.notify-on { background: rgba(52,199,89,0.12); color: var(--grn); }
+.notify-off { background: rgba(142,142,147,0.12); color: var(--text3); }
 
-/* QURAN CARD */
-.quran-card{background:linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.1);border-radius:var(--r);padding:18px 16px;margin-bottom:2px;}
-.quran-arabic{font-size:20px;text-align:right;line-height:1.7;color:var(--t1);margin-bottom:10px;direction:rtl;}
-.quran-trans{font-size:13px;color:var(--t2);line-height:1.6;font-style:italic;}
-.quran-ref{font-size:11px;color:var(--t3);margin-top:6px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;}
+/* ── PARTICLES ── */
+.particle {
+  position: fixed; pointer-events: none; z-index: 9998;
+  width: 8px; height: 8px; border-radius: 50%;
+  animation: burst 0.7s ease-out forwards;
+}
+@keyframes burst {
+  0% { transform: translate(0,0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--dx),var(--dy)) scale(0); opacity: 0; }
+}
 
-/* MEAL */
-.meal-wrap{background:var(--card);border-radius:var(--r);overflow:hidden;}
-.meal-r{display:flex;align-items:center;padding:12px 16px;gap:12px;border-top:.5px solid var(--sep);}
-.meal-r:first-child{border-top:none;}
-.meal-e{font-size:22px;width:32px;text-align:center;flex-shrink:0;}
-.meal-n{font-size:15px;font-weight:500;flex:1;}
-.meal-m{font-size:12px;color:var(--t2);margin-top:1px;}
-.meal-k{font-size:12px;color:var(--t2);}
-
-/* SHOP */
-.shop-wrap{border-radius:var(--r);overflow:hidden;}
-.shop-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;}
-.si{background:var(--card);padding:11px 14px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;}
-.si:active{background:rgba(255,255,255,.04);}
-.si.got{opacity:.4;}
-.si.got .sn{text-decoration:line-through;}
-.sc{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--t3);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s cubic-bezier(.34,1.56,.64,1);}
-.sc svg{opacity:0;transform:scale(0);transition:all .18s cubic-bezier(.34,1.56,.64,1);}
-.si.got .sc{background:var(--grn);border-color:var(--grn);}
-.si.got .sc svg{opacity:1;transform:scale(1);}
-.sn{font-size:13px;}
-
-/* PARKED */
-.pk-tog{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;background:var(--card);border-radius:var(--r);cursor:pointer;user-select:none;}
-.pk-tog:active{background:rgba(255,255,255,.04);}
-.pkl{display:flex;align-items:center;gap:10px;}
-.pk-icon{width:28px;height:28px;background:rgba(120,120,128,.18);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;}
-.pk-name{font-size:15px;font-weight:500;}
-.pk-ct{font-size:12px;color:var(--t2);margin-top:1px;}
-.ch{color:var(--t3);transition:transform .25s;font-size:18px;}
-.ch.open{transform:rotate(90deg);}
-.pk-list{display:none;background:var(--card);border-radius:0 0 var(--r) var(--r);margin-top:2px;overflow:hidden;}
-.pk-list.open{display:block;}
-.pi{padding:9px 16px;border-top:.5px solid var(--sep);display:flex;align-items:center;gap:10px;}
-.pd{width:6px;height:6px;border-radius:50%;background:var(--t3);flex-shrink:0;}
-.pt{font-size:13px;color:var(--t2);line-height:1.4;}
-
-/* MANTRA */
-.mantra{margin:28px 24px 0;text-align:center;}
-.mantra p{font-size:13px;color:var(--t3);line-height:1.7;}
-.mantra strong{color:var(--t2);}
-
-/* CONFETTI */
-@keyframes fall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
-.cp{position:fixed;border-radius:2px;pointer-events:none;animation:fall 1.8s ease-in forwards;z-index:9999;}
-
-/* DONE BANNER */
-.done-banner{display:none;position:fixed;bottom:0;left:0;right:0;padding:20px 24px;padding-bottom:max(20px,env(safe-area-inset-bottom));background:linear-gradient(to top,rgba(0,0,0,.96) 60%,transparent);text-align:center;pointer-events:none;}
-.done-banner.show{display:block;}
-.done-pill{display:inline-block;background:var(--grn);color:#000;font-size:15px;font-weight:700;padding:12px 28px;border-radius:50px;}
-
-/* INSTALL BANNER */
-.install-banner{margin:20px 24px 0;background:var(--card);border-radius:var(--r);padding:13px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;}
-.install-banner:active{background:rgba(255,255,255,.04);}
-.install-icon{font-size:20px;}
-.install-text{flex:1;}
-.install-title{font-size:14px;font-weight:500;}
-.install-sub{font-size:12px;color:var(--t2);margin-top:1px;}
-.install-arr{color:var(--t3);font-size:18px;}
-
-  #pin-screen{position:fixed;inset:0;background:#000;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;}
-  .pin-logo{font-size:48px;margin-bottom:24px;}
-  .pin-title{font-size:22px;font-weight:700;color:#fff;margin-bottom:6px;}
-  .pin-sub{font-size:14px;color:#8E8E93;margin-bottom:40px;}
-  .pin-dots{display:flex;gap:16px;margin-bottom:40px;}
-  .pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid #48484A;transition:all .2s;}
-  .pin-dot.filled{background:#0A84FF;border-color:#0A84FF;}
-  .pin-dot.error{background:#FF375F;border-color:#FF375F;}
-  .pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:280px;}
-  .pin-btn{background:#1C1C1E;border:none;border-radius:50%;width:80px;height:80px;font-size:24px;font-weight:400;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:background .1s;font-family:-apple-system,sans-serif;}
-  .pin-btn:active{background:#2C2C2E;}
-  .pin-btn.del{font-size:20px;}
-  .pin-btn.empty{background:transparent;pointer-events:none;}
-  @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
-  .shake{animation:shake .35s ease;}
-
+/* ── DONE SCREEN ── */
+#doneScreen {
+  display: none; position: fixed; inset: 0; z-index: 999;
+  background: linear-gradient(160deg, #0a2e1a 0%, #0d3d22 50%, #1a5c35 100%);
+  align-items: center; justify-content: center;
+  flex-direction: column; text-align: center; padding: 40px;
+}
+.done-emoji { font-size: 80px; margin-bottom: 20px; animation: bounce 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes bounce { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+.done-title { font-size: 36px; font-weight: 800; color: white; letter-spacing: -1px; margin-bottom: 10px; }
+.done-sub { font-size: 18px; color: rgba(255,255,255,0.7); margin-bottom: 40px; line-height: 1.5; }
+.done-btn { background: white; color: #0d3d22; border: none; border-radius: 14px; padding: 16px 40px; font-size: 17px; font-weight: 700; cursor: pointer; }
 </style>
 </head>
 <body>
 
-<div id="pin-screen">
-  <div class="pin-logo">✅</div>
-  <div class="pin-title">Today</div>
-  <div class="pin-sub">Enter PIN to continue</div>
-  <div class="pin-dots" id="pinDots">
-    <div class="pin-dot" id="pd0"></div>
-    <div class="pin-dot" id="pd1"></div>
-    <div class="pin-dot" id="pd2"></div>
-    <div class="pin-dot" id="pd3"></div>
+<!-- PIN SCREEN -->
+<div id="pinScreen">
+  <div class="pin-icon">✦</div>
+  <div class="pin-title">Good morning, Adam</div>
+  <div class="pin-sub">Enter your PIN to continue</div>
+  <div class="pin-dots">
+    <div class="pin-dot" id="d0"></div>
+    <div class="pin-dot" id="d1"></div>
+    <div class="pin-dot" id="d2"></div>
+    <div class="pin-dot" id="d3"></div>
   </div>
-  <div class="pin-pad">
-    <button class="pin-btn" onclick="pinKey('1')">1</button>
-    <button class="pin-btn" onclick="pinKey('2')">2</button>
-    <button class="pin-btn" onclick="pinKey('3')">3</button>
-    <button class="pin-btn" onclick="pinKey('4')">4</button>
-    <button class="pin-btn" onclick="pinKey('5')">5</button>
-    <button class="pin-btn" onclick="pinKey('6')">6</button>
-    <button class="pin-btn" onclick="pinKey('7')">7</button>
-    <button class="pin-btn" onclick="pinKey('8')">8</button>
-    <button class="pin-btn" onclick="pinKey('9')">9</button>
-    <button class="pin-btn empty"></button>
-    <button class="pin-btn" onclick="pinKey('0')">0</button>
-    <button class="pin-btn del" onclick="pinDel()">⌫</button>
+  <div class="pin-error" id="pinError">Wrong PIN — try again</div>
+  <div class="pin-keypad">
+    <button class="pin-key" onclick="pinPress('1')"><span>1</span></button>
+    <button class="pin-key" onclick="pinPress('2')"><span>2</span><span class="sub">ABC</span></button>
+    <button class="pin-key" onclick="pinPress('3')"><span>3</span><span class="sub">DEF</span></button>
+    <button class="pin-key" onclick="pinPress('4')"><span>4</span><span class="sub">GHI</span></button>
+    <button class="pin-key" onclick="pinPress('5')"><span>5</span><span class="sub">JKL</span></button>
+    <button class="pin-key" onclick="pinPress('6')"><span>6</span><span class="sub">MNO</span></button>
+    <button class="pin-key" onclick="pinPress('7')"><span>7</span><span class="sub">PQRS</span></button>
+    <button class="pin-key" onclick="pinPress('8')"><span>8</span><span class="sub">TUV</span></button>
+    <button class="pin-key" onclick="pinPress('9')"><span>9</span><span class="sub">WXYZ</span></button>
+    <button class="pin-key empty"></button>
+    <button class="pin-key" onclick="pinPress('0')"><span>0</span></button>
+    <button class="pin-key del" onclick="pinDel()">⌫</button>
   </div>
 </div>
 
+<!-- DONE SCREEN -->
+<div id="doneScreen">
+  <div class="done-emoji">🏆</div>
+  <div class="done-title">Day Complete.</div>
+  <div class="done-sub">Every single task. Done.<br>That's rare. That's you.</div>
+  <button class="done-btn" onclick="document.getElementById('doneScreen').style.display='none'">Back to Today</button>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
 
 <!-- HEADER -->
-<div class="hdr">
-  <div class="streak-row">
-    <div class="streak-pill">
-      <span class="streak-fire">🔥</span>
-      <span class="streak-text" id="streakText">Day 1</span>
+<div class="header">
+  <div class="header-row">
+    <div class="header-left">
+      <div class="header-greeting" id="greetLabel">Tuesday · May 5</div>
+      <div class="header-date" id="dateLabel">Today</div>
+      <div class="header-sub">Not 30. Not everything. Just these. The rest is parked — not gone.</div>
     </div>
-    <div class="time-pill" id="timePill">--:--</div>
+    <div class="ring-wrap">
+      <svg class="ring-svg" width="76" height="76" viewBox="0 0 76 76">
+        <circle class="ring-bg" cx="38" cy="38" r="30" stroke-width="6"/>
+        <circle class="ring-fg" id="ringFg" cx="38" cy="38" r="30" stroke-width="6"
+          stroke-dasharray="188.5" stroke-dashoffset="188.5"/>
+        <g class="ring-center">
+          <text class="ring-pct" id="ringPct" x="38" y="35">0%</text>
+          <text class="ring-label" x="38" y="47">done</text>
+        </g>
+      </svg>
+    </div>
   </div>
-  <div class="eyebrow">Tuesday, May 5</div>
-  <div class="title">Execute.<br>Then <span>you're free</span>.</div>
-  <div class="sub">Not 30 tasks. Just these. The rest is parked.</div>
 </div>
 
-<!-- NOW BANNER -->
-<div class="now-banner" id="nowBanner">
-  <div class="now-dot"></div>
+<!-- STREAK -->
+<div class="streak-bar" id="streakBar">
+  <div class="streak-flame">🔥</div>
+  <div class="streak-text">Day <span class="streak-num" id="streakNum">1</span> streak — keep going</div>
+</div>
+
+<!-- NEXT TASK -->
+<div class="next-task-bar" id="nextBar">
+  <div class="next-arrow">→</div>
   <div>
-    <div class="now-label">Do This Now</div>
-    <div class="now-task" id="nowTask">Loading...</div>
+    <div class="next-label">Do This Now</div>
+    <div class="next-name" id="nextName">Go Gym</div>
   </div>
 </div>
 
-<!-- INSTALL HINT -->
-<div class="install-banner" id="installBanner" onclick="showInstallTip()" style="display:none;">
-  <span class="install-icon">📲</span>
-  <div class="install-text">
-    <div class="install-title">Add to Home Screen</div>
-    <div class="install-sub">One tap away. Always there.</div>
-  </div>
-  <div class="install-arr">›</div>
-</div>
+<!-- TODAY TASKS -->
+<div class="section">
+  <div class="section-label">Today · 8 Tasks</div>
+  <div class="task-group" id="taskList">
 
-<!-- PROGRESS -->
-<div class="prog-row">
-  <div class="prog-track"><div class="prog-fill" id="pFill"></div></div>
-  <div class="prog-label" id="pLabel">0 / 9</div>
-</div>
-
-<!-- TASKS -->
-<div class="sec">
-  <div class="sec-title">Today — In Order</div>
-  <div class="tg" id="taskList">
-
-    <div class="tc" id="t-islam" data-hour="11" data-min="30" onclick="tap(this)">
-      <div class="ti">
-        <div class="chk"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4L4.5 7.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="tx">
-          <div class="tn">Learn Islam — 20 min</div>
-          <div class="tt">11:30 – 12:00 · Quran + reflection before you step out.</div>
-          <div class="why">Ground yourself first. Everything you build means more when you know why.</div>
-        </div>
-        <div class="bdg b-islam">☪️</div>
+    <div class="task-row" onclick="toggleTask(this)" data-id="gym">
+      <div class="task-check"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4.5L4.5 8L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-body">
+        <div class="task-name">Go Gym</div>
+        <div class="task-time">11:30 – 12:45 · Energy first. Everything else follows.</div>
       </div>
+      <div class="task-tag tag-body">Body</div>
     </div>
 
-    <div class="tc" id="t-gym" data-hour="12" data-min="0" onclick="tap(this)">
-      <div class="ti">
-        <div class="chk"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4L4.5 7.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="tx">
-          <div class="tn">Go Gym</div>
-          <div class="tt">12:00 – 13:15 · Go. Don't think about it.</div>
-          <div class="why">Physical output = mental output. This unlocks the whole day.</div>
-        </div>
-        <div class="bdg b-body">Body</div>
+    <div class="task-row" onclick="toggleTask(this)" data-id="shop">
+      <div class="task-check"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4.5L4.5 8L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-body">
+        <div class="task-name">Shop — Groceries</div>
+        <div class="task-time">12:45 – 13:15 · List below. In and out in 30 min.</div>
       </div>
+      <div class="task-tag tag-home">Home</div>
     </div>
 
-    <div class="tc" id="t-shop" data-hour="13" data-min="15" onclick="tap(this)">
-      <div class="ti">
-        <div class="chk"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4L4.5 7.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="tx">
-          <div class="tn">Shop — Groceries</div>
-          <div class="tt">13:15 – 13:45 · List below. In and out.</div>
-          <div class="why">Food = energy. Your energy = everything else.</div>
-        </div>
-        <div class="bdg b-home">Home</div>
+    <div class="task-row" onclick="toggleTask(this)" data-id="whatsapp">
+      <div class="task-check"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4.5L4.5 8L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-body">
+        <div class="task-name">Reply WhatsApp + Gather new employee</div>
+        <div class="task-time">13:15 – 13:45 · One message at a time. Don't overthink.</div>
       </div>
+      <div class="task-tag tag-work">Work</div>
     </div>
 
-    <div class="tc" id="t-jacket" data-hour="13" data-min="45" onclick="tap(this)">
-      <div class="ti">
-        <div class="chk"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4L4.5 7.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="tx">
-          <div class="tn">Put Jacket on eBay</div>
-          <div class="tt">13:45 – 14:00 · Photo + title + price. 15 min max.</div>
-          <div class="why">Dead asset → cash. Every euro counts right now.</div>
-        </div>
-        <div class="bdg b-money">Money</div>
+    <div class="task-row" onclick="toggleTask(this)" data-id="ebay">
+      <div class="task-check"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4.5L4.5 8L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-body">
+        <div class="task-name">eBay — List the Jacket</div>
+        <div class="task-time">13:45 – 14:00 · Photos, description, post. 15 minutes max.</div>
       </div>
+      <div class="task-tag tag-money">Money</div>
     </div>
 
-    <div class="tc" id="t-wa" data-hour="14" data-min="0" onclick="tap(this)">
-      <div class="ti">
-        <div class="chk"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4L4.5 7.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="tx">
-          <div class="tn">Reply all WhatsApp + gather new employee</div>
-          <div class="tt">14:00 – 14:30 · Clear the queue. One at a time.</div>
-          <div class="why">Your network is your engine. Don't let it idle.</div>
-        </div>
-        <div class="bdg b-work">Work</div>
+    <div class="task-row" onclick="toggleTask(this)" data-id="build-pv">
+      <div class="task-check"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4.5L4.5 8L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-body">
+        <div class="task-name">Build Personalvermittler Website</div>
+        <div class="task-time">14:00 – 16:00 · Manychat CTA. Unlocks 3 cold emails when done.</div>
       </div>
+      <div class="task-tag tag-money">Money</div>
     </div>
 
-    <div class="tc" id="t-b1" data-hour="14" data-min="30" onclick="tap(this)">
-      <div class="ti">
-        <div class="chk"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4L4.5 7.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="tx">
-          <div class="tn">Build: Personalvermittler site</div>
-          <div class="tt">14:30 – 16:00 · Conversion page + Manychat CTA. Ask Claude.</div>
-          <div class="why">No site = no credibility. Gate to the cold email.</div>
-        </div>
-        <div class="bdg b-build">Build</div>
+    <div class="task-row" onclick="toggleTask(this)" data-id="build-ag">
+      <div class="task-check"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4.5L4.5 8L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-body">
+        <div class="task-name">Build Arbeitgeber Website</div>
+        <div class="task-time">16:00 – 18:00 · Video slot + Manychat CTA. Then email flows.</div>
       </div>
+      <div class="task-tag tag-money">Money</div>
     </div>
 
-    <div class="tc" id="t-b2" data-hour="16" data-min="0" onclick="tap(this)">
-      <div class="ti">
-        <div class="chk"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4L4.5 7.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="tx">
-          <div class="tn">Build: Arbeitgeber site + video slot</div>
-          <div class="tt">16:00 – 17:30 · Funnel page, video embed, Manychat CTA.</div>
-          <div class="why">Your most important funnel. Video + CTA = pipeline.</div>
-        </div>
-        <div class="bdg b-build">Build</div>
+    <div class="task-row" onclick="toggleTask(this)" data-id="video">
+      <div class="task-check"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4.5L4.5 8L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-body">
+        <div class="task-name">Video für Arbeitgeber</div>
+        <div class="task-time">18:00 – 18:30 · Record. Don't overthink. First take counts.</div>
       </div>
+      <div class="task-tag tag-work">Work</div>
     </div>
 
-    <div class="tc" id="t-vid" data-hour="17" data-min="30" onclick="tap(this)">
-      <div class="ti">
-        <div class="chk"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4L4.5 7.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="tx">
-          <div class="tn">Video für Arbeitgeber</div>
-          <div class="tt">17:30 – 18:30 · Record. First take ships. Good beats perfect.</div>
-          <div class="why">The asset that sells while you sleep.</div>
-        </div>
-        <div class="bdg b-focus">Focus</div>
+    <div class="task-row" onclick="toggleTask(this)" data-id="quran">
+      <div class="task-check"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4.5L4.5 8L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-body">
+        <div class="task-name">Learn Islam / Quran</div>
+        <div class="task-time">Evening · 20 minutes. Soul work is the foundation.</div>
       </div>
+      <div class="task-tag tag-soul">Soul</div>
     </div>
 
-    <!-- BLOCKED -->
-    <div class="blk-hdr" id="blkHdr">
-      <div class="blk-pill">Blocked</div>
-      <div class="blk-note">Unlocks when both sites are live</div>
-    </div>
-
-    <div class="tc blocked" id="cold1">
-      <div class="ti">
-        <div class="chk"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4L4.5 7.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="tx">
-          <div class="tn">Cold Email — Reiner (Arbeitgeber)</div>
-          <div class="tt">After site is live · Send with link.</div>
-          <div class="why">First contact. Funnel starts here.</div>
-        </div>
-        <div class="bdg b-email">Email</div>
-      </div>
-    </div>
-
-    <div class="tc blocked" id="cold2">
-      <div class="ti">
-        <div class="chk"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4L4.5 7.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="tx">
-          <div class="tn">Cold Email — Arbeitgeber</div>
-          <div class="tt">After site is live · Same structure as Reiner.</div>
-          <div class="why">First contact. Funnel starts here.</div>
-        </div>
-        <div class="bdg b-email">Email</div>
-      </div>
-    </div>
-
-    <div class="tc blocked" id="cold3">
-      <div class="ti">
-        <div class="chk"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4L4.5 7.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="tx">
-          <div class="tn">Cold Email — Personalvermittler</div>
-          <div class="tt">After site is live · Send with link.</div>
-          <div class="why">First contact. Funnel starts here.</div>
-        </div>
-        <div class="bdg b-email">Email</div>
-      </div>
-    </div>
-
-    <div class="tc" id="t-clean" data-hour="18" data-min="30" onclick="tap(this)">
-      <div class="ti">
-        <div class="chk"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4L4.5 7.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="tx">
-          <div class="tn">Clean House — 30 min reset</div>
-          <div class="tt">18:30 – 19:00 · Timer on. Stop when it rings.</div>
-          <div class="why">Environment is mindset. End the day clean.</div>
-        </div>
-        <div class="bdg b-home">Home</div>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="unlock-row" id="unlockRow" style="display:none" onclick="unlockEmails()">
-    <div>
-      <div style="font-size:15px;font-weight:600;color:var(--grn)">Sites are live — unlock emails 🔓</div>
-      <div style="font-size:12px;color:var(--t2);margin-top:2px">Tap when both websites are deployed</div>
-    </div>
-    <div style="font-size:18px;color:var(--t3)">›</div>
   </div>
 </div>
 
-<!-- QURAN SECTION -->
-<div class="sec">
-  <div class="sec-title">For Your 20 Minutes</div>
-  <div class="quran-card">
-    <div class="quran-arabic">وَالْعَصْرِ ۝ إِنَّ الْإِنسَانَ لَفِي خُسْرٍ ۝ إِلَّا الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ</div>
-    <div class="quran-trans">"By time — indeed, mankind is in loss. Except for those who have believed and done righteous deeds."</div>
-    <div class="quran-ref">Surah Al-Asr · 103:1–3</div>
-  </div>
-  <div style="background:var(--card);border-radius:var(--r);padding:14px 16px;margin-top:2px;">
-    <div style="font-size:14px;font-weight:500;margin-bottom:4px;">How to use 20 min</div>
-    <div style="font-size:13px;color:var(--t2);line-height:1.6;">Read Al-Asr slowly with translation. Sit with it. Then read any short surah you know by heart. End with: <em style="color:var(--t1)">"Bismillah — I start this day for something real."</em></div>
+<!-- BLOCKED EMAILS -->
+<div class="section">
+  <div class="section-label">Cold Emails · Blocked</div>
+  <div class="blocked-section" id="blockedSection">
+    <div class="blocked-header">
+      <div class="blocked-icon">🔒</div>
+      <div>
+        <div class="blocked-title">Blocked until sites are live</div>
+        <div class="blocked-sub" id="blockedSub">Complete both Build tasks to unlock</div>
+      </div>
+      <button class="blocked-unlock" id="unlockBtn" onclick="unlockEmails()">Unlock</button>
+    </div>
+    <div class="blocked-row" id="email-reiner" onclick="toggleBlocked(this)">
+      <div class="task-check"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4.5L4.5 8L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-body">
+        <div class="task-name">Cold Email — Reiner</div>
+        <div class="task-time">Draft → send. Don't polish forever.</div>
+      </div>
+      <div class="task-tag tag-money">Money</div>
+    </div>
+    <div class="blocked-row" id="email-ag" onclick="toggleBlocked(this)">
+      <div class="task-check"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4.5L4.5 8L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-body">
+        <div class="task-name">Cold Email — Arbeitgeber</div>
+        <div class="task-time">Copy Reiner structure. Adapt. Send.</div>
+      </div>
+      <div class="task-tag tag-money">Money</div>
+    </div>
+    <div class="blocked-row" id="email-pv" onclick="toggleBlocked(this)">
+      <div class="task-check"><svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4.5L4.5 8L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="task-body">
+        <div class="task-name">Cold Email — Personalvermittler</div>
+        <div class="task-time">Same rhythm. Send today.</div>
+      </div>
+      <div class="task-tag tag-money">Money</div>
+    </div>
   </div>
 </div>
 
 <!-- MEAL PLAN -->
-<div class="sec">
-  <div class="sec-title">Meal Plan — Feel Good, Stay Sharp</div>
-  <div class="meal-wrap">
-    <div class="meal-r">
-      <div class="meal-e">🍳</div>
-      <div class="tx"><div class="meal-n">Breakfast — Eggs + Avo Toast</div><div class="meal-m">3 scrambled eggs · avocado · whole grain bread · coffee</div></div>
-      <div class="meal-k">~480 kcal</div>
+<div class="section">
+  <div class="section-label">Meal Plan</div>
+  <div class="meal-group">
+    <div class="meal-row">
+      <div class="meal-emoji">🥚</div>
+      <div class="meal-body">
+        <div class="meal-name">Eggs + Avocado Toast</div>
+        <div class="meal-desc">Breakfast · Protein + healthy fats. No crash.</div>
+      </div>
+      <div class="meal-kcal">~450</div>
     </div>
-    <div class="meal-r">
-      <div class="meal-e">🍌</div>
-      <div class="tx"><div class="meal-n">Post-Gym — Yogurt + Banana</div><div class="meal-m">Greek yogurt 200g · banana · handful almonds</div></div>
-      <div class="meal-k">~320 kcal</div>
+    <div class="meal-row">
+      <div class="meal-emoji">🍗</div>
+      <div class="meal-body">
+        <div class="meal-name">Chicken Rice Bowl</div>
+        <div class="meal-desc">Lunch · Lean protein + complex carbs. Fuel for the build.</div>
+      </div>
+      <div class="meal-kcal">~620</div>
     </div>
-    <div class="meal-r">
-      <div class="meal-e">🍗</div>
-      <div class="tx"><div class="meal-n">Lunch — Chicken Rice Bowl</div><div class="meal-m">Chicken breast · jasmine rice · cucumber · cherry tomatoes · lemon + olive oil</div></div>
-      <div class="meal-k">~580 kcal</div>
-    </div>
-    <div class="meal-r">
-      <div class="meal-e">🐟</div>
-      <div class="tx"><div class="meal-n">Dinner — Salmon + Sweet Potato</div><div class="meal-m">Salmon fillet · roasted sweet potato · green beans · olive oil</div></div>
-      <div class="meal-k">~620 kcal</div>
-    </div>
-    <div class="meal-r">
-      <div class="meal-e">🍫</div>
-      <div class="tx"><div class="meal-n">Snack — Nuts + Dark Chocolate</div><div class="meal-m">Mixed nuts · 2 squares 70%+ dark chocolate</div></div>
-      <div class="meal-k">~200 kcal</div>
+    <div class="meal-row">
+      <div class="meal-emoji">🐟</div>
+      <div class="meal-body">
+        <div class="meal-name">Salmon + Sweet Potato</div>
+        <div class="meal-desc">Dinner · Omega-3 + slow carbs. Recovery mode.</div>
+      </div>
+      <div class="meal-kcal">~580</div>
     </div>
   </div>
 </div>
 
 <!-- SHOPPING LIST -->
-<div class="sec">
-  <div class="sec-title">Shopping List — 14 items</div>
-  <div class="shop-wrap">
-    <div class="shop-grid">
-      <div class="si" onclick="ts(this)"><div class="sc"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="sn">Eggs (6)</div></div>
-      <div class="si" onclick="ts(this)"><div class="sc"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="sn">Avocado (1)</div></div>
-      <div class="si" onclick="ts(this)"><div class="sc"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="sn">Vollkornbrot</div></div>
-      <div class="si" onclick="ts(this)"><div class="sc"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="sn">Greek yogurt 500g</div></div>
-      <div class="si" onclick="ts(this)"><div class="sc"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="sn">Bananas (3)</div></div>
-      <div class="si" onclick="ts(this)"><div class="sc"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="sn">Mixed nuts (small bag)</div></div>
-      <div class="si" onclick="ts(this)"><div class="sc"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="sn">Chicken breast 300g</div></div>
-      <div class="si" onclick="ts(this)"><div class="sc"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="sn">Jasmine rice 500g</div></div>
-      <div class="si" onclick="ts(this)"><div class="sc"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="sn">Cucumber (1)</div></div>
-      <div class="si" onclick="ts(this)"><div class="sc"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="sn">Cherry tomatoes</div></div>
-      <div class="si" onclick="ts(this)"><div class="sc"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="sn">Lemon (1)</div></div>
-      <div class="si" onclick="ts(this)"><div class="sc"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="sn">Salmon fillet 200g</div></div>
-      <div class="si" onclick="ts(this)"><div class="sc"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="sn">Sweet potatoes (2)</div></div>
-      <div class="si" onclick="ts(this)"><div class="sc"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="sn">Green beans 200g</div></div>
-      <div class="si" onclick="ts(this)"><div class="sc"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="sn">Dark chocolate 70%</div></div>
-      <div class="si" onclick="ts(this)"><div class="sc"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="sn">Olive oil (if needed)</div></div>
+<div class="section">
+  <div class="section-label">Shopping List</div>
+  <div class="shop-grid">
+    <div class="shop-item" onclick="toggleShop(this)">
+      <div class="shop-check"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="shop-name">Eggs (6)</div>
+    </div>
+    <div class="shop-item" onclick="toggleShop(this)">
+      <div class="shop-check"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="shop-name">Avocado (2)</div>
+    </div>
+    <div class="shop-item" onclick="toggleShop(this)">
+      <div class="shop-check"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="shop-name">Salmon fillet (200g)</div>
+    </div>
+    <div class="shop-item" onclick="toggleShop(this)">
+      <div class="shop-check"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="shop-name">Sweet potato (2)</div>
+    </div>
+    <div class="shop-item" onclick="toggleShop(this)">
+      <div class="shop-check"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="shop-name">Chicken thighs (2)</div>
+    </div>
+    <div class="shop-item" onclick="toggleShop(this)">
+      <div class="shop-check"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="shop-name">Rice (200g)</div>
+    </div>
+    <div class="shop-item" onclick="toggleShop(this)">
+      <div class="shop-check"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="shop-name">Broccoli</div>
+    </div>
+    <div class="shop-item" onclick="toggleShop(this)">
+      <div class="shop-check"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="shop-name">Greek yogurt</div>
+    </div>
+    <div class="shop-item" onclick="toggleShop(this)">
+      <div class="shop-check"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="shop-name">Mixed berries</div>
+    </div>
+    <div class="shop-item" onclick="toggleShop(this)">
+      <div class="shop-check"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="shop-name">Bananas</div>
+    </div>
+    <div class="shop-item" onclick="toggleShop(this)">
+      <div class="shop-check"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="shop-name">Garlic</div>
+    </div>
+    <div class="shop-item" onclick="toggleShop(this)">
+      <div class="shop-check"><svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 3.5L3.5 6L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="shop-name">Peanut butter</div>
     </div>
   </div>
+</div>
+
+<!-- QURAN / ISLAM -->
+<div class="section">
+  <div class="section-label">Soul · Quran</div>
+  <div class="quran-card">
+    <div class="quran-top">
+      <div class="quran-label">Daily Remembrance</div>
+      <div class="quran-streak" id="quranStreak">📿 0 days</div>
+    </div>
+    <div class="quran-ayah">إِنَّ مَعَ الْعُسْرِ يُسْرًا</div>
+    <div class="quran-ref">Surah Al-Inshirah 94:6 · "Indeed, with hardship comes ease."</div>
+    <button class="quran-btn" onclick="markQuran(this)">✓ Done for Today</button>
+  </div>
+</div>
+
+<!-- PUSH NOTIFICATIONS -->
+<div class="section">
+  <div class="section-label">Morning Reminder</div>
+  <button class="notify-btn" onclick="toggleNotify(this)">
+    <div class="notify-icon">🔔</div>
+    <div class="notify-body">
+      <div class="notify-title">Daily 8:00 AM Push</div>
+      <div class="notify-sub">Get notified when today's list is ready</div>
+    </div>
+    <div class="notify-status notify-off" id="notifyStatus">OFF</div>
+  </button>
 </div>
 
 <!-- PARKED -->
-<div class="sec">
-  <div class="sec-title">Parked — Not Today</div>
-  <div class="pk-tog" onclick="toggleP()">
-    <div class="pkl">
-      <div class="pk-icon">🗂</div>
-      <div><div class="pk-name">Vision &amp; Projects</div><div class="pk-ct">23 items — safe, not forgotten</div></div>
+<div class="section">
+  <div class="section-label">Parked · Not Today</div>
+  <div class="parked-card">
+    <div class="parked-toggle" onclick="toggleParked()">
+      <div class="parked-left">
+        <div class="parked-emoji">🗂</div>
+        <div>
+          <div class="parked-title">Vision & Projects</div>
+          <div class="parked-count">23 items — safe here, not forgotten</div>
+        </div>
+      </div>
+      <div class="parked-chev" id="parkedChev">›</div>
     </div>
-    <div class="ch" id="ch">›</div>
-  </div>
-  <div class="pk-list" id="pList">
-    <div class="pi"><div class="pd"></div><div class="pt">Brain (standalone)</div></div>
-    <div class="pi"><div class="pd"></div><div class="pt">Jarvis + Brain — Co-evolution engine</div></div>
-    <div class="pi"><div class="pd"></div><div class="pt">Jarvis → Co-evolution Engine — Refine vision + life plan</div></div>
-    <div class="pi"><div class="pd"></div><div class="pt">Launch Webuild / Digitalo Company</div></div>
-    <div class="pi"><div class="pd"></div><div class="pt">Make the 3-Sided Website</div></div>
-    <div class="pi"><div class="pd"></div><div class="pt">Website for Employer (planned)</div></div>
-    <div class="pi"><div class="pd"></div><div class="pt">Set up Manychat — Customers + Business Owners</div></div>
-    <div class="pi"><div class="pd"></div><div class="pt">Launch Meta-Ads for employers</div></div>
-    <div class="pi"><div class="pd"></div><div class="pt">Start the Company — Webuild/Digitalo</div></div>
-    <div class="pi"><div class="pd"></div><div class="pt">Framer Templates → Design Extractor Plugin → AI</div></div>
-    <div class="pi"><div class="pd"></div><div class="pt">Pre-Made sites → Extract → Template Library → Scale</div></div>
-    <div class="pi"><div class="pd"></div><div class="pt">Kentnissprüfung App, Site and Vids</div></div>
-    <div class="pi"><div class="pd"></div><div class="pt">Plan For Dr. Lashin</div></div>
-    <div class="pi"><div class="pd"></div><div class="pt">Plan for Webuild</div></div>
-    <div class="pi"><div class="pd"></div><div class="pt">Plan For Life</div></div>
-    <div class="pi"><div class="pd"></div><div class="pt">Claude + Higgsfield setup</div></div>
-    <div class="pi"><div class="pd"></div><div class="pt">Jarvis → Claude Hybrid Model (Notion bridge)</div></div>
-    <div class="pi"><div class="pd"></div><div class="pt">Startup video for Jarvis + fix app speed + design</div></div>
-    <div class="pi"><div class="pd"></div><div class="pt">Claude code as Jarvis coder via Notion</div></div>
-    <div class="pi"><div class="pd"></div><div class="pt">Download WhatsApp messages → Claude replies</div></div>
-    <div class="pi"><div class="pd"></div><div class="pt">Openclaw on old laptop</div></div>
-    <div class="pi"><div class="pd"></div><div class="pt">Redesign Home (Printer table, glass, balcony)</div></div>
-    <div class="pi"><div class="pd"></div><div class="pt">add stuff to home · sell Baba's furniture · clean daily</div></div>
-    <div class="pi"><div class="pd"></div><div class="pt">Figure out Claude design + system (stop re-prompting)</div></div>
-    <div class="pi"><div class="pd"></div><div class="pt">Best way to make Claude overpowered</div></div>
+    <div class="parked-body" id="parkedBody">
+      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Brain — Standalone knowledge system</div></div>
+      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Jarvis + Brain — Co-evolution engine, refine vision</div></div>
+      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Launch Webuild / Digitalo Company</div></div>
+      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Make the 3-Sided Website</div></div>
+      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Website for Employer</div></div>
+      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Set up Manychat — Customers + Business Owners</div></div>
+      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Launch Meta-Ads for employers</div></div>
+      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Start the Company that builds websites & systems</div></div>
+      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Framer Templates → Design Extractor Plugin → AI</div></div>
+      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Pre-Made sites → Extract → Template Library → Scale</div></div>
+      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Kentnissprüfung App, Site and Vids</div></div>
+      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Plan For Dr. Lashin</div></div>
+      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Plan for Webuild</div></div>
+      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Plan For Life</div></div>
+      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Claude + Higgsfield setup</div></div>
+      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Jarvis → Claude Hybrid Model (Notion bridge)</div></div>
+      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Startup video for Jarvis + fix app speed + design</div></div>
+      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Claude code as Jarvis coder via Notion</div></div>
+      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Download WhatsApp messages → Claude replies</div></div>
+      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Openclaw on old laptop</div></div>
+      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Redesign Home (Printer table, glass, balcony)</div></div>
+      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Sell Baba's furniture, add stuff to home</div></div>
+      <div class="parked-item"><div class="parked-dot"></div><div class="parked-text">Figure out Claude design + system so you stop re-prompting</div></div>
+    </div>
   </div>
 </div>
 
-<div class="mantra">
-  <p><strong>Surah Al-Asr is watching.</strong><br>
-  You are not in loss — you are executing.<br>
-  Day 1 starts today. Tomorrow it's Day 2.</p>
-</div>
-
-<div class="done-banner" id="doneBanner">
-  <div class="done-pill">🎯 Day complete. Alhamdulillah.</div>
-</div>
+<div style="height:40px"></div>
+</div><!-- end #app -->
 
 <script>
-const TOTAL = 9;
-const SK = 'adam_day_v3';
-
-// ── State management ──────────────────────────────────
-function today() { return new Date().toISOString().split('T')[0]; }
-function yesterday() {
-  const d = new Date(); d.setDate(d.getDate()-1);
-  return d.toISOString().split('T')[0];
-}
-
-let state = JSON.parse(localStorage.getItem(SK) || 'null');
-if (!state || state.date !== today()) {
-  const wasYest = state && state.date === yesterday() && state.completed;
-  state = { date: today(), streak: wasYest ? state.streak+1 : 1, checked:[], completed:false };
-  save();
-}
-
-function save() { localStorage.setItem(SK, JSON.stringify(state)); }
-
-// ── Restore checked state ─────────────────────────────
-window.addEventListener('DOMContentLoaded', () => {
-  state.checked.forEach(id => {
-    const el = document.getElementById(id);
-    if (el && !el.classList.contains('blocked')) el.classList.add('done');
-  });
-  updateProgress();
-  updateStreak();
-  updateClock();
-  setInterval(updateClock, 30000);
-  checkInstall();
-});
-
-// ── Task tap ──────────────────────────────────────────
-function tap(card) {
-  if (card.classList.contains('blocked')) return;
-  const wasDone = card.classList.contains('done');
-  card.classList.toggle('done');
-  if (!wasDone) {
-    ripple(card);
-    burst(card);
-    addChecked(card.id);
-  } else {
-    removeChecked(card.id);
-  }
-  updateProgress();
-}
-function addChecked(id) {
-  if (!state.checked.includes(id)) state.checked.push(id);
-  save();
-}
-function removeChecked(id) {
-  state.checked = state.checked.filter(x=>x!==id);
-  save();
-}
-
-// ── Ripple effect ─────────────────────────────────────
-function ripple(card) {
-  const ti = card.querySelector('.ti');
-  const r = document.createElement('div');
-  r.className = 'ripple';
-  r.style.cssText = 'width:100px;height:100px;left:50%;top:50%;margin:-50px 0 0 -50px;';
-  ti.appendChild(r);
-  setTimeout(() => r.remove(), 600);
-}
-
-// ── Burst animation ───────────────────────────────────
-function burst(card) {
-  const rect = card.getBoundingClientRect();
-  const cx = rect.left + rect.width/2;
-  const cy = rect.top + rect.height/2;
-  const colors = ['#30D158','#0A84FF','#FF9F0A','#BF5AF2'];
-  for (let i=0;i<12;i++) {
-    const p = document.createElement('div');
-    const angle = (i/12)*Math.PI*2;
-    const dist = 60+Math.random()*40;
-    p.style.cssText = `position:fixed;width:6px;height:6px;border-radius:50%;background:${colors[i%colors.length]};left:${cx}px;top:${cy}px;pointer-events:none;z-index:9999;transition:all .5s cubic-bezier(.2,.8,.4,1);`;
-    document.body.appendChild(p);
-    requestAnimationFrame(() => {
-      p.style.transform = `translate(${Math.cos(angle)*dist}px,${Math.sin(angle)*dist}px)`;
-      p.style.opacity = '0';
-    });
-    setTimeout(() => p.remove(), 600);
-  }
-}
-
-// ── Confetti ──────────────────────────────────────────
-function confetti() {
-  const colors=['#30D158','#0A84FF','#FF9F0A','#BF5AF2','#FF375F','#FFF'];
-  for(let i=0;i<80;i++){
-    setTimeout(()=>{
-      const e=document.createElement('div');
-      e.className='cp';
-      e.style.cssText=`left:${Math.random()*100}vw;top:-10px;background:${colors[Math.floor(Math.random()*colors.length)]};width:${Math.random()*10+4}px;height:${Math.random()*10+4}px;animation-delay:${Math.random()*.8}s;animation-duration:${Math.random()*1.2+1.2}s;`;
-      document.body.appendChild(e);
-      setTimeout(()=>e.remove(),2500);
-    },i*15);
-  }
-}
-
-// ── Progress ──────────────────────────────────────────
-function updateProgress() {
-  const active = document.querySelectorAll('#taskList .tc:not(.blocked)');
-  const done = Array.from(active).filter(c=>c.classList.contains('done')).length;
-  document.getElementById('pFill').style.width = (done/TOTAL*100)+'%';
-  document.getElementById('pLabel').textContent = done+' / '+TOTAL;
-
-  const b1 = document.getElementById('t-b1').classList.contains('done');
-  const b2 = document.getElementById('t-b2').classList.contains('done');
-  document.getElementById('unlockRow').style.display = (b1&&b2) ? 'flex' : 'none';
-
-  if (done===TOTAL && !state.completed) {
-    state.completed = true; save();
-    confetti();
-    setTimeout(()=>document.getElementById('doneBanner').classList.add('show'),700);
-  }
-  updateNow();
-}
-
-// ── Unlock emails ─────────────────────────────────────
-function unlockEmails() {
-  ['cold1','cold2','cold3'].forEach(id=>{
-    const c=document.getElementById(id);
-    c.classList.remove('blocked');
-    c.setAttribute('onclick','tap(this)');
-  });
-  document.getElementById('unlockRow').style.display='none';
-  document.getElementById('blkHdr').style.display='none';
-}
-
-// ── Streak display ────────────────────────────────────
-function updateStreak() {
-  const s = state.streak;
-  const el = document.getElementById('streakText');
-  if (s===1) el.textContent = 'Day 1 — Comeback';
-  else if (s<7) el.textContent = `Day ${s} 🔥`;
-  else if (s<30) el.textContent = `${s} Days 🔥`;
-  else el.textContent = `${s} Days 🏆`;
-}
-
-// ── Clock + Now indicator ─────────────────────────────
-const TASKS = [
-  {id:'t-islam', h:11,m:30, name:'Learn Islam — 20 min'},
-  {id:'t-gym',   h:12,m:0,  name:'Go Gym'},
-  {id:'t-shop',  h:13,m:15, name:'Shop — Groceries'},
-  {id:'t-jacket',h:13,m:45, name:'Put Jacket on eBay'},
-  {id:'t-wa',    h:14,m:0,  name:'Reply all WhatsApp'},
-  {id:'t-b1',    h:14,m:30, name:'Build: Personalvermittler site'},
-  {id:'t-b2',    h:16,m:0,  name:'Build: Arbeitgeber site'},
-  {id:'t-vid',   h:17,m:30, name:'Video für Arbeitgeber'},
-  {id:'t-clean', h:18,m:30, name:'Clean House'},
-];
-
-function updateClock() {
-  const now = new Date();
-  const h = now.getHours(), m = now.getMinutes();
-  document.getElementById('timePill').textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
-  updateNow(h,m);
-}
-
-function updateNow(h,m) {
-  const now = new Date();
-  const ch = h ?? now.getHours(), cm = m ?? now.getMinutes();
-  const nowMin = ch*60+cm;
-
-  // Remove all now highlights
-  document.querySelectorAll('.tc.now-task-card').forEach(c=>c.classList.remove('now-task-card'));
-
-  // Find next undone task
-  let found = null;
-  for (const t of TASKS) {
-    const card = document.getElementById(t.id);
-    if (!card || card.classList.contains('done')) continue;
-    found = t;
-    break;
-  }
-
-  // If current time is past the task's start
-  const nowEl = document.getElementById('nowBanner');
-  const nowTaskEl = document.getElementById('nowTask');
-  if (found) {
-    nowEl.style.display = 'flex';
-    nowTaskEl.textContent = found.name;
-    const card = document.getElementById(found.id);
-    if (card) card.classList.add('now-task-card');
-  } else {
-    nowEl.style.display = 'none';
-  }
-}
-
-// ── Shop toggle ───────────────────────────────────────
-function ts(item) { item.classList.toggle('got'); }
-
-// ── Parked toggle ─────────────────────────────────────
-function toggleP() {
-  document.getElementById('pList').classList.toggle('open');
-  document.getElementById('ch').classList.toggle('open');
-}
-
-// ── Install hint ──────────────────────────────────────
-function checkInstall() {
-  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  const isStandalone = window.navigator.standalone;
-  if (isIOS && !isStandalone) document.getElementById('installBanner').style.display='flex';
-}
-function showInstallTip() {
-  alert('To add to Home Screen:\n\n1. Tap the Share button (□↑) at the bottom of Safari\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add"\n\nNow it\'s one tap away every morning.');
-}
-
-// PIN LOCK
 const CORRECT_PIN = '0605';
-const PIN_SK = 'adam_pin_v1';
+const PIN_KEY = 'adam_pin_v1';
+const STATE_KEY = 'adam_ios_v2';
+const VAPID_PUBLIC = 'BAkRnXwUgj1gzn04jv2GCArscugp7Q_kb0vAP7ghTPHuOcDobGAQ61FXmiGoTMLEfjr_lvs3qwXKjIHFLK9tFwM';
+const WORKER_URL = 'WORKER_URL_PLACEHOLDER';
+
+// ── PIN LOGIC ──
 let pinEntry = '';
 
-(function() {
-  const stored = localStorage.getItem(PIN_SK);
-  const now = Date.now();
-  if (stored) {
-    const d = JSON.parse(stored);
-    // Unlocked for 12 hours
-    if (d.unlocked && (now - d.ts) < 12 * 60 * 60 * 1000) {
-      document.getElementById('pin-screen').style.display = 'none';
-      return;
+function checkPinSession() {
+  try {
+    const s = JSON.parse(localStorage.getItem(PIN_KEY) || '{}');
+    if (s.unlocked && Date.now() - s.unlocked < 12 * 60 * 60 * 1000) {
+      showApp(); return;
     }
-  }
-})();
+  } catch(e) {}
+  document.getElementById('pinScreen').style.display = 'flex';
+}
 
-function pinKey(k) {
+function pinPress(d) {
   if (pinEntry.length >= 4) return;
-  pinEntry += k;
-  updatePinDots();
+  pinEntry += d;
+  for (let i = 0; i < 4; i++) {
+    document.getElementById('d'+i).classList.toggle('filled', i < pinEntry.length);
+  }
   if (pinEntry.length === 4) {
-    setTimeout(checkPin, 80);
+    if (pinEntry === CORRECT_PIN) {
+      localStorage.setItem(PIN_KEY, JSON.stringify({unlocked: Date.now()}));
+      document.getElementById('pinScreen').style.transition = 'opacity 0.4s';
+      document.getElementById('pinScreen').style.opacity = '0';
+      setTimeout(showApp, 400);
+    } else {
+      document.getElementById('pinError').classList.add('show');
+      document.getElementById('pinScreen').style.animation = 'shake 0.4s ease';
+      setTimeout(() => {
+        pinEntry = '';
+        for (let i = 0; i < 4; i++) document.getElementById('d'+i).classList.remove('filled');
+        document.getElementById('pinError').classList.remove('show');
+        document.getElementById('pinScreen').style.animation = '';
+      }, 700);
+    }
   }
 }
 
 function pinDel() {
+  if (!pinEntry.length) return;
   pinEntry = pinEntry.slice(0, -1);
-  updatePinDots();
-}
-
-function updatePinDots() {
   for (let i = 0; i < 4; i++) {
-    const d = document.getElementById('pd' + i);
-    d.classList.toggle('filled', i < pinEntry.length);
-    d.classList.remove('error');
+    document.getElementById('d'+i).classList.toggle('filled', i < pinEntry.length);
   }
 }
 
-function checkPin() {
-  if (pinEntry === CORRECT_PIN) {
-    localStorage.setItem(PIN_SK, JSON.stringify({unlocked: true, ts: Date.now()}));
-    document.getElementById('pin-screen').style.display = 'none';
-  } else {
-    const dots = document.getElementById('pinDots');
-    for (let i = 0; i < 4; i++) {
-      document.getElementById('pd' + i).classList.add('error');
-    }
-    dots.classList.add('shake');
-    setTimeout(() => {
-      dots.classList.remove('shake');
-      pinEntry = '';
-      updatePinDots();
-    }, 400);
-  }
+function showApp() {
+  document.getElementById('pinScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  loadState();
+  updateUI();
 }
 
+// ── STATE ──
+function getState() {
+  try { return JSON.parse(localStorage.getItem(STATE_KEY) || '{}'); } catch(e) { return {}; }
+}
+function saveState(s) { localStorage.setItem(STATE_KEY, JSON.stringify(s)); }
 
-// Service Worker registration
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
+function loadState() {
+  const s = getState();
+  // Tasks
+  document.querySelectorAll('.task-row[data-id]').forEach(row => {
+    if (s.tasks && s.tasks[row.dataset.id]) row.classList.add('done');
   });
+  // Emails
+  ['email-reiner','email-ag','email-pv'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (s.emailsUnlocked) el.classList.add('unlocked');
+    if (s.emails && s.emails[id]) el.classList.add('done');
+  });
+  if (s.emailsUnlocked) {
+    document.getElementById('unlockBtn').style.display = 'none';
+  }
+  // Streak
+  const streak = s.streak || 1;
+  document.getElementById('streakNum').textContent = streak;
+  if (streak <= 1) document.getElementById('streakBar').classList.add('hidden');
+  // Quran
+  document.getElementById('quranStreak').textContent = '📿 ' + (s.quranStreak || 0) + ' days';
 }
 
+function updateUI() {
+  const rows = document.querySelectorAll('.task-row[data-id]');
+  const total = rows.length;
+  const done = Array.from(rows).filter(r => r.classList.contains('done')).length;
+  const pct = total ? Math.round((done / total) * 100) : 0;
+
+  // Ring
+  const circ = 188.5;
+  document.getElementById('ringFg').style.strokeDashoffset = circ - (circ * pct / 100);
+  document.getElementById('ringPct').textContent = pct + '%';
+
+  // Next task
+  const next = Array.from(rows).find(r => !r.classList.contains('done'));
+  if (next) {
+    document.getElementById('nextName').textContent = next.querySelector('.task-name').textContent;
+    document.getElementById('nextBar').style.display = 'flex';
+  } else {
+    document.getElementById('nextBar').style.display = 'none';
+  }
+
+  // Check if builds done → show unlock
+  const s = getState();
+  const buildDone = s.tasks && s.tasks['build-pv'] && s.tasks['build-ag'];
+  if (buildDone && !s.emailsUnlocked) {
+    document.getElementById('unlockBtn').style.display = 'flex';
+    document.getElementById('blockedSub').textContent = '✓ Both sites live — ready to send';
+  }
+
+  // All done?
+  if (done === total) {
+    setTimeout(() => {
+      document.getElementById('doneScreen').style.display = 'flex';
+      // Bump streak
+      const st = getState();
+      st.streak = (st.streak || 0) + 1;
+      st.completedToday = true;
+      saveState(st);
+    }, 600);
+  }
+}
+
+// ── TASK TOGGLE ──
+function toggleTask(row) {
+  const wasDone = row.classList.contains('done');
+  row.classList.toggle('done');
+  if (!wasDone) burst(row);
+  const s = getState();
+  if (!s.tasks) s.tasks = {};
+  s.tasks[row.dataset.id] = !wasDone;
+  saveState(s);
+  updateUI();
+}
+
+function toggleBlocked(row) {
+  if (!row.classList.contains('unlocked')) return;
+  const wasDone = row.classList.contains('done');
+  row.classList.toggle('done');
+  if (!wasDone) burst(row);
+  const s = getState();
+  if (!s.emails) s.emails = {};
+  s.emails[row.id] = !wasDone;
+  saveState(s);
+}
+
+function unlockEmails() {
+  ['email-reiner','email-ag','email-pv'].forEach(id => {
+    document.getElementById(id).classList.add('unlocked');
+  });
+  document.getElementById('unlockBtn').style.display = 'none';
+  document.getElementById('blockedSub').textContent = 'Sites are live — go send those emails';
+  const s = getState();
+  s.emailsUnlocked = true;
+  saveState(s);
+}
+
+// ── SHOP ──
+function toggleShop(item) {
+  item.classList.toggle('got');
+}
+
+// ── PARKED ──
+function toggleParked() {
+  const body = document.getElementById('parkedBody');
+  const chev = document.getElementById('parkedChev');
+  body.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+
+// ── QURAN ──
+function markQuran(btn) {
+  btn.textContent = '✓ Done — بارك الله فيك';
+  btn.style.background = 'rgba(52,199,89,0.25)';
+  btn.style.color = '#34C759';
+  btn.disabled = true;
+  const s = getState();
+  s.quranStreak = (s.quranStreak || 0) + 1;
+  saveState(s);
+  document.getElementById('quranStreak').textContent = '📿 ' + s.quranStreak + ' days';
+}
+
+// ── PUSH NOTIFICATIONS ──
+function urlBase64ToUint8Array(b64) {
+  const pad = '='.repeat((4 - b64.length % 4) % 4);
+  const raw = atob((b64 + pad).replace(/-/g, '+').replace(/_/g, '/'));
+  const out = new Uint8Array(raw.length);
+  for (let i = 0; i < raw.length; ++i) out[i] = raw.charCodeAt(i);
+  return out;
+}
+
+async function toggleNotify(btn) {
+  if (WORKER_URL === 'WORKER_URL_PLACEHOLDER') {
+    alert('Push notifications coming soon — Cloudflare setup pending.');
+    return;
+  }
+  const status = document.getElementById('notifyStatus');
+  if (status.classList.contains('notify-on')) {
+    // Unsubscribe
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.getSubscription();
+      if (sub) {
+        await fetch(WORKER_URL + '/subscribe', {method:'DELETE', headers:{'Content-Type':'application/json'}, body: JSON.stringify(sub)});
+        await sub.unsubscribe();
+      }
+    } catch(e) {}
+    status.textContent = 'OFF'; status.className = 'notify-status notify-off';
+    return;
+  }
+  try {
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') { alert('Notifications blocked — enable in Settings.'); return; }
+    const reg = await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC)
+    });
+    await fetch(WORKER_URL + '/subscribe', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(sub)
+    });
+    status.textContent = 'ON ✓'; status.className = 'notify-status notify-on';
+  } catch(e) {
+    alert('Could not enable notifications: ' + e.message);
+  }
+}
+
+// ── PARTICLE BURST ──
+function burst(el) {
+  const rect = el.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  const colors = ['#007AFF','#34C759','#AF52DE','#FF9500','#FFD60A'];
+  for (let i = 0; i < 12; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const angle = (i / 12) * 360;
+    const dist = 40 + Math.random() * 40;
+    p.style.cssText = `
+      left:${cx - 4}px; top:${cy - 4}px;
+      background:${colors[i % colors.length]};
+      --dx:${Math.cos(angle * Math.PI/180) * dist}px;
+      --dy:${Math.sin(angle * Math.PI/180) * dist}px;
+    `;
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 700);
+  }
+}
+
+// ── DATE ──
+function setDate() {
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const now = new Date();
+  document.getElementById('greetLabel').textContent = days[now.getDay()] + ' · ' + months[now.getMonth()] + ' ' + now.getDate();
+  const h = now.getHours();
+  const greet = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('dateLabel').textContent = greet + ', Adam';
+}
+
+// ── SERVICE WORKER ──
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
+
+// ── INIT ──
+setDate();
+checkPinSession();
 </script>
+
+<style>
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20% { transform: translateX(-12px); }
+  40% { transform: translateX(12px); }
+  60% { transform: translateX(-8px); }
+  80% { transform: translateX(8px); }
+}
+</style>
 </body>
 </html>
