@@ -26,7 +26,7 @@ body.dark{--bg:#000;--card:#1C1C1E;--text:#FFF;--text2:#EBEBF5CC;--text3:#EBEBF5
 body.dark .sidebar,body.dark .tab-bar{background:#111}
 
 /* ── LAYOUT ── */
-#shell{display:flex;flex-direction:row;height:100dvh;overflow:hidden}
+#shell{display:flex;flex-direction:row;height:100dvh;overflow:hidden;padding-top:env(safe-area-inset-top,0px);box-sizing:border-box}
 .sidebar{display:none;width:var(--sidebar-w);flex-direction:column;align-items:center;background:var(--card);border-right:1px solid var(--sep);padding:20px 0 20px;gap:4px;flex-shrink:0}
 .s-logo{font-size:20px;font-weight:700;color:var(--orange);margin-bottom:12px}
 .s-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 6px;border-radius:12px;border:none;background:none;color:var(--text3);cursor:pointer;width:56px}
@@ -38,7 +38,7 @@ body.dark .sidebar,body.dark .tab-bar{background:#111}
 .pages{flex:1;overflow:hidden;position:relative}
 .page{position:absolute;inset:0;overflow-y:auto;opacity:0;transform:translateY(12px);transition:opacity .22s,transform .22s;pointer-events:none;padding-bottom:calc(var(--tab-h) + var(--safe-bot) + 20px)}
 .page.active{opacity:1;transform:none;pointer-events:auto}
-.tab-bar{position:relative;z-index:100;height:calc(var(--tab-h) + var(--safe-bot));background:var(--card);border-top:1px solid var(--sep);display:flex;align-items:flex-start;padding-top:10px}
+.tab-bar{position:fixed;bottom:0;left:0;right:0;z-index:100;height:calc(var(--tab-h) + var(--safe-bot));background:var(--card);border-top:1px solid var(--sep);display:flex;align-items:flex-start;padding-top:10px}
 .t-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--text3);cursor:pointer;padding:0 4px}
 .t-btn svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .t-btn span{font-size:10px;font-weight:500}
@@ -550,7 +550,7 @@ body.dark .banner{background:#2C2C2E}
       <span class="me-row-val">→</span>
     </div>
   </div>
-  <div style="padding:16px 20px 20px;text-align:center;font-size:12px;color:var(--text3)">Do It · v2.8 · <span id="buildDate"></span></div>
+  <div style="padding:16px 20px 20px;text-align:center;font-size:12px;color:var(--text3)">Do It · v2.9 · <span id="buildDate"></span></div>
   <div style="height:20px"></div>
 </div>
 
@@ -956,10 +956,24 @@ async function toggleNotify(){
 async function testPush(){
   const el=document.getElementById('testPushVal');el.textContent='…';
   try{
+    // First ensure local subscription is synced to CF KV
+    if('serviceWorker' in navigator&&window.PushManager){
+      try{
+        const reg=await navigator.serviceWorker.ready;
+        const sub=await reg.pushManager.getSubscription();
+        if(sub){
+          // Re-save to KV (idempotent — overwrites stale entry)
+          await fetch(WORKER+'/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub)}).catch(()=>{});
+          // Update badge
+          const b=document.getElementById('notifyBadge');
+          if(b&&!b.classList.contains('on')){b.textContent='ON ✓';b.className='notify-badge on';const sl=document.getElementById('notifySub');if(sl)sl.textContent='Daily push at 8:00 AM enabled';}
+        }
+      }catch(e){}
+    }
     const d=await(await fetch(WORKER+'/notify',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer adam_notify_2026'},body:JSON.stringify({title:'Do It ⚡',body:'Test — push is working!'})})).json();
-    if(d.sent>0){el.textContent='✓';el.style.color='var(--green)';toast('🔔','Push sent — check your phone');}
-    else{el.textContent='✗';el.style.color='var(--red)';toast('⚠️','Enable notifications first (Daily Push above)');}
-  }catch(e){el.textContent='err';}
+    if(d.sent>0){el.textContent='✓';el.style.color='var(--green)';toast('🔔','Push sent — check your phone!');}
+    else{el.textContent='✗';el.style.color='var(--red)';toast('⚠️','No active subscription — tap Daily Push first');}
+  }catch(e){el.textContent='err';toast('⚠️','Network error: '+e.message);}
   setTimeout(()=>{el.textContent='→';el.style.color='';},4000);
 }
 
@@ -1003,27 +1017,4 @@ function init(){
   // Quran
   document.getElementById('quranStreak').textContent=(s.quranStreak||0)+' days';
   // Notify badge
-  if(navigator.serviceWorker&&window.PushManager){
-    navigator.serviceWorker.ready.then(reg=>reg.pushManager.getSubscription()).then(sub=>{
-      if(sub){const b=document.getElementById('notifyBadge');b.textContent='ON ✓';b.className='notify-badge on';const sl=document.getElementById('notifySub');if(sl)sl.textContent='Daily push at 8:00 AM enabled';}
-    }).catch(()=>{});
-  }
-  updateBanner();checkBuilds();refreshMeStats();
-  // Service worker — push-only, no caching
-  if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('/sw.js').then(reg=>{
-      reg.update(); // Check for new SW immediately
-      reg.addEventListener('updatefound',()=>{
-        const nw=reg.installing;
-        nw.addEventListener('statechange',()=>{
-          if(nw.state==='activated'&&navigator.serviceWorker.controller) window.location.reload();
-        });
-      });
-    }).catch(()=>{});
-  }
-}
-
-init();
-</script>
-</body>
-</html>
+  if(navigator.servi
